@@ -1,5 +1,6 @@
 ﻿using TaleWorlds.CampaignSystem;
 using HarmonyLib;
+using System;
 
 namespace MarryAnyone
 {
@@ -12,7 +13,10 @@ namespace MarryAnyone
             {
                 return false;
             }
-            return true;
+            else
+            {
+                return true;
+            }
         }
     }
 }
