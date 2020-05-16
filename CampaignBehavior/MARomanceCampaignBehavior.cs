@@ -30,7 +30,7 @@ namespace MarryAnyone
 
         private bool courtship_hero_not_noble_on_condition()
         {
-            return !(Hero.OneToOneConversationHero != null && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero));
+            return Hero.OneToOneConversationHero != null && !(Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero);
         }
 
         private bool conversation_finalize_courtship_for_hero_on_condition()
