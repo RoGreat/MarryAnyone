@@ -102,7 +102,7 @@
     <Compile Include="Harmony\Transpilers\GetListItemsPatch.cs" />
     <Compile Include="Harmony\Transpilers\RefreshMembersList.cs" />
     <Compile Include="CampaignBehavior\MARomanceCampaignBehavior.cs" />
-    <Compile Include="CampaignBehavior\MAConversationsCampaignBehavior.cs" />
+    <Compile Include="CampaignBehavior\MALordConversationsCampaignBehavior.cs" />
     <Compile Include="Harmony\Prefixes\ConversationPlayerCanOpenCourtshipOnConditionPatch.cs" />
     <Compile Include="NoHarmony\MADefaultMarriageModel.cs" />
     <Compile Include="NoHarmony\MASubModule.cs" />

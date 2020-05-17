@@ -16,6 +16,8 @@ namespace MarryAnyone
             starter.AddPlayerLine("hero_romance_task_pt3a", "hero_main_options", "hero_courtship_final_barter", "{=2aW6NC3Q}Let us discuss the final terms of our marriage.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), null, 120, null, null);
 
             starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition_companion), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_stage_2_success_on_consequence_companion), 140, null);
+
+
         }
 
         private bool courtship_hero_not_noble_on_condition()

@@ -3,7 +3,7 @@ using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone
 {
-    class MAConversationsCampaignBehavior : CampaignBehaviorBase
+    class MALordConversationsCampaignBehavior : CampaignBehaviorBase
     {
         protected void AddDialogs(CampaignGameStarter starter)
         {
@@ -12,7 +12,7 @@ namespace MarryAnyone
 
         private bool conversation_hero_main_options_discussions()
         {
-            return Hero.OneToOneConversationHero != null && (Hero.OneToOneConversationHero.IsPlayerCompanion || Hero.OneToOneConversationHero.IsNotable);
+            return Hero.OneToOneConversationHero != null && ((Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion) || Hero.OneToOneConversationHero.IsNotable);
         }
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)

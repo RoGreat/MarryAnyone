@@ -46,7 +46,7 @@ namespace MarryAnyone
 
         private void AddBehaviors(CampaignGameStarter gameInitializer)
         {
-            gameInitializer.AddBehavior(new MAConversationsCampaignBehavior());
+            gameInitializer.AddBehavior(new MALordConversationsCampaignBehavior());
             gameInitializer.AddBehavior(new MARomanceCampaignBehavior());
         }
     }
