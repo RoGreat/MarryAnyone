@@ -100,7 +100,7 @@
   <ItemGroup>
     <Compile Include="Harmony\Prefixes\LeaveEncounterPatch.cs" />
     <Compile Include="Harmony\Transpilers\GetListItemsPatch.cs" />
-    <Compile Include="Harmony\Transpilers\RefreshMembersList.cs" />
+    <Compile Include="Harmony\Transpilers\RefreshMembersListPatch.cs" />
     <Compile Include="CampaignBehavior\MARomanceCampaignBehavior.cs" />
     <Compile Include="CampaignBehavior\MALordConversationsCampaignBehavior.cs" />
     <Compile Include="Harmony\Prefixes\ConversationPlayerCanOpenCourtshipOnConditionPatch.cs" />
