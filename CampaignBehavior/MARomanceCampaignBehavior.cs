@@ -34,7 +34,7 @@ namespace MarryAnyone
         private void conversation_courtship_stage_2_success_on_consequence_companion()
         {
             ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Marriage);
-            PlayerEncounter.LeaveEncounter = true;
+            Hero.OneToOneConversationHero.CompanionOf = null;
         }
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
