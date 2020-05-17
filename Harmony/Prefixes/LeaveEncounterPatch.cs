@@ -1,6 +1,5 @@
 ﻿using TaleWorlds.CampaignSystem;
 using HarmonyLib;
-using System;
 
 namespace MarryAnyone
 {
@@ -9,7 +8,7 @@ namespace MarryAnyone
     {
         private static bool Prefix()
         {
-            if (Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.IsPlayerCompanion)
+            if (Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.IsWanderer)
             {
                 return false;
             }
