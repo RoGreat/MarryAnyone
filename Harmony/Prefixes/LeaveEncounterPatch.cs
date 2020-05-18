@@ -3,7 +3,7 @@ using HarmonyLib;
 
 namespace MarryAnyone
 {
-    [HarmonyPatch(typeof(PlayerEncounter), "set_LeaveEncounter")]
+    [HarmonyPatch(typeof(PlayerEncounter), "LeaveEncounter", MethodType.Setter)]
     class LeaveEncounterPatch
     {
         private static bool Prefix()
