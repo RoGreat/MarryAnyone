@@ -21,7 +21,7 @@ namespace MarryAnyone
                 if (codes[i].opcode == OpCodes.Callvirt
                     && codes[i].operand is MethodInfo && (codes[i].operand as MethodInfo) == AccessTools.PropertyGetter(typeof(Clan), "Nobles"))
                 {
-                    codes[i].operand = AccessTools.PropertyGetter(typeof(Clan), nameof(Clan.Heroes));
+                    codes[i].operand = AccessTools.PropertyGetter(typeof(Clan), "Heroes");
                     break;
                 }
             }
