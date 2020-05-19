@@ -13,13 +13,13 @@ namespace MarryAnyone
         [HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
-            var instructionsList = instructions.ToList();
-            for (var i = 0; i < instructionsList.Count; i++)
+            var codes = instructions.ToList();
+            for (int i = 0; i < codes.Count; i++)
             {
-                var instruction = instructionsList[i];
+                var instruction = codes[i];
                 yield return instruction;
                 if (instruction.opcode == OpCodes.Brfalse_S
-                    && instructionsList[i-1].operand is MethodInfo && (instructionsList[i-1].operand as MethodInfo) == AccessTools.PropertyGetter(typeof(Hero), "IsWanderer"))
+                    && codes[i-1].operand is MethodInfo && (codes[i-1].operand as MethodInfo) == AccessTools.PropertyGetter(typeof(Hero), "IsWanderer"))
                 {
                     yield return new CodeInstruction(OpCodes.Ldloc_1);
                     yield return new CodeInstruction(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(Hero), "Spouse"));
