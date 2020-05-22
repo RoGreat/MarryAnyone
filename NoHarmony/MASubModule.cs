@@ -8,6 +8,10 @@ namespace MarryAnyone
 {
     class MASubModule : NoHarmonyLoader
     {
+        public static bool IsPolyamorous = true;
+
+        public static bool IsIncestual = true;
+
         public override void NoHarmonyInit()
         {
             LogFile = "MANoHarmony";
@@ -19,6 +23,7 @@ namespace MarryAnyone
         {
             ReplaceModel<MADefaultMarriageModel, DefaultMarriageModel>();
         }
+
 
         protected override void OnSubModuleLoad()
         {

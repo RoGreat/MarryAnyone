@@ -9,7 +9,7 @@ namespace MarryAnyone
     {
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            if (maidenOrSuitor.Spouse != null || maidenOrSuitor.IsTemplate)
+            if ((maidenOrSuitor.Spouse != null && !MASubModule.IsPolyamorous) || maidenOrSuitor.IsTemplate) // If there is a spouse and is not polyamorous, then not suitable for marriage
             {
                 return false;
             }
@@ -30,6 +30,10 @@ namespace MarryAnyone
             if (hero != null)
             {
                 yield return hero;
+                if (MASubModule.IsIncestual)
+                {
+                    yield break;
+                }
                 if (n > 0)
                 {
                     foreach (Hero hero2 in DiscoverAncestors(hero.Mother, n - 1))

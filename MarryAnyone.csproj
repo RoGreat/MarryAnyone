@@ -44,6 +44,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.InteropServices.RuntimeInformation" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -80,11 +81,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CampaignBehavior\MARomanceCampaignBehavior.cs" />
+    <Compile Include="Harmony\Prefixes\DailyTickHeroPatch.cs" />
+    <Compile Include="Harmony\Prefixes\ConversationRomanceAtStagesOneAndTwoDiscussionOnConditionPatches.cs" />
     <Compile Include="Harmony\Prefixes\LeaveEncounterPatch.cs" />
+    <Compile Include="Harmony\Prefixes\EndAllCourtshipsPatch.cs" />
     <Compile Include="Harmony\Transpilers\CreateNewHeroPatch.cs" />
     <Compile Include="Harmony\Transpilers\GetListItemsPatch.cs" />
+    <Compile Include="Harmony\Transpilers\GetHeroRelationToHeroTextShortPatch.cs" />
     <Compile Include="Harmony\Transpilers\RefreshMembersListPatch.cs" />
-    <Compile Include="CampaignBehavior\MARomanceCampaignBehavior.cs" />
     <Compile Include="CampaignBehavior\MALordConversationsCampaignBehavior.cs" />
     <Compile Include="Harmony\Prefixes\ConversationPlayerCanOpenCourtshipOnConditionPatch.cs" />
     <Compile Include="NoHarmony\MADefaultMarriageModel.cs" />
