@@ -18,10 +18,14 @@ namespace MarryAnyone
             {
                 var instruction = codes[i];
                 yield return instruction;
-                if (instruction.opcode == OpCodes.Ldloc_0
-                    && codes[i-1].operand is FieldInfo && (codes[i-1].operand as FieldInfo) == AccessTools.Field(typeof(Hero), "_spouse"))
+                if (instruction.opcode == OpCodes.Brfalse_S
+                    && codes[i+2].operand is FieldInfo && (codes[i+2].operand as FieldInfo) == AccessTools.Field(typeof(Hero), "_exSpouses"))
                 {
-                    yield return new CodeInstruction(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(Hero), "IsAlive"));
+                    yield return new CodeInstruction(OpCodes.Ldarg_0);
+                    yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Hero), "_exSpouses"));
+                    yield return new CodeInstruction(OpCodes.Ldloc_0);
+                    yield return new CodeInstruction(OpCodes.Callvirt, AccessTools.Method(typeof(List<Hero>), "Contains"));
+                    yield return new CodeInstruction(OpCodes.Brtrue_S, instruction.operand);
                 }
             }
         }

@@ -4,49 +4,77 @@ using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using System.Linq;
 using System.Collections.Generic;
 using TaleWorlds.Core;
+using System;
+using System.Diagnostics;
 
 namespace MarryAnyone
 {
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "DailyTickHero")]
-    class DailyTickHeroPatch
+    internal class DailyTickHeroPatch
     {
-        private static void Prefix(Hero hero)
+
+        //public static int Index;
+
+        public static List<Hero> Spouses;
+
+        static void Prefix(Hero hero)
         {
-            _spouses = new List<Hero>();
-            if (hero.IsFemale && hero.IsAlive && hero.Age > 18f) // Standard check
+            Spouses = new List<Hero>();
+            if (hero.IsFemale && hero.IsAlive && hero.Age > 18f) // Is a woman
             {
-                if (hero.ExSpouses != null && hero.ExSpouses.Any()) // If there is an ExSpouse
+                if (hero == Hero.MainHero)  // Is the main hero
                 {
-                    foreach (Hero spouse in hero.ExSpouses)
+                    InformationManager.DisplayMessage(new InformationMessage("Main Hero: " + hero.Name));
+                    if (hero.Spouse != null && hero.Spouse.IsAlive) // If the woman's Spouse in question exists
                     {
-                        if (!_spouses.Contains(spouse)) // If spouse is not already one of multiple spouses
+                        Spouses.Add(hero.Spouse); // Add current Spouse to spouses
+                        InformationManager.DisplayMessage(new InformationMessage("Adding Spouse: " + hero.Spouse.Name));
+                    }
+                    if (hero.ExSpouses.Any()) // If woman has any ExSpouse(s)
+                    {
+                        foreach (Hero exSpouse in hero.ExSpouses)
                         {
-                            _spouses.Add(spouse);
-                            InformationManager.DisplayMessage(new InformationMessage("Adding Spouse"));
+                            if (!Spouses.Contains(exSpouse) && exSpouse.IsAlive) // If exSpouse(s) in question exists
+                            {
+                                Spouses.Add(exSpouse);
+                                InformationManager.DisplayMessage(new InformationMessage("Adding ExSpouse: " + exSpouse.Name));
+                            }
                         }
-                        if (spouse.IsDead)  // If spouse is dead
+                    }
+                    if (Spouses.Any()) // If there is/are spouse(s) in spouses
+                    {
+                        Random random = new Random();
+                        hero.Spouse = Spouses.ElementAt(random.Next(Spouses.Count));   // Set Spouse at current element of spouses
+                        if (hero.Spouse != null)
                         {
-                            _spouses.Remove(spouse);
-                            InformationManager.DisplayMessage(new InformationMessage("Removing Spouse"));
+                            InformationManager.DisplayMessage(new InformationMessage("Assigning Spouse: " + hero.Spouse.Name));
                         }
                     }
                 }
-                if (_spouses != null && _spouses.Any()) // If there is multiple spouses
+                else
                 {
-                    if (i > _spouses.Count - 1)
+                    if (hero == Hero.MainHero.Spouse || Hero.MainHero.ExSpouses.Contains(hero))
                     {
-                        i = 0;
+                        InformationManager.DisplayMessage(new InformationMessage("Not Main Hero: " + hero.Name));
+                        if (hero == Hero.MainHero.Spouse)
+                        {
+                            if (hero.Spouse != null)
+                            {
+                                InformationManager.DisplayMessage(new InformationMessage("Spouse: " + hero.Name));
+                            }
+                        }
+                        if (Hero.MainHero.ExSpouses.Contains(hero))
+                        {
+                            InformationManager.DisplayMessage(new InformationMessage("ExSpouse: " + hero.Name));
+                        }
+                        hero.Spouse = Hero.MainHero;             
+                        if (hero.Spouse != null)
+                        {
+                            InformationManager.DisplayMessage(new InformationMessage("Assigning Spouse: " + hero.Spouse.Name));
+                        }
                     }
-                    hero.Spouse = _spouses.ElementAt(i);
-                    InformationManager.DisplayMessage(new InformationMessage("Assigning Spouse"));
-                    InformationManager.DisplayMessage(new InformationMessage("Index " + i));
-                    i++;
                 }
             }
         }
-
-        private static int i = 0;
-
-        private static List<Hero> _spouses;
     }
 }

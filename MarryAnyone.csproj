@@ -86,6 +86,7 @@
     <Compile Include="Harmony\Prefixes\ConversationRomanceAtStagesOneAndTwoDiscussionOnConditionPatches.cs" />
     <Compile Include="Harmony\Prefixes\LeaveEncounterPatch.cs" />
     <Compile Include="Harmony\Prefixes\EndAllCourtshipsPatch.cs" />
+    <Compile Include="Harmony\Transpilers\SpousePatchv2.cs" />
     <Compile Include="Harmony\Transpilers\CreateNewHeroPatch.cs" />
     <Compile Include="Harmony\Transpilers\GetListItemsPatch.cs" />
     <Compile Include="Harmony\Transpilers\GetHeroRelationToHeroTextShortPatch.cs" />

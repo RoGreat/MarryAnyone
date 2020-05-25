@@ -1,12 +1,15 @@
 ﻿using HarmonyLib;
 using NoHarmony;
+using System;
+using System.Diagnostics;
+using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
 
 namespace MarryAnyone
 {
-    class MASubModule : NoHarmonyLoader
+    internal class MASubModule : NoHarmonyLoader
     {
         public static bool IsPolyamorous = true;
 
