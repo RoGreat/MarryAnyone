@@ -25,16 +25,16 @@ namespace MarryAnyone
                 if (hero == Hero.MainHero)  // Is the main hero
                 {
                     InformationManager.DisplayMessage(new InformationMessage("Main Hero: " + hero.Name));
-                    if (hero.Spouse != null && hero.Spouse.IsAlive) // If the woman's Spouse in question exists
+                    if (!hero.ExSpouses.Contains(hero.Spouse) && hero.Spouse != null && hero.Spouse.IsAlive) // If the woman's Spouse in question exists
                     {
                         Spouses.Add(hero.Spouse); // Add current Spouse to spouses
                         InformationManager.DisplayMessage(new InformationMessage("Adding Spouse: " + hero.Spouse.Name));
                     }
-                    if (hero.ExSpouses.Any()) // If woman has any ExSpouse(s)
+                    else if (hero.ExSpouses.Any()) // If woman has any ExSpouse(s)
                     {
                         foreach (Hero exSpouse in hero.ExSpouses)
                         {
-                            if (!Spouses.Contains(exSpouse) && exSpouse.IsAlive) // If exSpouse(s) in question exists
+                            if (exSpouse.IsAlive) // If exSpouse(s) in question exists
                             {
                                 Spouses.Add(exSpouse);
                                 InformationManager.DisplayMessage(new InformationMessage("Adding ExSpouse: " + exSpouse.Name));
