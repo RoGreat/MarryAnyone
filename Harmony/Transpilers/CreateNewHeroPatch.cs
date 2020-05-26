@@ -8,10 +8,10 @@ using TaleWorlds.CampaignSystem;
 namespace MarryAnyone
 {
     [HarmonyPatch(typeof(HeroCreator), "CreateNewHero")]
-    public static class CreateNewHeroPatch
+    internal static class CreateNewHeroPatch
     {
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             var codes = instructions.ToList();
             for (int i = 0; i < codes.Count; i++)

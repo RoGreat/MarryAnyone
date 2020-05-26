@@ -5,7 +5,7 @@ using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 namespace MarryAnyone
 {
     [HarmonyPatch(typeof(RomanceCampaignBehavior))]
-    class ConversationRomanceAtStagesOneAndTwoDiscussionOnConditionPatches
+    internal class ConversationRomanceAtStagesOneAndTwoDiscussionOnConditionPatches
     {
         [HarmonyPrefix]
         [HarmonyPatch("conversation_romance_at_stage_1_discussions_on_condition")]

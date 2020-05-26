@@ -2,14 +2,17 @@
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
+using TaleWorlds.Core;
 
 namespace MarryAnyone
 {
-    class MADefaultMarriageModel : DefaultMarriageModel
+    internal class MADefaultMarriageModel : DefaultMarriageModel
     {
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            if ((maidenOrSuitor.Spouse != null && !MASubModule.IsPolyamorous) || maidenOrSuitor.IsTemplate) // If there is a spouse and is not polyamorous, then not suitable for marriage
+            bool IsPolyamorous = !MASubModule.IsPolyamorous && (maidenOrSuitor != Hero.MainHero || maidenOrSuitor != Hero.OneToOneConversationHero);
+
+            if ((maidenOrSuitor.Spouse != null && IsPolyamorous) || maidenOrSuitor.IsTemplate)
             {
                 return false;
             }
@@ -22,7 +25,23 @@ namespace MarryAnyone
 
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
-            return firstHero.IsFemale != secondHero.IsFemale && !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+            bool IsMainHeroRelated = firstHero == Hero.MainHero || firstHero == Hero.OneToOneConversationHero || secondHero == Hero.MainHero || secondHero == Hero.OneToOneConversationHero;
+            bool IsHomosexual = MASubModule.IsHomosexual && IsMainHeroRelated;
+            bool IsBisexual = MASubModule.IsBisexual && IsMainHeroRelated;
+            bool IsIncestual = MASubModule.IsIncestual && IsMainHeroRelated;
+
+            if (IsHomosexual)
+            {
+                InformationManager.DisplayMessage(new InformationMessage("Homosexual"));
+                return firstHero.IsFemale == secondHero.IsFemale && !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && this.IsSuitableForMarriage(firstHero) && this.IsSuitableForMarriage(secondHero);
+            }
+            if (IsBisexual)
+            {
+                InformationManager.DisplayMessage(new InformationMessage("Bisexual"));
+                return !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && this.IsSuitableForMarriage(firstHero) && this.IsSuitableForMarriage(secondHero);
+            }
+            InformationManager.DisplayMessage(new InformationMessage("Heterosexual"));
+            return firstHero.IsFemale != secondHero.IsFemale && (IsIncestual || !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>()) && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
         }
 
         private IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)
@@ -30,10 +49,6 @@ namespace MarryAnyone
             if (hero != null)
             {
                 yield return hero;
-                if (MASubModule.IsIncestual)
-                {
-                    yield break;
-                }
                 if (n > 0)
                 {
                     foreach (Hero hero2 in DiscoverAncestors(hero.Mother, n - 1))

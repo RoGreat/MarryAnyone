@@ -4,7 +4,7 @@ using TaleWorlds.CampaignSystem.Actions;
 
 namespace MarryAnyone
 {
-    class MARomanceCampaignBehavior : CampaignBehaviorBase
+    internal class MARomanceCampaignBehavior : CampaignBehaviorBase
     {
         protected void AddDialogs(CampaignGameStarter starter)
         {

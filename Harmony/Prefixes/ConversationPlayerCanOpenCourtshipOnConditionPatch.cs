@@ -6,7 +6,7 @@ using TaleWorlds.Localization;
 namespace MarryAnyone
 {
     [HarmonyPatch(typeof(RomanceCampaignBehavior), "conversation_player_can_open_courtship_on_condition")]
-    class ConversationPlayerCanOpenCourtshipOnConditionPatch
+    internal class ConversationPlayerCanOpenCourtshipOnConditionPatch
     {
         private static bool Prefix(ref bool __result)
         {
@@ -16,6 +16,12 @@ namespace MarryAnyone
 
         private static bool conversation_player_can_open_courtship_on_condition()
         {
+            bool IsHeterosexual = MASubModule.IsHeterosexual;
+            bool IsHomosexual = MASubModule.IsHomosexual;
+            bool IsBisexual = MASubModule.IsBisexual;
+
+            bool flag = Hero.MainHero.IsFemale && IsHeterosexual || !Hero.MainHero.IsFemale && IsHomosexual || !Hero.OneToOneConversationHero.IsFemale && IsBisexual;
+
             if (Hero.OneToOneConversationHero == null)
             {
                 return false;
@@ -25,14 +31,14 @@ namespace MarryAnyone
                 if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
-                        Hero.MainHero.IsFemale
+                        flag
                             ? "{=bjJs0eeB}My lord, I note that you have not yet taken a wife."
                             : "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer", false);
                 }
                 else
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
-                        Hero.MainHero.IsFemale
+                        flag
                             ? "{=bjJs0eeB}Goodman, I note that you have not yet taken a wife."
                             : "{=v1hC6Aem}Goodwife, I wish to profess myself your most ardent admirer", false);
                 }
@@ -43,14 +49,14 @@ namespace MarryAnyone
                 if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
-                        Hero.MainHero.IsFemale
+                        flag
                             ? "{=2WnhUBMM}My lord, may you give me another chance to prove myself?"
                             : "{=4iTaEZKg}My lady, may you give me another chance to prove myself?", false);
                 }
                 else
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
-                        Hero.MainHero.IsFemale
+                        flag
                             ? "{=2WnhUBMM}Goodman, may you give me another chance to prove myself?"
                             : "{=4iTaEZKg}Goodwife, may you give me another chance to prove myself?", false);
                 }

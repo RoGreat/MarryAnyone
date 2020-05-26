@@ -9,10 +9,10 @@ using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
 namespace MarryAnyone
 {
     [HarmonyPatch(typeof(ClanMembersVM), "RefreshMembersList")]
-    public static class RefreshMembersListPatch
+    internal static class RefreshMembersListPatch
     {
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             var codes = instructions.ToList();
             for (int i = 0; i < codes.Count; i++)

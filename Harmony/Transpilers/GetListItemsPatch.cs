@@ -9,10 +9,10 @@ using TaleWorlds.CampaignSystem.Encyclopedia.Pages;
 namespace MarryAnyone
 {
     [HarmonyPatch(typeof(DefaultEncyclopediaHeroPage), "GetListItems")]
-    public static class GetListItemsPatch
+    internal static class GetListItemsPatch
     {
         [HarmonyTranspiler]
-        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
         {
             int startIndex = -1, endIndex = -1;
             bool nextState = false;

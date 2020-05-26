@@ -3,7 +3,7 @@ using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone
 {
-    class MALordConversationsCampaignBehavior : CampaignBehaviorBase
+    internal class MALordConversationsCampaignBehavior : CampaignBehaviorBase
     {
         protected void AddDialogs(CampaignGameStarter starter)
         {
