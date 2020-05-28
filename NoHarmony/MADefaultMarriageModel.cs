@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
 
@@ -28,7 +29,6 @@ namespace MarryAnyone
             bool IsMainHeroRelated = firstHero == Hero.MainHero || firstHero == Hero.OneToOneConversationHero || secondHero == Hero.MainHero || secondHero == Hero.OneToOneConversationHero;
             bool IsHomosexual = MASubModule.IsHomosexual && IsMainHeroRelated;
             bool IsBisexual = MASubModule.IsBisexual && IsMainHeroRelated;
-            bool IsIncestual = MASubModule.IsIncestual && IsMainHeroRelated;
 
             if (IsHomosexual)
             {
@@ -41,14 +41,20 @@ namespace MarryAnyone
                 return !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && this.IsSuitableForMarriage(firstHero) && this.IsSuitableForMarriage(secondHero);
             }
             InformationManager.DisplayMessage(new InformationMessage("Heterosexual"));
-            return firstHero.IsFemale != secondHero.IsFemale && (IsIncestual || !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>()) && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+            return firstHero.IsFemale != secondHero.IsFemale && !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
         }
 
         private IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)
         {
+            bool IsIncestual = MASubModule.IsIncestual && (hero == Hero.MainHero || hero == Hero.OneToOneConversationHero);
+
             if (hero != null)
             {
                 yield return hero;
+                if (IsIncestual)
+                {
+                    yield break;
+                }
                 if (n > 0)
                 {
                     foreach (Hero hero2 in DiscoverAncestors(hero.Mother, n - 1))

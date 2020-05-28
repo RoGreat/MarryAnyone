@@ -8,11 +8,11 @@ namespace MarryAnyone
     {
         private static bool Prefix()
         {
-            if (Hero.OneToOneConversationHero != null && (Hero.OneToOneConversationHero.IsWanderer || Hero.OneToOneConversationHero.IsPlayerCompanion))
+            if (PlayerEncounter.IsActive)
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
     }
 }
