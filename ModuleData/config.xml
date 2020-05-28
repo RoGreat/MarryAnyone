@@ -1,0 +1,6 @@
+<MarryAnyoneConfig>
+	<!--Heterosexual, Homosexual, Bisexual-->
+    <polygamy>true</polygamy>
+    <incest>false</incest>
+	<orientation>Heterosexual</orientation>
+</MarryAnyoneConfig>

@@ -8,38 +8,6 @@ namespace MarryAnyone
 {
     internal class MASubModule : NoHarmonyLoader
     {
-        public static bool IsPolyamorous = true;
-
-        public static bool IsIncestual = true;
-
-        public enum SexualOrientation
-        {
-            Heterosexual,
-            Homosexual,
-            Bisexual
-        }
-
-        public static int SetSexualOrientation = 2;
-
-        public static SexualOrientation GetSexualOrientation()
-        {
-            switch(SetSexualOrientation)
-            {
-                case 1:
-                    return SexualOrientation.Homosexual;
-                case 2:
-                    return SexualOrientation.Bisexual;
-                default:
-                    return SexualOrientation.Heterosexual;
-            }
-        }
-
-        public static bool IsHeterosexual = GetSexualOrientation() == SexualOrientation.Heterosexual;
-
-        public static bool IsHomosexual = GetSexualOrientation() == SexualOrientation.Homosexual;
-
-        public static bool IsBisexual = GetSexualOrientation() == SexualOrientation.Bisexual;
-
         public override void NoHarmonyInit()
         {
             LogFile = "MANoHarmony";
@@ -56,6 +24,7 @@ namespace MarryAnyone
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
+            MASettings.Settings();
             new Harmony("mod.bannerlord.anyone.marry").PatchAll();
         }
 

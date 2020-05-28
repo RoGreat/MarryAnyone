@@ -33,7 +33,8 @@ namespace MarryAnyone
 
         private bool conversation_player_eligible_for_marriage_on_condition()
         {
-            return ((!MASubModule.IsPolyamorous && Hero.MainHero.Spouse == null) || (MASubModule.IsPolyamorous && Hero.MainHero.Spouse != null)) && Hero.OneToOneConversationHero != null && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) == null && Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero);
+            MAConfig config = MASettings.Config;
+            return (!config.IsPolygamous && Hero.MainHero.Spouse == null || config.IsPolygamous && Hero.MainHero.Spouse != null) && Hero.OneToOneConversationHero != null && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) == null && Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero);
         }
 
         private void conversation_courtship_stage_2_success_on_consequence()
@@ -43,10 +44,7 @@ namespace MarryAnyone
             {
                 Hero.OneToOneConversationHero.CompanionOf = null;
             }
-            else
-            {
-                PlayerEncounter.LeaveEncounter = true;
-            }
+            PlayerEncounter.LeaveEncounter = true;
         }
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)

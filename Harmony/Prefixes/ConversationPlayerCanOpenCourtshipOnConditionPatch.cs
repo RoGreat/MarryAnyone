@@ -16,11 +16,12 @@ namespace MarryAnyone
 
         private static bool conversation_player_can_open_courtship_on_condition()
         {
-            bool IsHeterosexual = MASubModule.IsHeterosexual;
-            bool IsHomosexual = MASubModule.IsHomosexual;
-            bool IsBisexual = MASubModule.IsBisexual;
+            MAConfig config = MASettings.Config;
+            bool isHeterosexual = config.SexualOrientation == SexualOrientation.Heterosexual;
+            bool isHomosexual = config.SexualOrientation == SexualOrientation.Homosexual;
+            bool isBisexual = config.SexualOrientation == SexualOrientation.Bisexual;
 
-            bool flag = Hero.MainHero.IsFemale && IsHeterosexual || !Hero.MainHero.IsFemale && IsHomosexual || !Hero.OneToOneConversationHero.IsFemale && IsBisexual;
+            bool flag = Hero.MainHero.IsFemale && isHeterosexual || !Hero.MainHero.IsFemale && isHomosexual || !Hero.OneToOneConversationHero.IsFemale && isBisexual;
 
             if (Hero.OneToOneConversationHero == null)
             {
