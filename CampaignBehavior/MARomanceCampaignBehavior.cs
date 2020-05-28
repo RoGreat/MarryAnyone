@@ -91,7 +91,10 @@ namespace MarryAnyone
         private void conversation_courtship_stage_2_success_on_consequence()
         {
             ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Marriage);
-
+            if (Hero.OneToOneConversationHero.IsPlayerCompanion)
+            {
+                Hero.OneToOneConversationHero.CompanionOf = null;
+            }
             PlayerEncounter.LeaveEncounter = true;
         }
 
