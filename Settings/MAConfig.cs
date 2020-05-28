@@ -6,14 +6,17 @@ namespace MarryAnyone
 
     internal class MAConfig
     {
+        [DataMember(Name = "difficulty", IsRequired = false)]
+        public Difficulty Difficulty = Difficulty.Realistic;
+
+        [DataMember(Name = "orientation", IsRequired = false)]
+        public SexualOrientation SexualOrientation = SexualOrientation.Heterosexual;
+
         [DataMember(Name ="polygamy", IsRequired = false)]
         public bool IsPolygamous = false;
 
         [DataMember(Name = "incest", IsRequired = false)]
         public bool IsIncestual = false;
-
-        [DataMember(Name = "orientation", IsRequired = false)]
-        public SexualOrientation SexualOrientation = SexualOrientation.Heterosexual;
     }
 
     public enum SexualOrientation
@@ -21,5 +24,12 @@ namespace MarryAnyone
         Heterosexual,
         Homosexual,
         Bisexual
+    }
+
+    public enum Difficulty
+    {
+        Realistic,
+        Easy,
+        VeryEasy
     }
 }
