@@ -2,6 +2,8 @@
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Localization;
+using TaleWorlds.Core;
+using TaleWorlds.CampaignSystem.Actions;
 
 namespace MarryAnyone
 {
@@ -20,7 +22,6 @@ namespace MarryAnyone
             bool isHeterosexual = config.SexualOrientation == SexualOrientation.Heterosexual;
             bool isHomosexual = config.SexualOrientation == SexualOrientation.Homosexual;
             bool isBisexual = config.SexualOrientation == SexualOrientation.Bisexual;
-
             bool flag = Hero.MainHero.IsFemale && isHeterosexual || !Hero.MainHero.IsFemale && isHomosexual || !Hero.OneToOneConversationHero.IsFemale && isBisexual;
 
             if (Hero.OneToOneConversationHero == null)
@@ -40,8 +41,8 @@ namespace MarryAnyone
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
                         flag
-                            ? "{=bjJs0eeB}Goodman, I note that you have not yet taken a wife."
-                            : "{=v1hC6Aem}Goodwife, I wish to profess myself your most ardent admirer", false);
+                            ? "{=1hqoFgKW}Goodman, I note that you have not yet taken a wife."
+                            : "{=bX3veGa2}Goodwife, I wish to profess myself your most ardent admirer.", false);
                 }
                 return true;
             }
@@ -58,9 +59,10 @@ namespace MarryAnyone
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
                         flag
-                            ? "{=2WnhUBMM}Goodman, may you give me another chance to prove myself?"
-                            : "{=4iTaEZKg}Goodwife, may you give me another chance to prove myself?", false);
+                            ? "{=gkRbOqsP}Goodman, may you give me another chance to prove myself?"
+                            : "{=gVM0EyGL}Goodwife, may you give me another chance to prove myself?", false);
                 }
+                ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
                 return true;
             }
             return false;

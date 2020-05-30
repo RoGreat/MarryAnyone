@@ -1,7 +1,7 @@
 <MarryAnyoneConfig>
-	<!--Realistic, Easy, VeryEasy-->
+	<!--Realistic, Easy, VeryEasy -->
 	<difficulty>Realistic</difficulty>
-	<!--Heterosexual, Homosexual, Bisexual-->
+	<!--Heterosexual, Homosexual, Bisexual -->
 	<orientation>Heterosexual</orientation>
     <polygamy>false</polygamy>
     <incest>false</incest>

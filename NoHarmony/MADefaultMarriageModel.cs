@@ -12,17 +12,21 @@ namespace MarryAnyone
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
             MAConfig config = MASettings.Config;
-            bool isPolygamous = !config.IsPolygamous && (maidenOrSuitor != Hero.MainHero || maidenOrSuitor != Hero.OneToOneConversationHero);
+            bool isPolygamous = config.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
 
-            if ((maidenOrSuitor.Spouse != null && isPolygamous) || maidenOrSuitor.IsTemplate)
+            if (Hero.MainHero.ExSpouses.Contains(maidenOrSuitor) || maidenOrSuitor.IsTemplate || !maidenOrSuitor.IsAlive || maidenOrSuitor.Spouse == Hero.OneToOneConversationHero)
             {
                 return false;
             }
-            if (maidenOrSuitor.IsFemale)
+            if (maidenOrSuitor.Spouse == null || isPolygamous)
             {
-                return maidenOrSuitor.CharacterObject.Age >= (float)MinimumMarriageAgeFemale;
+                if (maidenOrSuitor.IsFemale)
+                {
+                    return maidenOrSuitor.CharacterObject.Age >= (float)MinimumMarriageAgeFemale;
+                }
+                return maidenOrSuitor.CharacterObject.Age >= (float)MinimumMarriageAgeMale;
             }
-            return maidenOrSuitor.CharacterObject.Age >= (float)MinimumMarriageAgeMale;
+            return false;
         }
 
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
@@ -34,13 +38,11 @@ namespace MarryAnyone
 
             if (isHomosexual)
             {
-                InformationManager.DisplayMessage(new InformationMessage("Homosexual"));
-                return firstHero.IsFemale == secondHero.IsFemale && !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && this.IsSuitableForMarriage(firstHero) && this.IsSuitableForMarriage(secondHero);
+                return firstHero.IsFemale == secondHero.IsFemale && !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
             }
             if (isBisexual)
             {
-                InformationManager.DisplayMessage(new InformationMessage("Bisexual"));
-                return !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && this.IsSuitableForMarriage(firstHero) && this.IsSuitableForMarriage(secondHero);
+                return !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
             }
             return firstHero.IsFemale != secondHero.IsFemale && !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
         }

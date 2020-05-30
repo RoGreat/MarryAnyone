@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using NoHarmony;
+using System.Diagnostics;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
@@ -8,6 +9,8 @@ namespace MarryAnyone
 {
     internal class MASubModule : NoHarmonyLoader
     {
+        private static Harmony harmony = null;
+
         public override void NoHarmonyInit()
         {
             LogFile = "MANoHarmony";
@@ -20,12 +23,12 @@ namespace MarryAnyone
             ReplaceModel<MADefaultMarriageModel, DefaultMarriageModel>();
         }
 
-
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
             MASettings.Settings();
-            new Harmony("mod.bannerlord.anyone.marry").PatchAll();
+            harmony = new Harmony("mod.bannerlord.anyone.marry");
+            harmony.PatchAll();
         }
 
         public override void OnCampaignStart(Game game, object starterObject)

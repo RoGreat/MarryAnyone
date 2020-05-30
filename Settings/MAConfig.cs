@@ -19,17 +19,17 @@ namespace MarryAnyone
         public bool IsIncestual = false;
     }
 
-    public enum SexualOrientation
-    {
-        Heterosexual,
-        Homosexual,
-        Bisexual
-    }
-
     public enum Difficulty
     {
         Realistic,
         Easy,
         VeryEasy
+    }
+
+    public enum SexualOrientation
+    {
+        Heterosexual,
+        Homosexual,
+        Bisexual
     }
 }
