@@ -84,12 +84,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CampaignBehavior\MARomanceCampaignBehavior.cs" />
-    <Compile Include="Harmony\Prefixes\ConversationPlayerEligibleForMarriageOnConditionPatch.cs" />
+    <Compile Include="Harmony\Postfixes\ConversationPlayerEligibleForMarriageOnConditionPatch.cs" />
     <Compile Include="Harmony\Prefixes\DailyTickHeroPatch.cs" />
     <Compile Include="Harmony\Prefixes\ConversationRomanceAtStagesOneAndTwoDiscussionOnConditionPatches.cs" />
-    <Compile Include="Harmony\Prefixes\EndAllCourtshipsPatch.cs" />
+    <Compile Include="Harmony\Postfixes\EndAllCourtshipsPatch.cs" />
     <Compile Include="Harmony\Prefixes\LeaveEncounterPatch.cs" />
-    <Compile Include="Harmony\Transpilers\GetHeroRelationToHeroTextShortPatch.cs" />
     <Compile Include="Harmony\Transpilers\SpousePatch.cs" />
     <Compile Include="Harmony\Transpilers\CreateNewHeroPatch.cs" />
     <Compile Include="CampaignBehavior\MALordConversationsCampaignBehavior.cs" />

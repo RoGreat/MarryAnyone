@@ -1,12 +1,8 @@
 ﻿using HarmonyLib;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.Conversation.Tags;
-using TaleWorlds.CampaignSystem.SandBox.Conversations;
-using TaleWorlds.Core;
 
 namespace MarryAnyone
 {
@@ -21,11 +17,11 @@ namespace MarryAnyone
             }
             else
             {
-                starter.AddDialogLine("hero_courtship_persuasion_2_success", "lord_start_courtship_response_3", "lord_conclude_courtship_stage_2", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(conversation_start_and_finalize_courtship_on_condition), null, 120, null);
+                starter.AddDialogLine("hero_courtship_persuasion_2_success", "lord_start_courtship_response_3", "lord_conclude_courtship_stage_2", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(conversation_start_and_finalize_courtship_for_hero_on_condition), null, 120, null);
 
-                starter.AddPlayerLine("hero_romance_task_pt1_pt2", "hero_main_options", "lord_start_courtship_response_3", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(conversation_start_and_finalize_courtship_on_condition), null, 140, null, null);
+                starter.AddPlayerLine("hero_romance_task_pt1_pt2", "hero_main_options", "lord_start_courtship_response_3", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(conversation_start_and_finalize_courtship_for_hero_on_condition), null, 140, null, null);
 
-                starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", null, new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
+                starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_start_and_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
             }
         }
 
@@ -45,12 +41,16 @@ namespace MarryAnyone
         }
 
 
-        private bool conversation_start_and_finalize_courtship_on_condition()
+        private bool conversation_start_and_finalize_courtship_for_hero_on_condition()
         {
             MAConfig config = MASubModule.Config;
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
             if (MADefaultMarriageModel.DiscoverAncestors(Hero.MainHero, 3).Intersect(MADefaultMarriageModel.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any<Hero>() && config.IsIncestual)
             {
+                if (config.Difficulty == Difficulty.Easy)
+                {
+                    return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+                }
                 return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
             }
             if (config.Difficulty == Difficulty.Easy && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))

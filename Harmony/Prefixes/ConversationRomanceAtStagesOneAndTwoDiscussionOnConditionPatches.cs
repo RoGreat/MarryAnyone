@@ -1,10 +1,7 @@
 ﻿using TaleWorlds.CampaignSystem;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
-using System.Diagnostics;
-using TaleWorlds.Core;
-using TaleWorlds.CampaignSystem.Actions;
-using System;
+using System.Linq;
 
 namespace MarryAnyone
 {
@@ -16,7 +13,7 @@ namespace MarryAnyone
         private static bool Prefix1(ref bool __result)
         {
             MAConfig config = MASubModule.Config;
-            if (config.Difficulty == Difficulty.VeryEasy || (config.Difficulty == Difficulty.Easy && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
+            if (config.Difficulty == Difficulty.VeryEasy || config.Difficulty == Difficulty.Easy && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero)
             {
                 __result = false;
                 return false;
@@ -29,7 +26,7 @@ namespace MarryAnyone
         private static bool Prefix2(ref bool __result)
         {
             MAConfig config = MASubModule.Config;
-            if (config.Difficulty == Difficulty.VeryEasy || (config.Difficulty == Difficulty.Easy && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
+            if (config.Difficulty == Difficulty.VeryEasy || config.Difficulty == Difficulty.Easy && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero)
             {
                 __result = false;
                 return false;

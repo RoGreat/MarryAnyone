@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using NoHarmony;
-using System.Diagnostics;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
@@ -28,15 +27,6 @@ namespace MarryAnyone
         public override void NoHarmonyLoad()
         {
             ReplaceModel<MADefaultMarriageModel, DefaultMarriageModel>();
-        }
-
-        private void MADebug(String message)
-        {
-            MAConfig config = MASubModule.Config;
-            if(config.Debug)
-            {
-                InformationManager.DisplayMessage(new InformationMessage(message));
-            }
         }
 
         protected override void OnSubModuleLoad()
@@ -90,6 +80,15 @@ namespace MarryAnyone
         {
             gameInitializer.AddBehavior(new MALordConversationsCampaignBehavior());
             gameInitializer.AddBehavior(new MARomanceCampaignBehavior());
+        }
+
+        public static void MADebug(String message)
+        {
+            MAConfig config = MASubModule.Config;
+            if (config.Debug)
+            {
+                InformationManager.DisplayMessage(new InformationMessage(message));
+            }
         }
     }
 }

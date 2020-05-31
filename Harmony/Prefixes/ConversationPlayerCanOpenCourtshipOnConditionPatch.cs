@@ -2,7 +2,6 @@
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Localization;
-using TaleWorlds.Core;
 using TaleWorlds.CampaignSystem.Actions;
 
 namespace MarryAnyone

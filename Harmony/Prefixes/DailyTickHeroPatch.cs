@@ -4,6 +4,7 @@ using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using System.Linq;
 using System.Collections.Generic;
 using System;
+using TaleWorlds.Core;
 
 namespace MarryAnyone
 {
@@ -14,8 +15,12 @@ namespace MarryAnyone
 
         private static void Prefix(Hero hero)
         {
+            MAConfig config = MASubModule.Config;
             Spouses = new List<Hero>();
-
+            if (!config.IsPolygamous)
+            {
+                return;
+            }    
             if (hero.IsFemale && hero.IsAlive && hero.Age > 18f)
             {
                 if (hero == Hero.MainHero)
