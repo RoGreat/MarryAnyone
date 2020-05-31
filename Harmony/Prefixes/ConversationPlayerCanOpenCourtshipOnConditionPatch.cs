@@ -18,7 +18,7 @@ namespace MarryAnyone
 
         private static bool conversation_player_can_open_courtship_on_condition()
         {
-            MAConfig config = MASettings.Config;
+            MAConfig config = MASubModule.Config;
             bool isHeterosexual = config.SexualOrientation == SexualOrientation.Heterosexual;
             bool isHomosexual = config.SexualOrientation == SexualOrientation.Homosexual;
             bool isBisexual = config.SexualOrientation == SexualOrientation.Bisexual;
@@ -41,8 +41,8 @@ namespace MarryAnyone
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
                         flag
-                            ? "{=1hqoFgKW}Goodman, I note that you have not yet taken a wife."
-                            : "{=bX3veGa2}Goodwife, I wish to profess myself your most ardent admirer.", false);
+                            ? "{=MA1hqoFgKW}Goodman, I note that you have not yet taken a wife."
+                            : "{=MAbX3veGa2}Goodwife, I wish to profess myself your most ardent admirer.", false);
                 }
                 return true;
             }
@@ -59,8 +59,8 @@ namespace MarryAnyone
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
                         flag
-                            ? "{=gkRbOqsP}Goodman, may you give me another chance to prove myself?"
-                            : "{=gVM0EyGL}Goodwife, may you give me another chance to prove myself?", false);
+                            ? "{=MAgkRbOqsP}Goodman, may you give me another chance to prove myself?"
+                            : "{=MAgVM0EyGL}Goodwife, may you give me another chance to prove myself?", false);
                 }
                 ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
                 return true;

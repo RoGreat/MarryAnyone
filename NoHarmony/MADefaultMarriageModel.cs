@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -11,7 +12,7 @@ namespace MarryAnyone
     {
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            MAConfig config = MASettings.Config;
+            MAConfig config = MASubModule.Config;
             bool isPolygamous = config.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
 
             if (Hero.MainHero.ExSpouses.Contains(maidenOrSuitor) || maidenOrSuitor.IsTemplate || !maidenOrSuitor.IsAlive || maidenOrSuitor.Spouse == Hero.OneToOneConversationHero)
@@ -31,34 +32,33 @@ namespace MarryAnyone
 
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
-            MAConfig config = MASettings.Config;
+            MAConfig config = MASubModule.Config;
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
             bool isHomosexual = config.SexualOrientation == SexualOrientation.Homosexual && isMainHero;
             bool isBisexual = config.SexualOrientation == SexualOrientation.Bisexual && isMainHero;
+            bool isIncestual = config.IsIncestual && DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && isMainHero;
+            bool discoverAncestors = true;
 
+            if (!isIncestual)
+            { 
+                discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>();
+            }
             if (isHomosexual)
             {
-                return firstHero.IsFemale == secondHero.IsFemale && !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+                return firstHero.IsFemale == secondHero.IsFemale && discoverAncestors && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
             }
             if (isBisexual)
             {
-                return !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+                return discoverAncestors && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
             }
-            return firstHero.IsFemale != secondHero.IsFemale && !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any<Hero>() && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+            return firstHero.IsFemale != secondHero.IsFemale && discoverAncestors && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
         }
 
-        private IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)
+        public static IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)
         {
-            MAConfig config = MASettings.Config;
-            bool isIncestual = config.IsIncestual && (hero == Hero.MainHero || hero == Hero.OneToOneConversationHero);
-
             if (hero != null)
             {
                 yield return hero;
-                if (isIncestual)
-                {
-                    yield break;
-                }
                 if (n > 0)
                 {
                     foreach (Hero hero2 in DiscoverAncestors(hero.Mother, n - 1))

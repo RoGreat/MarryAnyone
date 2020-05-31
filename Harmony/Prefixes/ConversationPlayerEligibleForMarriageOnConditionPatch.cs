@@ -10,7 +10,7 @@ namespace MarryAnyone
     {
         private static bool Prefix(ref bool __result)
         {
-            MAConfig config = MASettings.Config;
+            MAConfig config = MASubModule.Config;
             __result = Hero.OneToOneConversationHero != null && Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) != null;
             return false;
         }

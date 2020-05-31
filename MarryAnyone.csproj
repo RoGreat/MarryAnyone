@@ -95,7 +95,6 @@
     <Compile Include="CampaignBehavior\MALordConversationsCampaignBehavior.cs" />
     <Compile Include="Harmony\Prefixes\ConversationPlayerCanOpenCourtshipOnConditionPatch.cs" />
     <Compile Include="Settings\MAConfig.cs" />
-    <Compile Include="Settings\MASettings.cs" />
     <Compile Include="NoHarmony\MADefaultMarriageModel.cs" />
     <Compile Include="NoHarmony\MASubModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
