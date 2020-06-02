@@ -29,6 +29,7 @@ namespace MarryAnyone
                     if (!hero.ExSpouses.Contains(hero.Spouse) && hero.Spouse != null && hero.Spouse.IsAlive && hero.IsFemale != hero.Spouse.IsFemale)
                     {
                         Spouses.Add(hero.Spouse);
+                        MASubModule.MADebug("Added Spouse to Spouses: " + hero.Spouse.Name);
                     }
                     if (hero.ExSpouses.Any())
                     {
@@ -37,6 +38,7 @@ namespace MarryAnyone
                             if (exSpouse.IsAlive && hero.IsFemale != exSpouse.IsFemale)
                             {
                                 Spouses.Add(exSpouse);
+                                MASubModule.MADebug("Added ExSpouse to Spouses: " + exSpouse.Name);
                             }
                         }
                     }
@@ -45,22 +47,30 @@ namespace MarryAnyone
                         Random random = new Random();
                         hero.Spouse = Spouses.ElementAt(random.Next(Spouses.Count));
                         hero.Spouse.Spouse = hero;
+                        MASubModule.MADebug("Random spouse assigned:");
+                        MASubModule.MADebug("   Hero: " + hero.Spouse.Spouse);
+                        MASubModule.MADebug("   Spouse: " + hero.Spouse);
                     }
                 }
                 else if (hero == Hero.MainHero.Spouse || Hero.MainHero.ExSpouses.Contains(hero))
                 {
                     ResetSpouse(hero);
-                    if (!hero.IsAlive)
+                    if (hero.IsDead)
                     {
+                        MASubModule.MADebug("Spouse is dead");
                         return;
                     }
                     else if (hero.Spouse == null)
                     {
                         hero.Spouse = Hero.MainHero;
                         hero.Spouse.Spouse = hero;
+                        MASubModule.MADebug("Spouse assigned:");
+                        MASubModule.MADebug("   Hero: " + hero.Spouse.Spouse);
+                        MASubModule.MADebug("   Spouse: " + hero.Spouse);
                     }
                     if (hero.Spouse != null && hero.IsFemale == hero.Spouse.IsFemale)
                     {
+                        MASubModule.MADebug("Spouse is of same sex");
                         ResetSpouse(hero);
                     }
                 }
@@ -73,6 +83,7 @@ namespace MarryAnyone
             {
                 hero.Spouse.Spouse = null;
                 hero.Spouse = null;
+                MASubModule.MADebug("Spouse reset");
             }
         }
     }

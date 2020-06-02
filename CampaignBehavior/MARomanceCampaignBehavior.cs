@@ -62,13 +62,46 @@ namespace MarryAnyone
 
         private void conversation_courtship_success_on_consequence()
         {
-            AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(Hero.OneToOneConversationHero.CharacterObject, Occupation.Lord, null);
-            Hero.OneToOneConversationHero.IsNoble = true;
-            ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Marriage);
+            if (Hero.OneToOneConversationHero.IsNotable)
+            {
+                LeaveSettlementAction.ApplyForCharacterOnly(Hero.OneToOneConversationHero);
+                AddHeroToPartyAction.Apply(Hero.OneToOneConversationHero, MobileParty.MainParty, true);
+                MASubModule.MADebug("Notable joined your party");
+            }
             if (Hero.OneToOneConversationHero.IsPlayerCompanion)
             {
                 Hero.OneToOneConversationHero.CompanionOf = null;
+                MASubModule.MADebug("Companion is no longer a companion");
             }
+            if (Hero.OneToOneConversationHero.CharacterObject.Occupation != Occupation.Lord)
+            {
+                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(Hero.OneToOneConversationHero.CharacterObject, Occupation.Lord, null);
+                Hero.OneToOneConversationHero.IsNoble = true;
+                MASubModule.MADebug("Spouse is now a lord");
+            }
+            if (Hero.OneToOneConversationHero.IsFactionLeader && !Hero.OneToOneConversationHero.IsMinorFactionHero)
+            {
+                if (Hero.MainHero.Spouse != null)
+                {
+                    Hero.MainHero.Spouse.Clan = Hero.OneToOneConversationHero.Clan;
+                    MASubModule.MADebug("Brought Spouse to major faction");
+                }
+                if (Hero.MainHero.ExSpouses.Any())
+                {
+                    foreach (Hero exSpouse in Hero.MainHero.ExSpouses)
+                    {
+                        exSpouse.Clan = Hero.OneToOneConversationHero.Clan;
+                        MASubModule.MADebug("Brought ExSpouse to major faction");
+                    }
+                }
+                if (Hero.MainHero.Clan.Kingdom != Hero.OneToOneConversationHero.Clan.Kingdom)
+                {
+                    ChangeKingdomAction.ApplyByJoinToKingdom(Hero.MainHero.Clan, Hero.OneToOneConversationHero.Clan.Kingdom, true);
+                    MASubModule.MADebug("Joined major faction");
+                }
+            }
+            ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Marriage);
+            MASubModule.MADebug("Marriage action applied");
             PlayerEncounter.LeaveEncounter = true;
         }
 

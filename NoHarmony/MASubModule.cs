@@ -17,6 +17,15 @@ namespace MarryAnyone
 
         public static MAConfig Config { get; private set; }
 
+        public static void MADebug(string message)
+        {
+            MAConfig config = Config;
+            if (config.Debug)
+            {
+                InformationManager.DisplayMessage(new InformationMessage(message, new Color(0.6f, 0.2f, 1f)));
+            }
+        }
+
         public override void NoHarmonyInit()
         {
             LogFile = "MANoHarmony";
@@ -40,7 +49,7 @@ namespace MarryAnyone
                 {
                     if (new DataContractSerializer(typeof(MAConfig)).ReadObject(xmlReader) is MAConfig config)
                     {
-                        MASubModule.Config = config;
+                        Config = config;
                     }
                 }
             }
@@ -48,12 +57,18 @@ namespace MarryAnyone
             harmony.PatchAll();
         }
 
+        protected override void OnSubModuleUnloaded()
+        {
+            base.OnSubModuleUnloaded();
+            harmony.UnpatchAll();
+        }
+
         protected override void OnBeforeInitialModuleScreenSetAsRoot()
         {
             base.OnBeforeInitialModuleScreenSetAsRoot();
-            MAConfig config = MASubModule.Config;
-            MADebug("MA Difficulty: " + config.Difficulty);
-            MADebug("MA Orientation: " + config.SexualOrientation);
+            MAConfig config = Config;
+            MADebug("MA Difficulty: " + config.Difficulty.ToString());
+            MADebug("MA Orientation: " + config.SexualOrientation.ToString());
             MADebug("MA Polygamy: " + config.IsPolygamous.ToString());
             MADebug("MA Incest: " + config.IsIncestual.ToString());
         }
@@ -80,15 +95,6 @@ namespace MarryAnyone
         {
             gameInitializer.AddBehavior(new MALordConversationsCampaignBehavior());
             gameInitializer.AddBehavior(new MARomanceCampaignBehavior());
-        }
-
-        public static void MADebug(String message)
-        {
-            MAConfig config = MASubModule.Config;
-            if (config.Debug)
-            {
-                InformationManager.DisplayMessage(new InformationMessage(message));
-            }
         }
     }
 }
