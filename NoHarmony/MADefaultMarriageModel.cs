@@ -13,7 +13,7 @@ namespace MarryAnyone
             MAConfig config = MASubModule.Config;
             bool isPolygamous = config.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
 
-            if (Hero.MainHero.ExSpouses.Contains(maidenOrSuitor) || maidenOrSuitor.IsTemplate || maidenOrSuitor.IsDead || maidenOrSuitor.Spouse == Hero.OneToOneConversationHero)
+            if (maidenOrSuitor.IsTemplate || maidenOrSuitor.IsDead || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor))
             {
                 return false;
             }
@@ -74,74 +74,48 @@ namespace MarryAnyone
 
         public override Clan GetClanAfterMarriage(Hero firstHero, Hero secondHero)
         {
-            MASubModule.MADebug("Marriage: " + firstHero.Name + " and " + secondHero.Name);
-            if (firstHero.IsMinorFactionHero && secondHero.IsMinorFactionHero)
+            MASubModule.MADebug("Marriage between " + firstHero.Name + " and " + secondHero.Name);
+            if (firstHero.IsFactionLeader && firstHero.MapFaction.IsKingdomFaction)
             {
-                MASubModule.MADebug("Minor faction leader and minor faction leader married");
-                return RandomClan(firstHero, secondHero);
-            }
-            if (firstHero.IsFactionLeader && secondHero.IsMinorFactionHero)
-            {
-                MASubModule.MADebug("Major faction leader and minor faction leader married");
+                MASubModule.MADebug("Kingdom leader is the dominant clan in marriage");
                 return firstHero.Clan;
             }
-            if (secondHero.IsFactionLeader && firstHero.IsMinorFactionHero)
+            if (secondHero.IsFactionLeader && secondHero.MapFaction.IsKingdomFaction)
             {
-                MASubModule.MADebug("Major faction leader and minor faction leader married");
+                MASubModule.MADebug("Kingdom leader is the dominant clan in marriage");
                 return secondHero.Clan;
             }
-            if (firstHero.IsFactionLeader && secondHero.IsHumanPlayerCharacter)
+            if (firstHero.IsHumanPlayerCharacter)
             {
-                MASubModule.MADebug("Major faction leader and human faction leader married");
+                MASubModule.MADebug("Human player is the dominant clan in marriage");
                 return firstHero.Clan;
             }
-            if (secondHero.IsFactionLeader && firstHero.IsHumanPlayerCharacter)
+            if (secondHero.IsHumanPlayerCharacter)
             {
-                MASubModule.MADebug("Major faction leader and human faction leader married");
+                MASubModule.MADebug("Human player is the dominant clan in marriage");
                 return secondHero.Clan;
-            }
-            if (firstHero.IsFactionLeader && secondHero.IsFactionLeader)
-            {
-                MASubModule.MADebug("Major faction leader and major faction leader married");
-                return RandomClan(firstHero, secondHero);
             }
             if (firstHero.IsFactionLeader)
             {
-                MASubModule.MADebug("Major faction leader married");
+                MASubModule.MADebug("Faction leader is the dominant clan in marriage");
                 return firstHero.Clan;
             }
             if (secondHero.IsFactionLeader)
             {
-                MASubModule.MADebug("Major faction leader married");
+                MASubModule.MADebug("Faction leader is the dominant clan in marriage");
                 return secondHero.Clan;
-            }
-            if (firstHero.Clan.Leader == firstHero && secondHero.Clan.Leader == secondHero)
-            {
-                MASubModule.MADebug("Clan leader and clan leader married");
-                return RandomClan(firstHero, secondHero);
             }
             if (firstHero.Clan.Leader == firstHero)
             {
-                MASubModule.MADebug("Clan leader married");
+                MASubModule.MADebug("Clan leader is the dominant clan in marriage");
                 return firstHero.Clan;
             }
             if (secondHero.Clan.Leader == secondHero)
             {
-                MASubModule.MADebug("Clan leader married");
+                MASubModule.MADebug("Clan leader is the dominant clan in marriage");
                 return secondHero.Clan;
             }
             if (!firstHero.IsFemale)
-            {
-                return firstHero.Clan;
-            }
-            return secondHero.Clan;
-        }
-
-        private Clan RandomClan(Hero firstHero, Hero secondHero)
-        {
-            Random random = new Random();
-            int i = random.Next(2);
-            if (i == 0)
             {
                 return firstHero.Clan;
             }

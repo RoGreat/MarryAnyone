@@ -9,7 +9,7 @@ namespace MarryAnyone
     {
         private static void Postfix(ref bool __result)
         {
-            __result = Hero.OneToOneConversationHero != null && Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) != null;
+            __result = Hero.OneToOneConversationHero != null && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) == null && Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero);
         }
     }
 }

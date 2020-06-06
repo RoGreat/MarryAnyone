@@ -6,19 +6,19 @@ namespace MarryAnyone
 
     internal class MAConfig
     {
-        [DataMember(Name = "difficulty", Order = 1, IsRequired = false)]
+        [DataMember(Name = "difficulty", Order = 0)]
         public Difficulty Difficulty = Difficulty.Realistic;
 
-        [DataMember(Name = "orientation", Order = 2, IsRequired = false)]
+        [DataMember(Name = "orientation", Order = 1)]
         public SexualOrientation SexualOrientation = SexualOrientation.Heterosexual;
 
-        [DataMember(Name = "polygamy", Order = 3, IsRequired = false)]
+        [DataMember(Name = "polygamy", Order = 2)]
         public bool IsPolygamous = false;
 
-        [DataMember(Name = "incest", Order = 4, IsRequired = false)]
+        [DataMember(Name = "incest", Order = 3)]
         public bool IsIncestual = false;
 
-        [DataMember(Name = "debug", Order = 5, IsRequired = false)]
+        [DataMember(Name = "debug", Order = 4)]
         public bool Debug = false;
     }
 

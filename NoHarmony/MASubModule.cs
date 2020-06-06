@@ -7,13 +7,13 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
 using TaleWorlds.Library;
-using System;
+using TaleWorlds.CampaignSystem.SandBox.Issues;
 
 namespace MarryAnyone
 {
     internal class MASubModule : NoHarmonyLoader
     {
-        private static Harmony harmony = null;
+        private static Harmony harmony;
 
         public static MAConfig Config { get; private set; }
 
@@ -73,12 +73,19 @@ namespace MarryAnyone
             MADebug("MA Incest: " + config.IsIncestual.ToString());
         }
 
+        protected override void OnApplicationTick(float dt)
+        {
+            base.OnApplicationTick(dt);
+            MARomanceCampaignBehavior.DeactivateEncounter();
+        }
+
         public override void OnCampaignStart(Game game, object starterObject)
         {
             if (game.GameType is Campaign)
             {
                 CampaignGameStarter gameInitializer = (CampaignGameStarter)starterObject;
                 AddBehaviors(gameInitializer);
+                LoadXMLs(gameInitializer);
             }
         }
 
@@ -88,6 +95,7 @@ namespace MarryAnyone
             {
                 CampaignGameStarter gameInitializer = (CampaignGameStarter)initializerObject;
                 AddBehaviors(gameInitializer);
+                LoadXMLs(gameInitializer);
             }
         }
 
@@ -95,6 +103,12 @@ namespace MarryAnyone
         {
             gameInitializer.AddBehavior(new MALordConversationsCampaignBehavior());
             gameInitializer.AddBehavior(new MARomanceCampaignBehavior());
+        }
+
+        private void LoadXMLs(CampaignGameStarter campaignGameStarter)
+        {
+            string path = Path.Combine(BasePath.Name, "Modules", "MarryAnyone", "ModuleData", "ma_module_strings.xml");
+            campaignGameStarter.LoadGameTexts(path);
         }
     }
 }

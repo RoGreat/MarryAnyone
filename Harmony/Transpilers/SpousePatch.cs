@@ -33,3 +33,5 @@ namespace MarryAnyone
         }
     }
 }
+
+// There's got to be a better way to solve this.

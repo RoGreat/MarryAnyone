@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="string">
+  <strings>
+	<string id="str_father_husband" text="{=22a9fyiQ}Father-husband" />
+    <string id="str_mother_wife" text="{=UB4sqrWx}Mother-wife" />
+    <string id="str_brother_husband" text="{=22a9fyiQ}Brother-husband" />
+    <string id="str_sister_wife" text="{=UB4sqrWx}Sister-wife" />
+	<string id="str_son_husband" text="{=22a9fyiQ}Son-husband" />
+    <string id="str_daughter_wife" text="{=UB4sqrWx}Daughter-wife" />
+	<string id="str_son" text="{=22a9fyiQ}Son" />
+    <string id="str_daughter" text="{=UB4sqrWx}Daughter" />
+	<string id="str_husband" text="{=22a9fyiQ}Husband" />
+    <string id="str_wife" text="{=UB4sqrWx}Wife" />
+  </strings>
+</base>

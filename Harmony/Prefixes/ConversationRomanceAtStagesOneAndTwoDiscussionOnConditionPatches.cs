@@ -1,7 +1,6 @@
 ﻿using TaleWorlds.CampaignSystem;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
-using System.Linq;
 
 namespace MarryAnyone
 {

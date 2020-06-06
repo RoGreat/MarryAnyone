@@ -1,9 +1,6 @@
 ﻿using TaleWorlds.CampaignSystem;
 using HarmonyLib;
-using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using System.Linq;
-using System.Collections.Generic;
-using System;
 using TaleWorlds.Core;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.Localization;
@@ -64,6 +61,25 @@ namespace MarryAnyone
 					return GameTexts.FindText("str_son", null);
 				}
 				return GameTexts.FindText("str_daughter", null);
+			}
+			if (baseHero.Spouse != null)
+			{
+				if (baseHero.Spouse.Children.Contains(queriedHero))
+				{
+					if (!queriedHero.IsFemale)
+					{
+						return GameTexts.FindText("str_step_son", null);
+					}
+					return GameTexts.FindText("str_step_daughter", null);
+				}
+				if (baseHero.Spouse.Siblings.Contains(queriedHero))
+				{
+					if (!queriedHero.IsFemale)
+					{
+						return GameTexts.FindText("str_step_brother", null);
+					}
+					return GameTexts.FindText("str_step_sister", null);
+				}
 			}
 			return TextObject.Empty;
 		}

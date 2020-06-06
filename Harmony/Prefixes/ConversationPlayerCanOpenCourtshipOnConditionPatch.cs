@@ -61,7 +61,7 @@ namespace MarryAnyone
                             ? "{=MAgkRbOqsP}Goodman, may you give me another chance to prove myself?"
                             : "{=MAgVM0EyGL}Goodwife, may you give me another chance to prove myself?", false);
                 }
-                ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
+                ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);   // Also needs work
                 return true;
             }
             return false;
