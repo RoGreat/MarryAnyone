@@ -1,5 +1,5 @@
-﻿using TaleWorlds.CampaignSystem;
-using HarmonyLib;
+﻿using HarmonyLib;
+using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone
 {
@@ -8,8 +8,7 @@ namespace MarryAnyone
     {
         private static void Postfix()
         {
-            MAConfig config = MASubModule.Config;
-            if (config.IsPolygamous)
+            if (MASettings.Instance.IsPolygamous)
             {
                 foreach (Romance.RomanticState romanticState in Romance.RomanticStateList)
                 {

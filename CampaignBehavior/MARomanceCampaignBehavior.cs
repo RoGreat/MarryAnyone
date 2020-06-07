@@ -12,8 +12,7 @@ namespace MarryAnyone
 
         protected void AddDialogs(CampaignGameStarter starter)
         {
-            MAConfig config = MASubModule.Config;
-            if (config.Difficulty == Difficulty.Realistic)
+            if (MASettings.Instance.IsRealistic())
             {
                 starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
             }
@@ -30,12 +29,11 @@ namespace MarryAnyone
         private bool conversation_finalize_courtship_for_hero_on_condition()
         {
             ActivateEncounter();
-            MAConfig config = MASubModule.Config;
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-            if (config.Difficulty == Difficulty.Realistic)
+            if (MASettings.Instance.IsRealistic())
             {
                 MASubModule.MADebug("Realistic Mode");
-                if (MADefaultMarriageModel.DiscoverAncestors(Hero.MainHero, 3).Intersect(MADefaultMarriageModel.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any<Hero>() && config.IsIncestual)
+                if (MADefaultMarriageModel.DiscoverAncestors(Hero.MainHero, 3).Intersect(MADefaultMarriageModel.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any<Hero>() && MASettings.Instance.IsIncestual)
                 {
                     MASubModule.MADebug("Realistic: Incest");
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
@@ -49,10 +47,10 @@ namespace MarryAnyone
             }
             else
             {
-                MASubModule.MADebug("Easy Mode");
-                if (MADefaultMarriageModel.DiscoverAncestors(Hero.MainHero, 3).Intersect(MADefaultMarriageModel.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any<Hero>() && config.IsIncestual)
+                MASubModule.MADebug("Very Easy Mode or Easy Mode");
+                if (MADefaultMarriageModel.DiscoverAncestors(Hero.MainHero, 3).Intersect(MADefaultMarriageModel.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any<Hero>() && MASettings.Instance.IsIncestual)
                 {
-                    if (config.Difficulty == Difficulty.Easy)
+                    if (MASettings.Instance.IsEasy())
                     {
                         MASubModule.MADebug("Easy: Incest");
                         return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
@@ -60,7 +58,7 @@ namespace MarryAnyone
                     MASubModule.MADebug("Very Easy: Incest");
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
                 }
-                if (config.Difficulty == Difficulty.Easy && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))
+                if (MASettings.Instance.IsEasy() && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))
                 {
                     MASubModule.MADebug("Easy: Noble");
                     return false;

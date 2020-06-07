@@ -1,13 +1,10 @@
 ﻿using HarmonyLib;
 using NoHarmony;
+using System.IO;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
-using System.IO;
-using System.Runtime.Serialization;
-using System.Xml;
 using TaleWorlds.Library;
-using TaleWorlds.CampaignSystem.SandBox.Issues;
 
 namespace MarryAnyone
 {
@@ -15,12 +12,9 @@ namespace MarryAnyone
     {
         private static Harmony harmony;
 
-        public static MAConfig Config { get; private set; }
-
         public static void MADebug(string message)
         {
-            MAConfig config = Config;
-            if (config.Debug)
+            if (MASettings.Instance.Debug)
             {
                 InformationManager.DisplayMessage(new InformationMessage(message, new Color(0.6f, 0.2f, 1f)));
             }
@@ -41,18 +35,6 @@ namespace MarryAnyone
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
-            string path = Path.Combine(BasePath.Name, "Modules", "MarryAnyone", "ModuleData", "config.xml");
-            if (File.Exists(path))
-            {
-                using (var fileStream = new FileStream(path, FileMode.Open))
-                using (var xmlReader = XmlReader.Create(fileStream))
-                {
-                    if (new DataContractSerializer(typeof(MAConfig)).ReadObject(xmlReader) is MAConfig config)
-                    {
-                        Config = config;
-                    }
-                }
-            }
             harmony = new Harmony("mod.bannerlord.anyone.marry");
             harmony.PatchAll();
         }
@@ -63,16 +45,6 @@ namespace MarryAnyone
             harmony.UnpatchAll();
         }
 
-        protected override void OnBeforeInitialModuleScreenSetAsRoot()
-        {
-            base.OnBeforeInitialModuleScreenSetAsRoot();
-            MAConfig config = Config;
-            MADebug("MA Difficulty: " + config.Difficulty.ToString());
-            MADebug("MA Orientation: " + config.SexualOrientation.ToString());
-            MADebug("MA Polygamy: " + config.IsPolygamous.ToString());
-            MADebug("MA Incest: " + config.IsIncestual.ToString());
-        }
-
         protected override void OnApplicationTick(float dt)
         {
             base.OnApplicationTick(dt);
@@ -81,6 +53,7 @@ namespace MarryAnyone
 
         public override void OnCampaignStart(Game game, object starterObject)
         {
+            base.OnCampaignStart(game, starterObject);
             if (game.GameType is Campaign)
             {
                 CampaignGameStarter gameInitializer = (CampaignGameStarter)starterObject;
@@ -91,6 +64,7 @@ namespace MarryAnyone
 
         public override void OnGameLoaded(Game game, object initializerObject)
         {
+            base.OnGameLoaded(game, initializerObject);
             if (game.GameType is Campaign)
             {
                 CampaignGameStarter gameInitializer = (CampaignGameStarter)initializerObject;

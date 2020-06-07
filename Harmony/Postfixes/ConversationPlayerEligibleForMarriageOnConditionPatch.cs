@@ -1,5 +1,5 @@
-﻿using TaleWorlds.CampaignSystem;
-using HarmonyLib;
+﻿using HarmonyLib;
+using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 
 namespace MarryAnyone

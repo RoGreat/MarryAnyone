@@ -1,8 +1,8 @@
-﻿using TaleWorlds.CampaignSystem;
-using HarmonyLib;
+﻿using HarmonyLib;
+using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Localization;
-using TaleWorlds.CampaignSystem.Actions;
 
 namespace MarryAnyone
 {
@@ -17,11 +17,7 @@ namespace MarryAnyone
 
         private static bool conversation_player_can_open_courtship_on_condition()
         {
-            MAConfig config = MASubModule.Config;
-            bool isHeterosexual = config.SexualOrientation == SexualOrientation.Heterosexual;
-            bool isHomosexual = config.SexualOrientation == SexualOrientation.Homosexual;
-            bool isBisexual = config.SexualOrientation == SexualOrientation.Bisexual;
-            bool flag = Hero.MainHero.IsFemale && isHeterosexual || !Hero.MainHero.IsFemale && isHomosexual || !Hero.OneToOneConversationHero.IsFemale && isBisexual;
+            bool flag = Hero.MainHero.IsFemale && MASettings.Instance.IsHeterosexual() || !Hero.MainHero.IsFemale && MASettings.Instance.IsHomosexual() || !Hero.OneToOneConversationHero.IsFemale && MASettings.Instance.IsBisexual();
 
             if (Hero.OneToOneConversationHero == null)
             {

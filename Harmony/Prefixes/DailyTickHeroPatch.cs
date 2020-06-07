@@ -1,9 +1,9 @@
-﻿using TaleWorlds.CampaignSystem;
-using HarmonyLib;
-using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
-using System.Linq;
-using System.Collections.Generic;
+﻿using HarmonyLib;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 
 namespace MarryAnyone
 {

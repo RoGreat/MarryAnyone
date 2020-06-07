@@ -19,7 +19,7 @@ namespace MarryAnyone
                 var instruction = codes[i];
                 yield return instruction;
                 if (instruction.opcode == OpCodes.Brfalse_S
-                    && codes[i-1].operand is MethodInfo && (codes[i-1].operand as MethodInfo) == AccessTools.PropertyGetter(typeof(Hero), "IsWanderer"))
+                    && codes[i - 1].operand is MethodInfo && (codes[i - 1].operand as MethodInfo) == AccessTools.PropertyGetter(typeof(Hero), "IsWanderer"))
                 {
                     yield return new CodeInstruction(OpCodes.Ldloc_1);
                     yield return new CodeInstruction(OpCodes.Callvirt, AccessTools.PropertyGetter(typeof(Hero), "Spouse"));

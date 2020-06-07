@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
@@ -10,8 +9,7 @@ namespace MarryAnyone
     {
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            MAConfig config = MASubModule.Config;
-            bool isPolygamous = config.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
+            bool isPolygamous = MASettings.Instance.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
 
             if (maidenOrSuitor.IsTemplate || maidenOrSuitor.IsDead || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor))
             {
@@ -30,11 +28,10 @@ namespace MarryAnyone
 
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
-            MAConfig config = MASubModule.Config;
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
-            bool isHomosexual = config.SexualOrientation == SexualOrientation.Homosexual && isMainHero;
-            bool isBisexual = config.SexualOrientation == SexualOrientation.Bisexual && isMainHero;
-            bool isIncestual = config.IsIncestual && isMainHero;
+            bool isHomosexual = MASettings.Instance.IsHomosexual() && isMainHero;
+            bool isBisexual = MASettings.Instance.IsBisexual() && isMainHero;
+            bool isIncestual = MASettings.Instance.IsIncestual && isMainHero;
             bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
 
             if (isIncestual)
