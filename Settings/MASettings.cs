@@ -1,16 +1,18 @@
 ﻿using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Data;
-using MCM.Abstractions.Settings.Base.Global;
 using MCM.Abstractions.Settings.Base.PerCharacter;
+using System.ComponentModel;
 
 namespace MarryAnyone
 {
-    public class MASettings : AttributeGlobalSettings<MASettings> // AttributePerCharacterSettings<MASettings>
+    // Instance is null for some reason...
+    internal sealed class MASettings :   AttributePerCharacterSettings<MASettings> // AttributeGlobalSettings<MASettings>
     {
         public override string Id { get; } = "MarryAnyone_v11";
         public override string DisplayName { get; } = $"Marry Anyone {typeof(MASettings).Assembly.GetName().Version.ToString(2)}";
         public override string FolderName { get; } = "MarryAnyone";
+        public override string Format => "json";
 
         [SettingPropertyBool("Polygamy", RequireRestart = false, HintText = "Player character can have polygamous relationships", Order = 2)]
         [SettingPropertyGroup("Misc")]
@@ -33,33 +35,6 @@ namespace MarryAnyone
             "Realistic"
         }, 1);
 
-        public bool IsVeryEasy()
-        {
-            if (Difficulty.SelectedValue == "Very Easy")
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public bool IsEasy()
-        {
-            if (Difficulty.SelectedValue == "Easy")
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public bool IsRealistic()
-        {
-            if (Difficulty.SelectedValue == "Realistic")
-            {
-                return true;
-            }
-            return false;
-        }
-
         [SettingPropertyDropdown("Sexual Orientation", RequireRestart = false, HintText = "Player character can choose what gender the player can marry", Order = 1)]
         [SettingPropertyGroup("General")]
         public DefaultDropdown<string> SexualOrientation { get; set; } = new DefaultDropdown<string>(new string[]
@@ -68,32 +43,5 @@ namespace MarryAnyone
             "Homosexual",
             "Bisexual"
         }, 0);
-
-        public bool IsHeterosexual()
-        {
-            if (SexualOrientation.SelectedValue == "Heterosexual")
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public bool IsHomosexual()
-        {
-            if (SexualOrientation.SelectedValue == "Homosexual")
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public bool IsBisexual()
-        {
-            if (SexualOrientation.SelectedValue == "Bisexual")
-            {
-                return true;
-            }
-            return false;
-        }
     }
 }

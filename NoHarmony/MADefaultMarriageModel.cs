@@ -11,7 +11,7 @@ namespace MarryAnyone
         {
             bool isPolygamous = MASettings.Instance.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
 
-            if (maidenOrSuitor.IsTemplate || maidenOrSuitor.IsDead || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor))
+            if (maidenOrSuitor.IsTemplate || !maidenOrSuitor.IsAlive || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor))
             {
                 return false;
             }
@@ -29,8 +29,8 @@ namespace MarryAnyone
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
-            bool isHomosexual = MASettings.Instance.IsHomosexual() && isMainHero;
-            bool isBisexual = MASettings.Instance.IsBisexual() && isMainHero;
+            bool isHomosexual = MASettings.Instance.SexualOrientation.SelectedValue == "Homosexual" && isMainHero;
+            bool isBisexual = MASettings.Instance.SexualOrientation.SelectedValue == "Bisexual" && isMainHero;
             bool isIncestual = MASettings.Instance.IsIncestual && isMainHero;
             bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
 

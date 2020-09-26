@@ -11,7 +11,7 @@ namespace MarryAnyone
         [HarmonyPatch("conversation_romance_at_stage_1_discussions_on_condition")]
         private static bool Prefix1(ref bool __result)
         {
-            if (MASettings.Instance.IsVeryEasy() || MASettings.Instance.IsEasy() && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero)
+            if (MASettings.Instance.Difficulty.SelectedValue == "Very Easy" || MASettings.Instance.Difficulty.SelectedValue == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero)
             {
                 __result = false;
                 return false;
@@ -23,7 +23,7 @@ namespace MarryAnyone
         [HarmonyPatch("conversation_romance_at_stage_2_discussions_on_condition")]
         private static bool Prefix2(ref bool __result)
         {
-            if (MASettings.Instance.IsVeryEasy() || MASettings.Instance.IsEasy() && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero)
+            if (MASettings.Instance.Difficulty.SelectedValue == "Very Easy" || MASettings.Instance.Difficulty.SelectedValue == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero)
             {
                 __result = false;
                 return false;

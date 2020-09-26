@@ -51,25 +51,15 @@ namespace MarryAnyone
             MARomanceCampaignBehavior.DeactivateEncounter();
         }
 
-        public override void OnCampaignStart(Game game, object starterObject)
+        protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
-            base.OnCampaignStart(game, starterObject);
-            if (game.GameType is Campaign)
-            {
-                CampaignGameStarter gameInitializer = (CampaignGameStarter)starterObject;
-                AddBehaviors(gameInitializer);
-                LoadXMLs(gameInitializer);
-            }
-        }
+            base.OnGameLoaded(game, gameStarter);
 
-        public override void OnGameLoaded(Game game, object initializerObject)
-        {
-            base.OnGameLoaded(game, initializerObject);
-            if (game.GameType is Campaign)
+            if (game.GameType is Campaign && gameStarter is CampaignGameStarter campaignGameStarter)
             {
-                CampaignGameStarter gameInitializer = (CampaignGameStarter)initializerObject;
+                CampaignGameStarter gameInitializer = (CampaignGameStarter)gameStarter;
+                campaignGameStarter.LoadGameTexts($"{BasePath.Name}Modules/MarryAnyone/ModuleData/ma_module_strings.xml");
                 AddBehaviors(gameInitializer);
-                LoadXMLs(gameInitializer);
             }
         }
 
@@ -77,12 +67,6 @@ namespace MarryAnyone
         {
             gameInitializer.AddBehavior(new MALordConversationsCampaignBehavior());
             gameInitializer.AddBehavior(new MARomanceCampaignBehavior());
-        }
-
-        private void LoadXMLs(CampaignGameStarter campaignGameStarter)
-        {
-            string path = Path.Combine(BasePath.Name, "Modules", "MarryAnyone", "ModuleData", "ma_module_strings.xml");
-            campaignGameStarter.LoadGameTexts(path);
         }
     }
 }

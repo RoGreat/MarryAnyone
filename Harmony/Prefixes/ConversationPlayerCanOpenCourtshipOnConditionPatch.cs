@@ -17,7 +17,7 @@ namespace MarryAnyone
 
         private static bool conversation_player_can_open_courtship_on_condition()
         {
-            bool flag = Hero.MainHero.IsFemale && MASettings.Instance.IsHeterosexual() || !Hero.MainHero.IsFemale && MASettings.Instance.IsHomosexual() || !Hero.OneToOneConversationHero.IsFemale && MASettings.Instance.IsBisexual();
+            bool flag = Hero.MainHero.IsFemale && MASettings.Instance.Difficulty.SelectedValue == "Heterosexual" || !Hero.MainHero.IsFemale && MASettings.Instance.Difficulty.SelectedValue == "Homosexual" || !Hero.OneToOneConversationHero.IsFemale && MASettings.Instance.Difficulty.SelectedValue == "Bisexual";
 
             if (Hero.OneToOneConversationHero == null)
             {
@@ -57,7 +57,7 @@ namespace MarryAnyone
                             ? "{=MAgkRbOqsP}Goodman, may you give me another chance to prove myself?"
                             : "{=MAgVM0EyGL}Goodwife, may you give me another chance to prove myself?", false);
                 }
-                ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);   // Also needs work
+                // ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);   // Also needs work
                 return true;
             }
             return false;
