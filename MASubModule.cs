@@ -5,50 +5,38 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+using TaleWorlds.MountAndBlade;
 
 namespace MarryAnyone
 {
-    internal class MASubModule : NoHarmonyLoader
+    internal class MASubModule : MBSubModuleBase
     {
-        private static Harmony harmony;
+        private static Harmony _harmony;
 
-        public static void MADebug(string message)
-        {
-            if (MASettings.Instance.Debug)
-            {
-                InformationManager.DisplayMessage(new InformationMessage(message, new Color(0.6f, 0.2f, 1f)));
-            }
-        }
+        public static bool Incest = false;
 
-        public override void NoHarmonyInit()
-        {
-            LogFile = "MANoHarmony";
-            LogDateFormat = "MM/dd/yy HH:mm:ss.fff";
-            Logging = false;
-        }
+        public static bool Polygamy = false;
 
-        public override void NoHarmonyLoad()
+        public static string Orientation = "Heterosexual";
+
+        public static string Difficulty = "Very Easy";
+
+        public static void Debug(string message)
         {
-            ReplaceModel<MADefaultMarriageModel, DefaultMarriageModel>();
+            InformationManager.DisplayMessage(new InformationMessage(message, new Color(0.6f, 0.2f, 1f)));
         }
 
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
-            harmony = new Harmony("mod.bannerlord.anyone.marry");
-            harmony.PatchAll();
+            _harmony = new Harmony("mod.bannerlord.anyone.marry");
+            _harmony.PatchAll();
         }
 
         protected override void OnSubModuleUnloaded()
         {
             base.OnSubModuleUnloaded();
-            harmony.UnpatchAll();
-        }
-
-        protected override void OnApplicationTick(float dt)
-        {
-            base.OnApplicationTick(dt);
-            MARomanceCampaignBehavior.DeactivateEncounter();
+            _harmony.UnpatchAll();
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
@@ -65,7 +53,6 @@ namespace MarryAnyone
 
         private void AddBehaviors(CampaignGameStarter gameInitializer)
         {
-            gameInitializer.AddBehavior(new MALordConversationsCampaignBehavior());
             gameInitializer.AddBehavior(new MARomanceCampaignBehavior());
         }
     }

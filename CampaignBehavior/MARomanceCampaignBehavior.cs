@@ -1,67 +1,106 @@
 ﻿using HarmonyLib;
-using MCM.Abstractions.Settings.Base.PerCharacter;
+using Helpers;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
+using TaleWorlds.CampaignSystem.ViewModelCollection.Encyclopedia;
+using TaleWorlds.Core;
+using TaleWorlds.Library;
+using TaleWorlds.Localization;
 
 namespace MarryAnyone
 {
     internal class MARomanceCampaignBehavior : CampaignBehaviorBase
     {
-        private static bool activatedEncounter = false;
-
         protected void AddDialogs(CampaignGameStarter starter)
         {
-            if (MASettings.Instance.Difficulty.SelectedValue == "Realistic")
+            // Reset spouses as nobles after game restarts
+            foreach (Hero hero in Hero.All)
             {
-                starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
+                if ((hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero)) && hero.CharacterObject.Occupation != Occupation.Lord)
+                {
+                    AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(hero.CharacterObject, Occupation.Lord);
+                    Trace.WriteLine("To Lord: " + hero.Name.ToString());
+                    Clan.PlayerClan.Lords.Append(hero);
+                } 
             }
-            else
+            foreach (Hero hero in Clan.PlayerClan.Lords)
             {
-                starter.AddDialogLine("hero_courtship_persuasion_2_success", "lord_start_courtship_response_3", "lord_conclude_courtship_stage_2", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), null, 120, null);
-
-                starter.AddPlayerLine("hero_romance_task", "hero_main_options", "lord_start_courtship_response_3", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), null, 140, null, null);
-
-                starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
+                Trace.WriteLine("Lords: " + hero.Name.ToString());
             }
+            // To begin the dialog for companions
+            starter.AddPlayerLine("main_option_discussions_MA", "hero_main_options", "lord_talk_speak_diplomacy_MA", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_begin_courtship_for_hero_on_condition), null, 120, null, null);
+            starter.AddDialogLine("character_agrees_to_discussion_MA", "lord_talk_speak_diplomacy_MA", "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_character_agrees_to_discussion_on_condition), null, 100, null);
+
+            // Notable dialog starter if using Recruit Everyone mod
+            // starter.AddPlayerLine("lord_special_request_flirt_MA", "hero_main_options_agreed_to_discussion_RE", "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(RomanceCampaignBehaviorPatch.conversation_player_can_open_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
+
+            // From previous iteration
+            starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
+            starter.AddDialogLine("hero_courtship_persuasion_2_success", "lord_start_courtship_response_3", "lord_conclude_courtship_stage_2", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), null, 120, null);
+
+            starter.AddPlayerLine("hero_romance_task", "hero_main_options", "lord_start_courtship_response_3", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), null, 140, null, null);
+
+            starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
+        }
+
+        private void conversation_player_opens_courtship_on_consequence()
+        {
+            if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) != Romance.RomanceLevelEnum.FailedInCompatibility && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) != Romance.RomanceLevelEnum.FailedInPracticalities)
+            {
+                ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
+            }
+        }
+
+        private bool conversation_begin_courtship_for_hero_on_condition()
+        {
+            return Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
+        }
+
+        private bool conversation_character_agrees_to_discussion_on_condition()
+        {
+            MBTextManager.SetTextVariable("STR_INTRIGUE_AGREEMENT", Campaign.Current.ConversationManager.FindMatchingTextOrNull("str_lord_intrigue_accept", CharacterObject.OneToOneConversationCharacter), false);
+            return true;
         }
 
         private bool conversation_finalize_courtship_for_hero_on_condition()
         {
-            ActivateEncounter();
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-            if (MASettings.Instance.Difficulty.SelectedValue == "Realistic")
+            if (MASubModule.Difficulty == "Realistic")
             {
-                MASubModule.MADebug("Realistic Mode");
-                if (MADefaultMarriageModel.DiscoverAncestors(Hero.MainHero, 3).Intersect(MADefaultMarriageModel.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any<Hero>() && MASettings.Instance.IsIncestual)
+                MASubModule.Debug("Realistic Mode");
+                if (DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any<Hero>() && MASubModule.Incest)
                 {
-                    MASubModule.MADebug("Realistic: Incest");
+                    MASubModule.Debug("Realistic: Incest");
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
                 }
                 if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
                 {
-                    MASubModule.MADebug("Realistic: Noble");
+                    MASubModule.Debug("Realistic: Noble");
                     return false;
                 }
                 return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
             }
             else
             {
-                MASubModule.MADebug("Very Easy Mode or Easy Mode");
-                if (MADefaultMarriageModel.DiscoverAncestors(Hero.MainHero, 3).Intersect(MADefaultMarriageModel.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any<Hero>() && MASettings.Instance.IsIncestual)
+                MASubModule.Debug("Very Easy Mode or Easy Mode");
+                if (DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any<Hero>() && MASubModule.Incest)
                 {
-                    if (MASettings.Instance.Difficulty.SelectedValue == "Easy")
+                    if (MASubModule.Difficulty == "Easy")
                     {
-                        MASubModule.MADebug("Easy: Incest");
+                        MASubModule.Debug("Easy: Incest");
                         return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
                     }
-                    MASubModule.MADebug("Very Easy: Incest");
+                    MASubModule.Debug("Very Easy: Incest");
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
                 }
-                if (MASettings.Instance.Difficulty.SelectedValue == "Easy" && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))
+                if (MASubModule.Difficulty == "Easy" && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))
                 {
-                    MASubModule.MADebug("Easy: Noble");
+                    MASubModule.Debug("Easy: Noble");
                     return false;
                 }
                 return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
@@ -70,58 +109,60 @@ namespace MarryAnyone
 
         private void conversation_courtship_success_on_consequence()
         {
-            if (Hero.OneToOneConversationHero.IsNotable)
-            {
-                LeaveSettlementAction.ApplyForCharacterOnly(Hero.OneToOneConversationHero);
-                AddHeroToPartyAction.Apply(Hero.OneToOneConversationHero, MobileParty.MainParty, true);
-                MASubModule.MADebug("Notable joined your party");
-            }
-            if (Hero.OneToOneConversationHero.IsPlayerCompanion)
-            {
-                Hero.OneToOneConversationHero.CompanionOf = null;
-                MASubModule.MADebug("Companion is no longer a companion");
-            }
-            if (Hero.OneToOneConversationHero.CharacterObject.Occupation != Occupation.Lord)
-            {
-                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(Hero.OneToOneConversationHero.CharacterObject, Occupation.Lord, null);
-                Hero.OneToOneConversationHero.IsNoble = true;
-                MASubModule.MADebug("Spouse is now a lord");
-            }
             if (Hero.OneToOneConversationHero.IsFactionLeader && !Hero.OneToOneConversationHero.IsMinorFactionHero)
             {
                 if (Hero.MainHero.Clan.Kingdom != Hero.OneToOneConversationHero.Clan.Kingdom)
                 {
                     ChangeKingdomAction.ApplyByJoinToKingdom(Hero.MainHero.Clan, Hero.OneToOneConversationHero.Clan.Kingdom, true);
-                    MASubModule.MADebug("Joined spouse's kingdom");
+                    MASubModule.Debug("Joined spouse's kingdom");
                 }
             }
+            if (Hero.OneToOneConversationHero.Clan == null)
+            {
+                Hero.OneToOneConversationHero.Clan = Clan.PlayerClan;
+                MASubModule.Debug("Joined player's clan");
+            }
+            // Activate character if not already activated
+            if (!Hero.OneToOneConversationHero.IsActive)
+            {
+                Hero.OneToOneConversationHero.HasMet = true;
+                Hero.OneToOneConversationHero.ChangeState(Hero.CharacterStates.Active);
+                MASubModule.Debug("Activated spouse");
+            }
+            // Dodge the party crash for characters
+            if (!Hero.OneToOneConversationHero.IsNoble)
+            {
+                AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(Hero.OneToOneConversationHero, null, null);
+            }
+            // Apply marriage
             ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Marriage);
-            MASubModule.MADebug("Marriage action applied");
+            // Finalize marriage for new nobility
+            if (!Hero.OneToOneConversationHero.IsNoble)
+            {
+                AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(Hero.OneToOneConversationHero, MobileParty.MainParty, null);
+                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(Hero.OneToOneConversationHero.CharacterObject, Occupation.Lord);
+                Clan.PlayerClan.Lords.Append(Hero.OneToOneConversationHero);
+                Hero.OneToOneConversationHero.IsNoble = true;
+                Hero.MainHero.Clan.Lords.AddItem(Hero.OneToOneConversationHero);
+                MASubModule.Debug("Spouse is now a lord");
+            }
+            if (Hero.OneToOneConversationHero.IsPlayerCompanion)
+            {
+                Hero.OneToOneConversationHero.CompanionOf = null;
+                MASubModule.Debug("Companion is no longer a companion");
+            }
+            if (Hero.OneToOneConversationHero.IsNotable)
+            {
+                LeaveSettlementAction.ApplyForCharacterOnly(Hero.OneToOneConversationHero);
+                AddHeroToPartyAction.Apply(Hero.OneToOneConversationHero, MobileParty.MainParty, true);
+            }
+            MASubModule.Debug("Marriage action applied");
             PlayerEncounter.LeaveEncounter = true;
-        }
 
-        private static void ActivateEncounter()
-        {
-            if (!PlayerEncounter.IsActive)
-            {
-                PlayerEncounter.Start();
-                PlayerEncounter.Current.SetupFields(PartyBase.MainParty, PartyBase.MainParty);
-                activatedEncounter = true;
-                MASubModule.MADebug("Activated");
-            }
-        }
-
-        public static void DeactivateEncounter()
-        {
-            if (activatedEncounter)
-            {
-                if (Hero.OneToOneConversationHero == null)
-                {
-                    PlayerEncounter.Finish(false);
-                    activatedEncounter = false;
-                    MASubModule.MADebug("Deactivated");
-                }
-            }
+            // Last step is to get spouse to show up in the encyclopedia
+            // I think RecruitEveryone is conflicting here
+            // Maybe there is a way to make occupations permanent?
+            // Occupations are set correctly, might need a encyclopedia refresh?
         }
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)

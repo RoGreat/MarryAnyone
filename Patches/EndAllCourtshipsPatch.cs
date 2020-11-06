@@ -8,7 +8,12 @@ namespace MarryAnyone
     {
         private static void Postfix()
         {
-            if (MASettings.Instance.IsPolygamous)
+            EndAllCourtships();
+        }
+
+        public static void EndAllCourtships()
+        {
+            if (MASubModule.Polygamy)
             {
                 foreach (Romance.RomanticState romanticState in Romance.RomanticStateList)
                 {
