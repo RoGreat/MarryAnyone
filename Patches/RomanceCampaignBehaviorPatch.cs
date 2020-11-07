@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Localization;
 
@@ -20,7 +19,7 @@ namespace MarryAnyone
         [HarmonyPatch("conversation_player_can_open_courtship_on_condition")]
         private static bool Prefix1(ref bool __result)
         {
-            __result = RomanceCampaignBehaviorPatch.conversation_player_can_open_courtship_on_condition();
+            __result = conversation_player_can_open_courtship_on_condition();
             return false;
         }
 

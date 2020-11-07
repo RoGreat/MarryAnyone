@@ -24,30 +24,38 @@ namespace MarryAnyone
         {
             if (baseHero.Father == queriedHero && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero)))
             {
-                return GameTexts.FindText("str_father_husband", null);
+                return GameTexts.FindText("str_fatherhusband", null);
             }
             if (baseHero.Mother == queriedHero && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero)))
             {
-                return GameTexts.FindText("str_mother_wife", null);
+                return GameTexts.FindText("str_motherwife", null);
             }
             if (baseHero.Siblings.Contains(queriedHero) && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero)))
             {
                 if (!queriedHero.IsFemale)
                 {
-                    return GameTexts.FindText("str_brother_husband", null);
+                    return GameTexts.FindText("str_brotherhusband", null);
                 }
-                return GameTexts.FindText("str_sister_wife", null);
+                return GameTexts.FindText("str_sisterwife", null);
             }
             if (baseHero.Children.Contains(queriedHero) && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero)))
             {
                 if (!queriedHero.IsFemale)
                 {
-                    return GameTexts.FindText("str_son_husband", null);
+                    return GameTexts.FindText("str_sonhusband", null);
                 }
-                return GameTexts.FindText("str_daughter_wife", null);
+                return GameTexts.FindText("str_str_daughterwife", null);
             }
             if (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero))
             {
+                if (!queriedHero.IsAlive || !baseHero.IsAlive)
+                {
+                    if (!queriedHero.IsFemale)
+                    {
+                        return GameTexts.FindText("str_exhusband", null);
+                    }
+                    return GameTexts.FindText("str_exwife", null);
+                }
                 if (!queriedHero.IsFemale)
                 {
                     return GameTexts.FindText("str_husband", null);
@@ -68,17 +76,17 @@ namespace MarryAnyone
                 {
                     if (!queriedHero.IsFemale)
                     {
-                        return GameTexts.FindText("str_step_son", null);
+                        return GameTexts.FindText("str_stepson", null);
                     }
-                    return GameTexts.FindText("str_step_daughter", null);
+                    return GameTexts.FindText("str_stepdaughter", null);
                 }
                 if (baseHero.Spouse.Siblings.Contains(queriedHero))
                 {
                     if (!queriedHero.IsFemale)
                     {
-                        return GameTexts.FindText("str_step_brother", null);
+                        return GameTexts.FindText("str_stepbrother", null);
                     }
-                    return GameTexts.FindText("str_step_sister", null);
+                    return GameTexts.FindText("str_stepsister", null);
                 }
             }
             return TextObject.Empty;

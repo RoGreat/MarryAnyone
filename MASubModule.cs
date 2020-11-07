@@ -15,9 +15,9 @@ namespace MarryAnyone
 
         public static bool Incest = false;
 
-        public static bool Polygamy = true;
+        public static bool Polygamy = false;
 
-        public static string Orientation = "Bisexual";
+        public static string Orientation = "Heterosexual";
 
         public static string Difficulty = "Very Easy";
 
