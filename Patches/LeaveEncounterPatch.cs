@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 
-namespace MarryAnyone
+namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(PlayerEncounter), "LeaveEncounter", MethodType.Setter)]
     internal class LeaveEncounterPatch

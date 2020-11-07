@@ -1,9 +1,11 @@
 ﻿using HarmonyLib;
+using MarryAnyone.Settings;
+using MCM.Abstractions.Settings.Base.PerSave;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Localization;
 
-namespace MarryAnyone
+namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(RomanceCampaignBehavior))]
     internal class RomanceCampaignBehaviorPatch
@@ -25,9 +27,9 @@ namespace MarryAnyone
 
         public static bool conversation_player_can_open_courtship_on_condition()
         {
-            bool flag = Hero.MainHero.IsFemale && MASubModule.Orientation == "Heterosexual" || !Hero.MainHero.IsFemale && MASubModule.Orientation == "Homosexual" || !Hero.OneToOneConversationHero.IsFemale && MASubModule.Orientation == "Bisexual";
+            bool flag = Hero.MainHero.IsFemale && PerSaveSettings<MASettings>.Instance.SexualOrientation.SelectedValue == "Heterosexual" || !Hero.MainHero.IsFemale && PerSaveSettings<MASettings>.Instance.SexualOrientation.SelectedValue == "Homosexual" || !Hero.OneToOneConversationHero.IsFemale && PerSaveSettings<MASettings>.Instance.SexualOrientation.SelectedValue == "Bisexual";
 
-            MASubModule.Debug("condition 1a");
+            MASubModule.Debug("condition a");
             if (Hero.OneToOneConversationHero == null)
             {
                 return false;
@@ -36,7 +38,7 @@ namespace MarryAnyone
             MASubModule.Debug("Romantic Level: " + (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested).ToString());
             if (Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested)
             {
-                MASubModule.Debug("condition 1b");
+                MASubModule.Debug("condition b");
                 if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
@@ -48,14 +50,14 @@ namespace MarryAnyone
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
                         flag
-                            ? "{=MA1hqoFgKW}Goodman, I note that you have not yet taken a wife."
-                            : "{=MAbX3veGa2}Goodwife, I wish to profess myself your most ardent admirer.", false);
+                            ? "{=goodman_flirt}Goodman, I note that you have not yet taken a wife."
+                            : "{=goodwife_flirt}Goodwife, I wish to profess myself your most ardent admirer.", false);
                 }
                 return true;
             }
             if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility || Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
             {
-                MASubModule.Debug("condition 1c");
+                MASubModule.Debug("condition c");
                 if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
@@ -67,10 +69,9 @@ namespace MarryAnyone
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
                         flag
-                            ? "{=MAgkRbOqsP}Goodman, may you give me another chance to prove myself?"
-                            : "{=MAgVM0EyGL}Goodwife, may you give me another chance to prove myself?", false);
+                            ? "{=goodman_chance}Goodman, may you give me another chance to prove myself?"
+                            : "{=goodwife_chance}Goodwife, may you give me another chance to prove myself?", false);
                 }
-                // ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);   // Also needs work
                 return true;
             }
             return false;
@@ -80,7 +81,7 @@ namespace MarryAnyone
         [HarmonyPatch("conversation_romance_at_stage_1_discussions_on_condition")]
         private static bool Prefix2(ref bool __result)
         {
-            if (MASubModule.Difficulty == "Very Easy" || MASubModule.Difficulty == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero)
+            if (PerSaveSettings<MASettings>.Instance.Difficulty.SelectedValue == "Very Easy" || (PerSaveSettings<MASettings>.Instance.Difficulty.SelectedValue == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
             {
                 __result = false;
                 return false;
@@ -92,7 +93,7 @@ namespace MarryAnyone
         [HarmonyPatch("conversation_romance_at_stage_2_discussions_on_condition")]
         private static bool Prefix3(ref bool __result)
         {
-            if (MASubModule.Difficulty == "Very Easy" || MASubModule.Difficulty == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero)
+            if (PerSaveSettings<MASettings>.Instance.Difficulty.SelectedValue == "Very Easy" || (PerSaveSettings < MASettings>.Instance.Difficulty.SelectedValue == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
             {
                 __result = false;
                 return false;

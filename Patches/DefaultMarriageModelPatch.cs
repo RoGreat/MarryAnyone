@@ -1,10 +1,12 @@
 ﻿using HarmonyLib;
+using MarryAnyone.Settings;
+using MCM.Abstractions.Settings.Base.PerSave;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 
-namespace MarryAnyone
+namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(DefaultMarriageModel))]
     internal class DefaultMarriageModelPatch
@@ -19,7 +21,7 @@ namespace MarryAnyone
 
         public static bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            bool isPolygamous = MASubModule.Polygamy && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
+            bool isPolygamous = PerSaveSettings<MASettings>.Instance.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
 
             if (!maidenOrSuitor.IsAlive || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor) || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
             {
@@ -47,9 +49,9 @@ namespace MarryAnyone
         public static bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
-            bool isHomosexual = MASubModule.Orientation == "Homosexual" && isMainHero;
-            bool isBisexual = MASubModule.Orientation == "Bisexual" && isMainHero;
-            bool isIncestual = MASubModule.Incest && isMainHero;
+            bool isHomosexual = PerSaveSettings<MASettings>.Instance.SexualOrientation.SelectedValue == "Homosexual" && isMainHero;
+            bool isBisexual = PerSaveSettings<MASettings>.Instance.SexualOrientation.SelectedValue == "Bisexual" && isMainHero;
+            bool isIncestual = PerSaveSettings<MASettings>.Instance.IsIncestuous && isMainHero;
             bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
 
             if (isIncestual)

@@ -1,7 +1,9 @@
 ﻿using HarmonyLib;
+using MarryAnyone.Settings;
+using MCM.Abstractions.Settings.Base.PerSave;
 using TaleWorlds.CampaignSystem;
 
-namespace MarryAnyone
+namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(Romance), "EndAllCourtships")]
     internal class EndAllCourtshipsPatch
@@ -13,7 +15,7 @@ namespace MarryAnyone
 
         public static void EndAllCourtships()
         {
-            if (MASubModule.Polygamy)
+            if (PerSaveSettings<MASettings>.Instance.IsPolygamous)
             {
                 foreach (Romance.RomanticState romanticState in Romance.RomanticStateList)
                 {

@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,51 +7,51 @@ using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 
-namespace MarryAnyone
+namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "DailyTickHero")]
     internal class PregnancyCampaignBehaviorPatch
     {
-        public static List<Hero> Spouses;
+        private static List<Hero> _spouses;
 
         private static void Prefix(Hero hero)
         {
-            Hero femaleHero = hero;
-            Spouses = new List<Hero>();
-            if (femaleHero.IsFemale && femaleHero.IsAlive && femaleHero.Age > Campaign.Current.Models.AgeModel.HeroComesOfAge)
+            _spouses = new List<Hero>();
+            if (hero.IsFemale && hero.IsAlive && hero.Age > Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
+                Hero femaleHero = hero;
                 if (Hero.MainHero == femaleHero || Hero.MainHero == femaleHero.Spouse  || femaleHero.ExSpouses.Contains(Hero.MainHero))
                 {
                     MASubModule.Debug("Female Hero: " + femaleHero.Name);
                     if (femaleHero.Spouse != null)
                     {
-                        Spouses.Add(femaleHero.Spouse);
+                        _spouses.Add(femaleHero.Spouse);
                         MASubModule.Debug("Spouse to Spouses: " + femaleHero.Spouse.Name);
                     }
-                    List<Hero> ExSpouses = new List<Hero>();
+                    List<Hero> exSpouses = new List<Hero>();
                     foreach (Hero exSpouse in femaleHero.ExSpouses)
                     {
-                        ExSpouses.Add(exSpouse);
+                        exSpouses.Add(exSpouse);
                     }
-                    for (int i = 0; i < ExSpouses.Count; i++)
+                    for (int i = 0; i < exSpouses.Count; i++)
                     {
                         RemoveExSpouses(femaleHero);
-                        RemoveExSpouses(ExSpouses[i]);
+                        RemoveExSpouses(exSpouses[i]);
                     }
                     foreach (Hero exSpouse in femaleHero.ExSpouses)
                     {
                         if (exSpouse.IsAlive)
                         {
-                            Spouses.Add(exSpouse);
+                            _spouses.Add(exSpouse);
                             MASubModule.Debug("ExSpouse to Spouses: " + exSpouse.Name);
                         }
                     }
-                    if (Spouses.Count > 1)
+                    if (_spouses.Where(spouse => spouse != null).Count() > 1)
                     {
                         ResetSpouse(femaleHero);
                         List<int> attractionGoal = new List<int>();
                         int attraction = 0;
-                        foreach (Hero spouse in Spouses)
+                        foreach (Hero spouse in _spouses)
                         {
                             attraction += Romance.GetAttractionValueAsPercent(femaleHero, spouse);
                             attractionGoal.Add(attraction);
@@ -62,7 +61,7 @@ namespace MarryAnyone
                         int attractionRandom = MBRandom.RandomInt(attraction);
                         MASubModule.Debug("Random: " + attractionRandom.ToString());
                         int i = 0;
-                        while (i < Spouses.Count)
+                        while (i < _spouses.Count)
                         {
                             if (attractionRandom < attractionGoal[i])
                             {
@@ -71,12 +70,13 @@ namespace MarryAnyone
                             }
                             i++;
                         }
-                        femaleHero.Spouse = Spouses[i];
+                        femaleHero.Spouse = _spouses[i];
                     }
                     else
                     {
-                        MASubModule.Debug("Find Single Spouse: " + Spouses.Where(spouse => spouse != null).FirstOrDefault().Name.ToString());
-                        femaleHero.Spouse = Spouses.Where(spouse => spouse != null).FirstOrDefault();
+                        ResetSpouse(femaleHero);
+                        MASubModule.Debug("Find Single Spouse: " + _spouses.Where(spouse => spouse != null).FirstOrDefault().Name.ToString());
+                        femaleHero.Spouse = _spouses.Where(spouse => spouse != null).FirstOrDefault();
                     }
                     if (femaleHero.Spouse != null)
                     {
@@ -91,11 +91,11 @@ namespace MarryAnyone
                         }
                     }
                 }
-                foreach (Hero exSpouse in femaleHero.ExSpouses)
-                {
-                    RemoveExSpouses(femaleHero);
-                    RemoveExSpouses(exSpouse);
-                }
+            }
+            foreach (Hero exSpouse in hero.ExSpouses)
+            {
+                RemoveExSpouses(hero);
+                RemoveExSpouses(exSpouse);
             }
         }
 

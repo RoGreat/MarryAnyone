@@ -1,47 +1,50 @@
-﻿//using MCM.Abstractions.Attributes;
-//using MCM.Abstractions.Attributes.v2;
-//using MCM.Abstractions.Data;
-//using MCM.Abstractions.Settings.Base.PerCharacter;
-//using System.ComponentModel;
+﻿using MCM.Abstractions.Attributes;
+using MCM.Abstractions.Attributes.v2;
+using MCM.Abstractions.Dropdown;
+using MCM.Abstractions.Settings.Base.PerSave;
+using System.Collections.Generic;
+using TaleWorlds.CampaignSystem;
+using TaleWorlds.Localization;
 
-//namespace MarryAnyone
-//{
-//    // Instance is null for some reason...
-//    internal sealed class MASettings :   AttributePerCharacterSettings<MASettings> // AttributeGlobalSettings<MASettings>
-//    {
-//        public override string Id { get; } = "MarryAnyone_v11";
-//        public override string DisplayName { get; } = $"Marry Anyone {typeof(MASettings).Assembly.GetName().Version.ToString(2)}";
-//        public override string FolderName { get; } = "MarryAnyone";
-//        public override string Format => "json";
+namespace MarryAnyone.Settings
+{
+    // Instance is null for some reason...
+    internal class MASettings : AttributePerSaveSettings<MASettings>
+    {
+        public override string Id { get; } = "MarryAnyone_v2";
+        public override string DisplayName { get; } = new TextObject("{=marryanyone}Marry Anyone {VERSION}", new Dictionary<string, TextObject>
+        {
+            { "VERSION", new TextObject(typeof(MASettings).Assembly.GetName().Version.ToString(3)) }
+        }).ToString();
 
-//        [SettingPropertyBool("Polygamy", RequireRestart = false, HintText = "Player character can have polygamous relationships", Order = 2)]
-//        [SettingPropertyGroup("Misc")]
-//        public bool IsPolygamous { get; set; } = false;
+        [SettingPropertyDropdown("{=difficulty}Difficulty", Order = 0, RequireRestart = false, HintText = "{=difficulty_desc}Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all.")]
+        [SettingPropertyGroup("{=general}General")]
+        public DropdownDefault<string> Difficulty { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "Very Easy",
+            "Easy",
+            "Realistic"
+        }, 1);
 
-//        [SettingPropertyBool("Incest", RequireRestart = false, HintText = "Player character can have incestual relationships", Order = 3)]
-//        [SettingPropertyGroup("Misc")]
-//        public bool IsIncestual { get; set; } = false;
+        [SettingPropertyDropdown("{=orientation}Sexual Orientation", Order = 1, RequireRestart = false, HintText = "{=orientation_desc}Player character can choose what gender the player can marry")]
+        [SettingPropertyGroup("{=general}General")]
+        public DropdownDefault<string> SexualOrientation { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "Heterosexual",
+            "Homosexual",
+            "Bisexual"
+        }, 0);
 
-//        [SettingPropertyBool("Debug", RequireRestart = false, Order = 4)]
-//        [SettingPropertyGroup("Misc")]
-//        public bool Debug { get; set; } = false;
+        [SettingPropertyBool("{=polygamy}Polygamy", Order = 2, RequireRestart = false, HintText = "{=polygamy_desc}Player character can have polygamous relationships")]
+        [SettingPropertyGroup("{=other}Other")]
+        public bool IsPolygamous { get; set; } = false;
 
-//        [SettingPropertyDropdown("Difficulty", RequireRestart = false, HintText = "Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all.", Order = 0)]
-//        [SettingPropertyGroup("General")]
-//        public DefaultDropdown<string> Difficulty { get; set; } = new DefaultDropdown<string>(new string[]
-//        {
-//            "Very Easy",
-//            "Easy",
-//            "Realistic"
-//        }, 1);
+        [SettingPropertyBool("{=incest}Incest", Order = 3, RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships")]
+        [SettingPropertyGroup("{=other}Other")]
+        public bool IsIncestuous { get; set; } = false;
 
-//        [SettingPropertyDropdown("Sexual Orientation", RequireRestart = false, HintText = "Player character can choose what gender the player can marry", Order = 1)]
-//        [SettingPropertyGroup("General")]
-//        public DefaultDropdown<string> SexualOrientation { get; set; } = new DefaultDropdown<string>(new string[]
-//        {
-//            "Heterosexual",
-//            "Homosexual",
-//            "Bisexual"
-//        }, 0);
-//    }
-//}
+        [SettingPropertyBool("{=debug}Debug", Order = 4, RequireRestart = false)]
+        [SettingPropertyGroup("{=other}Other")]
+        public bool Debug { get; set; } = false;
+    }
+}

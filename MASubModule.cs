@@ -1,8 +1,8 @@
 ﻿using HarmonyLib;
-using NoHarmony;
-using System.IO;
+using MarryAnyone.Behaviors;
+using MarryAnyone.Settings;
+using MCM.Abstractions.Settings.Base.PerSave;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
@@ -13,17 +13,12 @@ namespace MarryAnyone
     {
         private static Harmony _harmony;
 
-        public static bool Incest = false;
-
-        public static bool Polygamy = false;
-
-        public static string Orientation = "Heterosexual";
-
-        public static string Difficulty = "Very Easy";
-
         public static void Debug(string message)
         {
-            InformationManager.DisplayMessage(new InformationMessage(message, new Color(0.6f, 0.2f, 1f)));
+            if (PerSaveSettings<MASettings>.Instance.Debug)
+            {
+                InformationManager.DisplayMessage(new InformationMessage(message, new Color(0.6f, 0.2f, 1f)));
+            }
         }
 
         protected override void OnSubModuleLoad()
