@@ -15,7 +15,7 @@ namespace MarryAnyone
 
         public static void Debug(string message)
         {
-            if (PerSaveSettings<MASettings>.Instance.Debug)
+            if (MASettings.Instance.Debug)
             {
                 InformationManager.DisplayMessage(new InformationMessage(message, new Color(0.6f, 0.2f, 1f)));
             }

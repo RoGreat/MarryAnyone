@@ -21,7 +21,7 @@ namespace MarryAnyone.Patches
 
         public static bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            bool isPolygamous = PerSaveSettings<MASettings>.Instance.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
+            bool isPolygamous = MASettings.Instance.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
 
             if (!maidenOrSuitor.IsAlive || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor) || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
             {
@@ -49,9 +49,9 @@ namespace MarryAnyone.Patches
         public static bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
-            bool isHomosexual = PerSaveSettings<MASettings>.Instance.SexualOrientation.SelectedValue == "Homosexual" && isMainHero;
-            bool isBisexual = PerSaveSettings<MASettings>.Instance.SexualOrientation.SelectedValue == "Bisexual" && isMainHero;
-            bool isIncestual = PerSaveSettings<MASettings>.Instance.IsIncestuous && isMainHero;
+            bool isHomosexual = MASettings.Instance.SexualOrientation.SelectedValue == "Homosexual" && isMainHero;
+            bool isBisexual = MASettings.Instance.SexualOrientation.SelectedValue == "Bisexual" && isMainHero;
+            bool isIncestual = MASettings.Instance.IsIncestuous && isMainHero;
             bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
 
             if (isIncestual)

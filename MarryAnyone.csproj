@@ -385,7 +385,7 @@
     <Compile Include="Patches\EndAllCourtshipsPatch.cs" />
     <Compile Include="Patches\DefaultMarriageModelPatch.cs" />
     <Compile Include="Patches\RomanceCampaignBehaviorPatch.cs" />
-    <Compile Include="Settings\MASettings.cs" />
+    <Compile Include="MASettings.cs" />
     <Compile Include="MASubModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

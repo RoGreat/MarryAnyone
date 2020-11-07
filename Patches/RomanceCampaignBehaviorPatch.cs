@@ -27,7 +27,7 @@ namespace MarryAnyone.Patches
 
         public static bool conversation_player_can_open_courtship_on_condition()
         {
-            bool flag = Hero.MainHero.IsFemale && PerSaveSettings<MASettings>.Instance.SexualOrientation.SelectedValue == "Heterosexual" || !Hero.MainHero.IsFemale && PerSaveSettings<MASettings>.Instance.SexualOrientation.SelectedValue == "Homosexual" || !Hero.OneToOneConversationHero.IsFemale && PerSaveSettings<MASettings>.Instance.SexualOrientation.SelectedValue == "Bisexual";
+            bool flag = Hero.MainHero.IsFemale && MASettings.Instance.SexualOrientation.SelectedValue == "Heterosexual" || !Hero.MainHero.IsFemale && MASettings.Instance.SexualOrientation.SelectedValue == "Homosexual" || !Hero.OneToOneConversationHero.IsFemale && MASettings.Instance.SexualOrientation.SelectedValue == "Bisexual";
 
             MASubModule.Debug("condition a");
             if (Hero.OneToOneConversationHero == null)
@@ -81,7 +81,7 @@ namespace MarryAnyone.Patches
         [HarmonyPatch("conversation_romance_at_stage_1_discussions_on_condition")]
         private static bool Prefix2(ref bool __result)
         {
-            if (PerSaveSettings<MASettings>.Instance.Difficulty.SelectedValue == "Very Easy" || (PerSaveSettings<MASettings>.Instance.Difficulty.SelectedValue == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
+            if (MASettings.Instance.Difficulty.SelectedValue == "Very Easy" || (MASettings.Instance.Difficulty.SelectedValue == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
             {
                 __result = false;
                 return false;
@@ -93,7 +93,7 @@ namespace MarryAnyone.Patches
         [HarmonyPatch("conversation_romance_at_stage_2_discussions_on_condition")]
         private static bool Prefix3(ref bool __result)
         {
-            if (PerSaveSettings<MASettings>.Instance.Difficulty.SelectedValue == "Very Easy" || (PerSaveSettings < MASettings>.Instance.Difficulty.SelectedValue == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
+            if (MASettings.Instance.Difficulty.SelectedValue == "Very Easy" || (PerSaveSettings < MASettings>.Instance.Difficulty.SelectedValue == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
             {
                 __result = false;
                 return false;

@@ -15,7 +15,7 @@ namespace MarryAnyone.Patches
 
         public static void EndAllCourtships()
         {
-            if (PerSaveSettings<MASettings>.Instance.IsPolygamous)
+            if (MASettings.Instance.IsPolygamous)
             {
                 foreach (Romance.RomanticState romanticState in Romance.RomanticStateList)
                 {

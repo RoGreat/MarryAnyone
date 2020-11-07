@@ -3,12 +3,13 @@ using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Dropdown;
 using MCM.Abstractions.Settings.Base.PerSave;
 using System.Collections.Generic;
-using TaleWorlds.CampaignSystem;
 using TaleWorlds.Localization;
 
 namespace MarryAnyone.Settings
 {
     // Instance is null for some reason...
+    // Seems to be that setting fields are null on new game creation
+    // Have to reload save in order for it to work.
     internal class MASettings : AttributePerSaveSettings<MASettings>
     {
         public override string Id { get; } = "MarryAnyone_v2";
