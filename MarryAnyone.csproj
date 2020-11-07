@@ -264,14 +264,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CampaignBehavior\MAClanMembersVM.cs" />
     <Compile Include="CampaignBehavior\MARomanceCampaignBehavior.cs" />
-    <Compile Include="Rework\DailyTickHeroPatch.cs" />
+    <Compile Include="Patches\GetHeroRelationToHeroTextShortPrefixPatch.cs" />
+    <Compile Include="Patches\PregnancyCampaignBehaviorPatch.cs" />
     <Compile Include="Patches\LeaveEncounterPatch.cs" />
     <Compile Include="Patches\EndAllCourtshipsPatch.cs" />
-    <Compile Include="Rework\GetHeroRelationToHeroTextShortPrefixPatch.cs" />
     <Compile Include="Patches\DefaultMarriageModelPatch.cs" />
-    <Compile Include="Rework\SpouseTranspiler.cs" />
     <Compile Include="Patches\RomanceCampaignBehaviorPatch.cs" />
     <Compile Include="Settings\MASettings.cs" />
     <Compile Include="MASubModule.cs" />

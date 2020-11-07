@@ -19,24 +19,29 @@ namespace MarryAnyone
         protected void AddDialogs(CampaignGameStarter starter)
         {
             // Reset spouses as nobles after game restarts
+            //foreach (Hero hero in Clan.PlayerClan.Lords)
+            //{
+            //    Trace.WriteLine("Lords Before: " + hero.Name.ToString());
+            //}
             foreach (Hero hero in Hero.All)
             {
                 if ((hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero)) && hero.CharacterObject.Occupation != Occupation.Lord)
                 {
                     AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(hero.CharacterObject, Occupation.Lord);
-                    Trace.WriteLine("To Lord: " + hero.Name.ToString());
-                    Clan.PlayerClan.Lords.Append(hero);
+                    hero.Clan = null;
+                    hero.Clan = Clan.PlayerClan;
                 } 
             }
-            foreach (Hero hero in Clan.PlayerClan.Lords)
-            {
-                Trace.WriteLine("Lords: " + hero.Name.ToString());
-            }
+            //foreach (Hero hero in Clan.PlayerClan.Lords)
+            //{
+            //    Trace.WriteLine("Lords After: " + hero.Name.ToString());
+            //}
             // To begin the dialog for companions
             starter.AddPlayerLine("main_option_discussions_MA", "hero_main_options", "lord_talk_speak_diplomacy_MA", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_begin_courtship_for_hero_on_condition), null, 120, null, null);
             starter.AddDialogLine("character_agrees_to_discussion_MA", "lord_talk_speak_diplomacy_MA", "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_character_agrees_to_discussion_on_condition), null, 100, null);
 
             // Notable dialog starter if using Recruit Everyone mod
+            // Seems there is crashing. That's fine. Just use the other mod for workaround...
             // starter.AddPlayerLine("lord_special_request_flirt_MA", "hero_main_options_agreed_to_discussion_RE", "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(RomanceCampaignBehaviorPatch.conversation_player_can_open_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
 
             // From previous iteration
@@ -48,13 +53,13 @@ namespace MarryAnyone
             starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
         }
 
-        private void conversation_player_opens_courtship_on_consequence()
-        {
-            if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) != Romance.RomanceLevelEnum.FailedInCompatibility && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) != Romance.RomanceLevelEnum.FailedInPracticalities)
-            {
-                ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
-            }
-        }
+        //private void conversation_player_opens_courtship_on_consequence()
+        //{
+        //    if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) != Romance.RomanceLevelEnum.FailedInCompatibility && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) != Romance.RomanceLevelEnum.FailedInPracticalities)
+        //    {
+        //        ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
+        //    }
+        //}
 
         private bool conversation_begin_courtship_for_hero_on_condition()
         {
@@ -119,6 +124,7 @@ namespace MarryAnyone
             }
             if (Hero.OneToOneConversationHero.Clan == null)
             {
+                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(Hero.OneToOneConversationHero.CharacterObject, Occupation.Lord);
                 Hero.OneToOneConversationHero.Clan = Clan.PlayerClan;
                 MASubModule.Debug("Joined player's clan");
             }
@@ -140,10 +146,7 @@ namespace MarryAnyone
             if (!Hero.OneToOneConversationHero.IsNoble)
             {
                 AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(Hero.OneToOneConversationHero, MobileParty.MainParty, null);
-                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(Hero.OneToOneConversationHero.CharacterObject, Occupation.Lord);
-                Clan.PlayerClan.Lords.Append(Hero.OneToOneConversationHero);
                 Hero.OneToOneConversationHero.IsNoble = true;
-                Hero.MainHero.Clan.Lords.AddItem(Hero.OneToOneConversationHero);
                 MASubModule.Debug("Spouse is now a lord");
             }
             if (Hero.OneToOneConversationHero.IsPlayerCompanion)
@@ -163,6 +166,7 @@ namespace MarryAnyone
             // I think RecruitEveryone is conflicting here
             // Maybe there is a way to make occupations permanent?
             // Occupations are set correctly, might need a encyclopedia refresh?
+            // Solved, seems like it just needed to assign clan after assigning occupation
         }
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)

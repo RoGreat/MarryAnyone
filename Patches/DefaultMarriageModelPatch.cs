@@ -21,7 +21,7 @@ namespace MarryAnyone
         {
             bool isPolygamous = MASubModule.Polygamy && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
 
-            if (!maidenOrSuitor.IsAlive || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor) || maidenOrSuitor.IsTemplate)
+            if (!maidenOrSuitor.IsAlive || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor) || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
             {
                 return false;
             }

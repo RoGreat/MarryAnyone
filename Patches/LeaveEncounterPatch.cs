@@ -12,10 +12,13 @@ namespace MarryAnyone
     {
         private static bool Prefix()
         {
-            if (Hero.OneToOneConversationHero.CurrentSettlement == null)
+            if (Hero.OneToOneConversationHero != null)
             {
-                Trace.WriteLine("Made It");
-                return false;
+                if (Hero.OneToOneConversationHero.PartyBelongedTo == MobileParty.MainParty)
+                {
+                    Trace.WriteLine("Made It");
+                    return false;
+                }
             }
             Trace.WriteLine("Didn't Make It");
             return true;
