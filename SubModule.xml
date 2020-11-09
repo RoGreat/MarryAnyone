@@ -6,7 +6,7 @@
 	<MultiplayerModule value="false"/>
 	<DependedModules>
 		<DependedModule Id="Bannerlord.Harmony" />
-    <DependedModule Id="Bannerlord.UIExtenderEx" />
+    		<DependedModule Id="Bannerlord.UIExtenderEx" />
 		<DependedModule Id="Bannerlord.ButterLib"/>
 		<DependedModule Id="Bannerlord.MBOptionScreen"/>
 		<DependedModule Id="Native"/>
@@ -26,16 +26,16 @@
 			</Tags>
 		</SubModule>
 		<SubModule>
-      <Name value="MCMv4" />
-      <DLLName value="MCMv4.dll" />
-      <SubModuleClassType value="MCM.MCMSubModule" />
-      <Tags />
-    </SubModule>
-    <SubModule>
-      <Name value="MCMv4 Basic Implementation" />
-      <DLLName value="MCMv4.dll" />
-      <SubModuleClassType value="MCM.Implementation.MCMImplementationSubModule" />
-      <Tags />
-    </SubModule>
+      			<Name value="MCMv4" />
+      			<DLLName value="MCMv4.dll" />
+      			<SubModuleClassType value="MCM.MCMSubModule" />
+      			<Tags />
+    		</SubModule>
+    		<SubModule>
+      			<Name value="MCMv4 Basic Implementation" />
+      			<DLLName value="MCMv4.dll" />
+      			<SubModuleClassType value="MCM.Implementation.MCMImplementationSubModule" />
+      			<Tags />
+    		</SubModule>
 	</SubModules>
 </Module>
