@@ -378,15 +378,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MARomanceCampaignBehavior.cs" />
+    <Compile Include="MAModule\MARomanceCampaignBehavior.cs" />
     <Compile Include="Patches\GetHeroRelationToHeroTextShortPrefixPatch.cs" />
     <Compile Include="Patches\PregnancyCampaignBehaviorPatch.cs" />
     <Compile Include="Patches\LeaveEncounterPatch.cs" />
     <Compile Include="Patches\EndAllCourtshipsPatch.cs" />
     <Compile Include="Patches\DefaultMarriageModelPatch.cs" />
     <Compile Include="Patches\RomanceCampaignBehaviorPatch.cs" />
-    <Compile Include="MASettings.cs" />
-    <Compile Include="MASubModule.cs" />
+    <Compile Include="MAModule\MASettings.cs" />
+    <Compile Include="MAModule\MASubModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
