@@ -28,8 +28,8 @@ namespace MarryAnyone.Patches
                     {
                         if (hero.IsFemale == hero.Spouse.IsFemale)
                         {
-                            ResetSpouse(hero);
                             MASubModule.Debug("Spouse Same Gender: " + hero.Spouse.Name);
+                            ResetSpouse(hero);
                         }
                         else
                         {
