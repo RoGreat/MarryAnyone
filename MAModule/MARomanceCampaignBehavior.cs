@@ -39,10 +39,13 @@ namespace MarryAnyone.Behaviors
 
         private bool conversation_begin_courtship_for_hero_on_condition()
         {
-            MASubModule.Debug("Difficulty: " + MASettings.Instance.Difficulty.SelectedValue);
-            MASubModule.Debug("Orientation: " + MASettings.Instance.SexualOrientation.SelectedValue);
-            MASubModule.Debug("Polygamy: " + MASettings.Instance.IsPolygamous);
-            MASubModule.Debug("Incest: " + MASettings.Instance.IsIncestuous);
+            if (MASettings.Instance != null)
+            {
+                MASubModule.Debug("Difficulty: " + MASettings.Instance.Difficulty.SelectedValue);
+                MASubModule.Debug("Orientation: " + MASettings.Instance.SexualOrientation.SelectedValue);
+                MASubModule.Debug("Polygamy: " + MASettings.Instance.IsPolygamous);
+                MASubModule.Debug("Incest: " + MASettings.Instance.IsIncestuous);
+            }
             return Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
         }
 
@@ -55,39 +58,43 @@ namespace MarryAnyone.Behaviors
         private bool conversation_finalize_courtship_for_hero_on_condition()
         {
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-            if (MASettings.Instance.Difficulty.SelectedValue == "Realistic")
+            if (MASettings.Instance != null)
             {
-                if (DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any() && MASettings.Instance.IsIncestuous)
+                if (MASettings.Instance.Difficulty.SelectedValue == "Realistic")
                 {
-                    MASubModule.Debug("Realistic: Incest");
-                    return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
-                }
-                if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
-                {
-                    MASubModule.Debug("Realistic: Noble");
-                    return false;
-                }
-                return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
-            }
-            else
-            {
-                if (DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any() && MASettings.Instance.IsIncestuous)
-                {
-                    if (MASettings.Instance.Difficulty.SelectedValue == "Easy")
+                    if (DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any() && MASettings.Instance.IsIncestuous)
                     {
-                        MASubModule.Debug("Easy: Incest");
+                        MASubModule.Debug("Realistic: Incest");
                         return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
                     }
-                    MASubModule.Debug("Very Easy: Incest");
+                    if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
+                    {
+                        MASubModule.Debug("Realistic: Noble");
+                        return false;
+                    }
+                    return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+                }
+                else
+                {
+                    if (DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any() && MASettings.Instance.IsIncestuous)
+                    {
+                        if (MASettings.Instance.Difficulty.SelectedValue == "Easy")
+                        {
+                            MASubModule.Debug("Easy: Incest");
+                            return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+                        }
+                        MASubModule.Debug("Very Easy: Incest");
+                        return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
+                    }
+                    if (MASettings.Instance.Difficulty.SelectedValue == "Easy" && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))
+                    {
+                        MASubModule.Debug("Easy: Noble");
+                        return false;
+                    }
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
                 }
-                if (MASettings.Instance.Difficulty.SelectedValue == "Easy" && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))
-                {
-                    MASubModule.Debug("Easy: Noble");
-                    return false;
-                }
-                return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
             }
+            return false;
         }
 
         private void conversation_courtship_success_on_consequence()

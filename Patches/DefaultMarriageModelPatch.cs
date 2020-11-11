@@ -21,6 +21,10 @@ namespace MarryAnyone.Patches
 
         public static bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
+            if (MASettings.Instance == null)
+            {
+                return false;
+            }
             bool isPolygamous = MASettings.Instance.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
 
             if (!maidenOrSuitor.IsAlive || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor) || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
@@ -49,6 +53,10 @@ namespace MarryAnyone.Patches
         public static bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
+            if (MASettings.Instance == null)
+            {
+                return false;
+            }
             bool isHomosexual = MASettings.Instance.SexualOrientation.SelectedValue == "Homosexual" && isMainHero;
             bool isBisexual = MASettings.Instance.SexualOrientation.SelectedValue == "Bisexual" && isMainHero;
             bool isIncestual = MASettings.Instance.IsIncestuous && isMainHero;
