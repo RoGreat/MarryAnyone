@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="string">
-  <tags>
-    <tag language="English" />
-  </tags>  
-  <strings>
+	<tags>
+		<tag language="English" />
+	</tags>  
+	<strings>
 		<string id="marryanyone" text="Marry Anyone" />
 		<string id="difficulty" text="Difficulty" />
 		<string id="difficulty_desc" text="Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all." />
@@ -16,5 +16,5 @@
 		<string id="incest" text="Incest" />
 		<string id="incest_desc" text="Player character can have incestuous relationships" />
 		<string id="debug" text="Debug" />
-  </strings>
+  	</strings>
 </base>
