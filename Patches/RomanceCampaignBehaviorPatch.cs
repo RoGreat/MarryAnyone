@@ -109,5 +109,17 @@ namespace MarryAnyone.Patches
             }
             return true;
         }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("conversation_finalize_courtship_for_hero_on_condition")]
+        private static bool Prefix4(ref bool __result)
+        {
+            if (CharacterObject.OneToOneConversationCharacter.Occupation == Occupation.Wanderer && !Hero.OneToOneConversationHero.IsPlayerCompanion)
+            {
+                __result = false;
+                return false;
+            }
+            return true;
+        }
     }
 }
