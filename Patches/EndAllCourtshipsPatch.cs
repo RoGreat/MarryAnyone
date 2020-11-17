@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Settings;
-using MCM.Abstractions.Settings.Base.PerSave;
 using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone.Patches
@@ -15,11 +14,8 @@ namespace MarryAnyone.Patches
 
         public static void EndAllCourtships()
         {
-            if (MASettings.Instance == null)
-            {
-                return;
-            }
-            if (MASettings.Instance.IsPolygamous)
+            ICustomSettingsProvider settings = new MASettings();
+            if (settings.IsPolygamous)
             {
                 foreach (Romance.RomanticState romanticState in Romance.RomanticStateList)
                 {

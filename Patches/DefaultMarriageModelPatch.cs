@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Settings;
-using MCM.Abstractions.Settings.Base.PerSave;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
@@ -21,11 +20,8 @@ namespace MarryAnyone.Patches
 
         public static bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            if (MASettings.Instance == null)
-            {
-                return false;
-            }
-            bool isPolygamous = MASettings.Instance.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
+            ICustomSettingsProvider settings = new MASettings();
+            bool isPolygamous = settings.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
 
             if (!maidenOrSuitor.IsAlive || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor) || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
             {
@@ -52,14 +48,11 @@ namespace MarryAnyone.Patches
 
         public static bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
+            ICustomSettingsProvider settings = new MASettings();
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
-            if (MASettings.Instance == null)
-            {
-                return false;
-            }
-            bool isHomosexual = MASettings.Instance.SexualOrientation.SelectedValue == "Homosexual" && isMainHero;
-            bool isBisexual = MASettings.Instance.SexualOrientation.SelectedValue == "Bisexual" && isMainHero;
-            bool isIncestual = MASettings.Instance.IsIncestuous && isMainHero;
+            bool isHomosexual = settings.SexualOrientation == "Homosexual" && isMainHero;
+            bool isBisexual = settings.SexualOrientation == "Bisexual" && isMainHero;
+            bool isIncestual = settings.IsIncestuous && isMainHero;
             bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
 
             if (isIncestual)

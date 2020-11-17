@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -18,6 +17,7 @@ namespace MarryAnyone.Patches
 
         private static void Prefix(Hero hero)
         {
+            ICustomSettingsProvider settings = new MASettings();
             _spouses = new List<Hero>();
             if (hero.IsFemale && hero.IsAlive && hero.Age > Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
@@ -97,14 +97,11 @@ namespace MarryAnyone.Patches
                     }
                 }
             }
-            if (MASettings.Instance != null)
+            if (settings.SexualOrientation == "Homosexual" && (hero == Hero.MainHero || hero.Spouse == Hero.MainHero))
             {
-                if (MASettings.Instance.SexualOrientation.SelectedValue == "Homosexual" && (hero == Hero.MainHero || hero.Spouse == Hero.MainHero))
-                {
-                    MASubModule.Debug("Homosexual");
-                    ResetSpouse(hero);
-                    return;
-                }
+                MASubModule.Debug("Homosexual");
+                ResetSpouse(hero);
+                return;
             }
             foreach (Hero exSpouse in hero.ExSpouses.ToList())
             {
