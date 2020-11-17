@@ -52,10 +52,10 @@ namespace MarryAnyone.Patches
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
             bool isHomosexual = settings.SexualOrientation == "Homosexual" && isMainHero;
             bool isBisexual = settings.SexualOrientation == "Bisexual" && isMainHero;
-            bool isIncestual = settings.IsIncestuous && isMainHero;
+            bool isIncestuous = settings.IsIncestuous && isMainHero;
             bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
 
-            if (isIncestual)
+            if (isIncestuous)
             {
                 discoverAncestors = true;
             }

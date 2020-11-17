@@ -112,7 +112,7 @@ namespace MarryAnyone.Behaviors
                 MASubModule.Debug("Joined Player's Clan");
             }
             // Activate character if not already activated
-            if (!Hero.OneToOneConversationHero.IsActive)
+            if (!Hero.OneToOneConversationHero.IsActive || Hero.OneToOneConversationHero.HasMet == false)
             {
                 Hero.OneToOneConversationHero.HasMet = true;
                 Hero.OneToOneConversationHero.ChangeState(Hero.CharacterStates.Active);
@@ -138,6 +138,7 @@ namespace MarryAnyone.Behaviors
                 MASubModule.Debug("No Longer Companion");
             }
             MASubModule.Debug("Marriage Action Applied");
+            PregnancyCampaignBehaviorPatch.RemoveExSpouses(Hero.OneToOneConversationHero);
             PlayerEncounter.LeaveEncounter = true;
         }
 
