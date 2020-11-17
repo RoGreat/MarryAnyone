@@ -35,7 +35,7 @@
     {
         public bool IsPolygamous { get; set; } = false;
         public bool IsIncestuous { get; set; } = false;
-        public bool Debug { get; set; } = true;
+        public bool Debug { get; set; } = false;
         public string Difficulty { get; set; } = "Easy";
         public string SexualOrientation { get; set; } = "Heterosexual";
     }
