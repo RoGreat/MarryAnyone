@@ -18,7 +18,7 @@ namespace MarryAnyone.Settings
             { "VERSION", new TextObject(typeof(MAMCMSettings).Assembly.GetName().Version.ToString(3)) }
         }).ToString();
 
-        [SettingPropertyDropdown("{=difficulty}Difficulty", Order = 0, RequireRestart = false, HintText = "{=difficulty_desc}Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all.")]
+        [SettingPropertyDropdown("{=difficulty}Difficulty", Order = 0, RequireRestart = false, HintText = "{=difficulty_desc}Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all")]
         [SettingPropertyGroup("{=general}General")]
         public DropdownDefault<string> DifficultyDropdown { get; set; } = new DropdownDefault<string>(new string[]
         {
@@ -36,24 +36,23 @@ namespace MarryAnyone.Settings
             "Bisexual"
         }, 0);
 
-        [SettingPropertyBool("{=becomeruler}Become Ruler", Order = 2, RequireRestart = false, HintText = "{=becomeruler_desc}Player character can become the kingdom ruler after marrying a kingdom ruler")]
-        [SettingPropertyGroup("{=kingdom}Kingdom")]
+        [SettingPropertyBool("{=becomeruler}Become Ruler", RequireRestart = false, HintText = "{=becomeruler_desc}Player character can become the kingdom ruler after marrying a kingdom ruler")]
+        [SettingPropertyGroup("{=kingdom}Kingdom Ruler Marriage")]
         public bool BecomeRuler { get; set; } = false;
 
-        [SettingPropertyBool("{=cheating}Cheating", Order = 3, RequireRestart = false, HintText = "{=cheating_desc}Player character can marry characters that are already married")]
-        [SettingPropertyGroup("{=other}Other")]
+        [SettingPropertyBool("{=cheating}Cheating", RequireRestart = false, HintText = "{=cheating_desc}Player character can marry characters that are already married")]
+        [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool Cheating { get; set; } = false;
 
-        [SettingPropertyBool("{=polygamy}Polygamy", Order = 4, RequireRestart = false, HintText = "{=polygamy_desc}Player character can have polygamous relationships")]
-        [SettingPropertyGroup("{=other}Other")]
+        [SettingPropertyBool("{=polygamy}Polygamy", RequireRestart = false, HintText = "{=polygamy_desc}Player character can have polygamous relationships")]
+        [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool Polygamy { get; set; } = false;
 
-        [SettingPropertyBool("{=incest}Incest", Order = 5, RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships")]
-        [SettingPropertyGroup("{=other}Other")]
+        [SettingPropertyBool("{=incest}Incest", RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships")]
+        [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool Incest { get; set; } = false;
 
-        [SettingPropertyBool("{=debug}Debug", Order = 6, RequireRestart = false)]
-        [SettingPropertyGroup("{=other}Other")]
+        [SettingPropertyBool("{=debug}Debug", RequireRestart = false, HintText = "{=debug_desc}Displays mod developer debug information in the game's message log")]
         public bool Debug { get; set; } = false;
 
         public string Difficulty { get => DifficultyDropdown.SelectedValue; set => DifficultyDropdown.SelectedValue = value; }

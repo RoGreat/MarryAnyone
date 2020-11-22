@@ -1,16 +1,12 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Models.Patches;
-using MarryAnyone.Behaviors.Patches;
 using MarryAnyone.Settings;
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Localization;
-using System.Diagnostics;
-using System.Reflection;
-using System.Collections.Generic;
-using TaleWorlds.Library;
+using MarryAnyone.Helpers;
 
 namespace MarryAnyone.Behaviors
 {
@@ -110,6 +106,7 @@ namespace MarryAnyone.Behaviors
                 if (hero.Clan.Kingdom != spouse.Clan.Kingdom)
                 {
                     // Extra option in case people want to become a ruler
+                    // Might need to flesh this out in the future
                     if (settings.BecomeRuler)
                     {
                         if (hero.Clan.Kingdom == null)
@@ -117,12 +114,16 @@ namespace MarryAnyone.Behaviors
                             ChangeKingdomAction.ApplyByCreateKingdom(hero.Clan, spouse.Clan.Kingdom, false);
                             MASubModule.Debug("Player is Kingdom Ruler");
                         }
+                        ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(spouse.Clan);
                         ChangeKingdomAction.ApplyByJoinToKingdom(spouse.Clan, hero.Clan.Kingdom, true);
+                        spouse.Clan = hero.Clan;
                         MASubModule.Debug("Spouse Joined Kingdom");
                     }
                     else
                     {
+                        ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(hero.Clan);
                         ChangeKingdomAction.ApplyByJoinToKingdom(hero.Clan, spouse.Clan.Kingdom, true);
+                        hero.Clan = spouse.Clan;
                         MASubModule.Debug("Joined Spouse's Kingdom");
                     }
                 }
@@ -154,7 +155,7 @@ namespace MarryAnyone.Behaviors
             MASubModule.Debug("Marriage Action Applied");
             if (oldSpouse != null)
             {
-                PregnancyCampaignBehaviorPatch.RemoveExSpouses(oldSpouse);
+                MASpouseHelper.RemoveExSpouses(oldSpouse);
             }
             // Finalize marriage for new nobility
             if (!spouse.IsNoble)
@@ -173,13 +174,13 @@ namespace MarryAnyone.Behaviors
                 spouse.CompanionOf = null;
                 MASubModule.Debug("No Longer Companion");
             }
-            if (settings.Cheating)
+            if (settings.Cheating && cheatedSpouse != null)
             {
-                PregnancyCampaignBehaviorPatch.RemoveExSpouses(cheatedSpouse, false);
-                PregnancyCampaignBehaviorPatch.RemoveExSpouses(spouse, false);
+                MASpouseHelper.RemoveExSpouses(cheatedSpouse, false);
+                MASpouseHelper.RemoveExSpouses(spouse, false);
             }
-            PregnancyCampaignBehaviorPatch.RemoveExSpouses(hero);
-            PregnancyCampaignBehaviorPatch.RemoveExSpouses(spouse);
+            MASpouseHelper.RemoveExSpouses(hero);
+            MASpouseHelper.RemoveExSpouses(spouse);
             PlayerEncounter.LeaveEncounter = true;
         }
 

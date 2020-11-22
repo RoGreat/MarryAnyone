@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="string">
-  	<strings>
+  <strings>
 		<string id="str_fatherhusband" text="{=fatherhusband}Father-husband" />
 		<string id="str_motherwife" text="{=motherwife}Mother-wife" />
 		<string id="str_brotherhusband" text="{=brotherhusband}Brother-husband" />
@@ -15,5 +15,5 @@
 		<string id="str_husbands_husband" text="{=husbands_husband}Husband's husband" />
 		<string id="str_wifes_husband" text="{=wifes_husband}Wife's husband" />
 		<string id="str_wifes_wife" text="{=wifes_wife}Wife's wife" />
-	</strings>
+  </strings>
 </base>

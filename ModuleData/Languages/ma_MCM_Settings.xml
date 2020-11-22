@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="string">
-	<tags>
-		<tag language="English" />
-	</tags>  
-	<strings>
+  <tags>
+    <tag language="English" />
+  </tags>  
+  <strings>
 		<string id="marryanyone" text="Marry Anyone" />
 		<string id="difficulty" text="Difficulty" />
-		<string id="difficulty_desc" text="Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all." />
+		<string id="difficulty_desc" text="Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all" />
 		<string id="general" text="General" />
 		<string id="orientation" text="Sexual Orientation" />
 		<string id="orientation_desc" text="Player character can choose what gender the player can marry" />
 		<string id="polygamy" text="Polygamy" />
 		<string id="polygamy_desc" text="Player character can have polygamous relationships" />
-		<string id="other" text="Other" />
 		<string id="incest" text="Incest" />
 		<string id="incest_desc" text="Player character can have incestuous relationships" />
 		<string id="debug" text="Debug" />
-  	</strings>
+		<string id="debug_desc" text="Displays mod developer debug information in the game's message log" />
+		<string id="kingdom" text="Kingdom Ruler Marriage" />
+		<string id="becomeruler" text="Become Ruler" />
+		<string id="becomeruler_desc" text="Player character can become the kingdom ruler after marrying a kingdom ruler" />
+		<string id="cheating" text="Cheating" />
+		<string id="cheating_desc" text="Player character can marry characters that are already married" />
+		<string id="relationship" text="Relationship Options" />
+  </strings>
 </base>

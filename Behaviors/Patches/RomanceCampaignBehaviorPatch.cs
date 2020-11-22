@@ -39,16 +39,26 @@ namespace MarryAnyone.Behaviors.Patches
             {
                 if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
                 {
-                    MBTextManager.SetTextVariable("FLIRTATION_LINE",
-                        flag
-                            ? "{=bjJs0eeB}My lord, I note that you have not yet taken a wife."
-                            : "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer", false);
+                    if (Hero.OneToOneConversationHero.Spouse == null)
+                    {
+                        MBTextManager.SetTextVariable("FLIRTATION_LINE",
+                            flag
+                                ? "{=lord_flirt}My lord, I note that you have not yet taken a spouse."
+                                : "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer.", false);
+                    }
+                    else
+                    {
+                        MBTextManager.SetTextVariable("FLIRTATION_LINE",
+                            flag
+                                ? "{=lord_cheating_flirt}My lord, I note that you might wish for a new spouse."
+                                : "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer.", false);
+                    }
                 }
                 else
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE",
                         flag
-                            ? "{=goodman_flirt}Goodman, I note that you have not yet taken a wife."
+                            ? "{=goodman_flirt}Goodman, I note that you have not yet taken a spouse."
                             : "{=goodwife_flirt}Goodwife, I wish to profess myself your most ardent admirer.", false);
                 }
                 return true;

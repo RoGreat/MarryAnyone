@@ -1,12 +1,11 @@
 ﻿using HarmonyLib;
+using MarryAnyone.Helpers;
 using MarryAnyone.Settings;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Core;
-using TaleWorlds.Library;
 
 namespace MarryAnyone.Behaviors.Patches
 {
@@ -39,8 +38,8 @@ namespace MarryAnyone.Behaviors.Patches
                     }
                     foreach (Hero exSpouse in hero.ExSpouses.ToList())
                     {
-                        RemoveExSpouses(hero);
-                        RemoveExSpouses(exSpouse);
+                        MASpouseHelper.RemoveExSpouses(hero);
+                        MASpouseHelper.RemoveExSpouses(exSpouse);
                     }
                     foreach (Hero exSpouse in hero.ExSpouses.ToList())
                     {
@@ -98,44 +97,14 @@ namespace MarryAnyone.Behaviors.Patches
             }
             if (settings.SexualOrientation == "Homosexual" && (hero == Hero.MainHero || hero.Spouse == Hero.MainHero))
             {
-                MASubModule.Debug("Homosexual");
                 hero.Spouse = null;
                 return;
             }
             foreach (Hero exSpouse in hero.ExSpouses.ToList())
             {
-                RemoveExSpouses(hero);
-                RemoveExSpouses(exSpouse);
+                MASpouseHelper.RemoveExSpouses(hero);
+                MASpouseHelper.RemoveExSpouses(exSpouse);
             }
-        }
-
-        public static void RemoveExSpouses(Hero hero, bool spouse = true)
-        {
-            FieldInfo _exSpouses = AccessTools.Field(typeof(Hero), "_exSpouses");
-            List<Hero> _exSpousesList = (List<Hero>)_exSpouses.GetValue(hero);
-            FieldInfo ExSpouses = AccessTools.Field(typeof(Hero), "ExSpouses");
-            MBReadOnlyList<Hero> ExSpousesReadOnlyList;
-
-            if (spouse)
-            {
-                _exSpousesList = _exSpousesList.Distinct().ToList();
-                if (_exSpousesList.Contains(hero.Spouse))
-                {
-                    _exSpousesList.Remove(hero.Spouse);
-                }
-            }
-            else
-            {
-                _exSpousesList = _exSpousesList.ToList();
-                Hero exSpouse = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).FirstOrDefault();
-                if (exSpouse != null)
-                {
-                    _exSpousesList.Remove(exSpouse);
-                }
-            }
-            ExSpousesReadOnlyList = new MBReadOnlyList<Hero>(_exSpousesList);
-            _exSpouses.SetValue(hero, _exSpousesList);
-            ExSpouses.SetValue(hero, ExSpousesReadOnlyList);
         }
     }
 }

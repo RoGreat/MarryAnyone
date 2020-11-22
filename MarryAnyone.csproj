@@ -390,6 +390,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Behaviors\MARomanceCampaignBehavior.cs" />
+    <Compile Include="Helpers\MASpouseHelper.cs" />
     <Compile Include="Patches\GetHeroRelationToHeroTextShortPrefixPatch.cs" />
     <Compile Include="Behaviors\Patches\PregnancyCampaignBehaviorPatch.cs" />
     <Compile Include="Patches\LeaveEncounterPatch.cs" />

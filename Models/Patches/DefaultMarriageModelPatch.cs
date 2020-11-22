@@ -29,7 +29,7 @@ namespace MarryAnyone.Models.Patches
             {
                 return false;
             }
-            if (maidenOrSuitor.Spouse == null && !maidenOrSuitor.ExSpouses.ToList().Where(exSpouse => exSpouse.IsAlive).Any() || isPolygamous || isCheating)
+            if (maidenOrSuitor.Spouse == null && !maidenOrSuitor.ExSpouses.Where(exSpouse => exSpouse.IsAlive).Any() || isPolygamous || isCheating)
             {
                 if (maidenOrSuitor.IsFemale)
                 {
