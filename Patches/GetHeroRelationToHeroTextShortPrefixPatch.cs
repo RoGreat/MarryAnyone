@@ -7,6 +7,7 @@ using TaleWorlds.Localization;
 
 namespace MarryAnyone.Patches
 {
+    // Fix the last part
     [HarmonyPatch(typeof(CampaignUIHelper), "GetHeroRelationToHeroTextShort")]
     internal class GetHeroRelationToHeroTextShortPatch
     {

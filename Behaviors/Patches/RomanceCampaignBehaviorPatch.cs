@@ -4,7 +4,8 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Localization;
 
-namespace MarryAnyone.Patches
+// Add dialog in case of cheating...
+namespace MarryAnyone.Behaviors.Patches
 {
     [HarmonyPatch(typeof(RomanceCampaignBehavior))]
     internal class RomanceCampaignBehaviorPatch
@@ -26,7 +27,7 @@ namespace MarryAnyone.Patches
 
         public static bool conversation_player_can_open_courtship_on_condition()
         {
-            ICustomSettingsProvider settings = new MASettings();
+            ISettingsProvider settings = new MASettings();
             if (Hero.OneToOneConversationHero == null)
             {
                 return false;
@@ -77,7 +78,7 @@ namespace MarryAnyone.Patches
         [HarmonyPatch("conversation_romance_at_stage_1_discussions_on_condition")]
         private static bool Prefix2(ref bool __result)
         {
-            ICustomSettingsProvider settings = new MASettings();
+            ISettingsProvider settings = new MASettings();
             if (settings.Difficulty == "Very Easy" || (settings.Difficulty == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
             {
                 __result = false;
@@ -90,7 +91,7 @@ namespace MarryAnyone.Patches
         [HarmonyPatch("conversation_romance_at_stage_2_discussions_on_condition")]
         private static bool Prefix3(ref bool __result)
         {
-            ICustomSettingsProvider settings = new MASettings();
+            ISettingsProvider settings = new MASettings();
             if (settings.Difficulty == "Very Easy" || (settings.Difficulty == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
             {
                 __result = false;

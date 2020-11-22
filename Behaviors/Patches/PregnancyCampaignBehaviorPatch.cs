@@ -8,7 +8,7 @@ using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
 
-namespace MarryAnyone.Patches
+namespace MarryAnyone.Behaviors.Patches
 {
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "DailyTickHero")]
     internal class PregnancyCampaignBehaviorPatch
@@ -17,7 +17,7 @@ namespace MarryAnyone.Patches
 
         private static void Prefix(Hero hero)
         {
-            ICustomSettingsProvider settings = new MASettings();
+            ISettingsProvider settings = new MASettings();
             _spouses = new List<Hero>();
             if (hero.IsFemale && hero.IsAlive && hero.Age > Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
@@ -29,7 +29,7 @@ namespace MarryAnyone.Patches
                         if (hero.IsFemale == hero.Spouse.IsFemale)
                         {
                             MASubModule.Debug("Spouse Same Gender: " + hero.Spouse.Name);
-                            ResetSpouse(hero);
+                            hero.Spouse = null;
                         }
                         else
                         {
@@ -60,7 +60,6 @@ namespace MarryAnyone.Patches
                     }
                     if (_spouses.Where(spouse => spouse != null).Count() > 1)
                     {
-                        ResetSpouse(hero);
                         List<int> attractionGoal = new List<int>();
                         int attraction = 0;
                         foreach (Hero spouse in _spouses)
@@ -100,7 +99,7 @@ namespace MarryAnyone.Patches
             if (settings.SexualOrientation == "Homosexual" && (hero == Hero.MainHero || hero.Spouse == Hero.MainHero))
             {
                 MASubModule.Debug("Homosexual");
-                ResetSpouse(hero);
+                hero.Spouse = null;
                 return;
             }
             foreach (Hero exSpouse in hero.ExSpouses.ToList())
@@ -110,31 +109,33 @@ namespace MarryAnyone.Patches
             }
         }
 
-        private static void ResetSpouse(Hero hero)
-        {
-            if (hero.Spouse != null)
-            {
-                hero.Spouse.Spouse = null;
-                hero.Spouse = null;
-                MASubModule.Debug("Spouse Reset");
-            }
-        }
-
-        public static void RemoveExSpouses(Hero hero)
+        public static void RemoveExSpouses(Hero hero, bool spouse = true)
         {
             FieldInfo _exSpouses = AccessTools.Field(typeof(Hero), "_exSpouses");
-            List<Hero> exSpouseList = (List<Hero>)_exSpouses.GetValue(hero);
+            List<Hero> _exSpousesList = (List<Hero>)_exSpouses.GetValue(hero);
             FieldInfo ExSpouses = AccessTools.Field(typeof(Hero), "ExSpouses");
-            MBReadOnlyList<Hero> exSpouseReadOnlyList;
+            MBReadOnlyList<Hero> ExSpousesReadOnlyList;
 
-            exSpouseList = exSpouseList.Distinct().ToList();
-            if (exSpouseList.Contains(hero.Spouse))
+            if (spouse)
             {
-                exSpouseList.Remove(hero.Spouse);
+                _exSpousesList = _exSpousesList.Distinct().ToList();
+                if (_exSpousesList.Contains(hero.Spouse))
+                {
+                    _exSpousesList.Remove(hero.Spouse);
+                }
             }
-            exSpouseReadOnlyList = new MBReadOnlyList<Hero>(exSpouseList);
-            _exSpouses.SetValue(hero, exSpouseList);
-            ExSpouses.SetValue(hero, exSpouseReadOnlyList);
+            else
+            {
+                _exSpousesList = _exSpousesList.ToList();
+                Hero exSpouse = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).FirstOrDefault();
+                if (exSpouse != null)
+                {
+                    _exSpousesList.Remove(exSpouse);
+                }
+            }
+            ExSpousesReadOnlyList = new MBReadOnlyList<Hero>(_exSpousesList);
+            _exSpouses.SetValue(hero, _exSpousesList);
+            ExSpouses.SetValue(hero, ExSpousesReadOnlyList);
         }
     }
 }

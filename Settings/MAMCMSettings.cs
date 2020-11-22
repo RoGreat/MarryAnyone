@@ -10,12 +10,12 @@ namespace MarryAnyone.Settings
     // Instance is null for some reason...
     // Seems to be that setting fields are null on new game creation
     // Have to reload save in order for it to work.
-    internal class MACustomSettings : AttributePerSaveSettings<MACustomSettings>, ICustomSettingsProvider
+    internal class MAMCMSettings : AttributePerSaveSettings<MAMCMSettings>, ISettingsProvider
     {
         public override string Id { get; } = "MarryAnyone_v2";
         public override string DisplayName { get; } = new TextObject("{=marryanyone}Marry Anyone {VERSION}", new Dictionary<string, TextObject>
         {
-            { "VERSION", new TextObject(typeof(MACustomSettings).Assembly.GetName().Version.ToString(3)) }
+            { "VERSION", new TextObject(typeof(MAMCMSettings).Assembly.GetName().Version.ToString(3)) }
         }).ToString();
 
         [SettingPropertyDropdown("{=difficulty}Difficulty", Order = 0, RequireRestart = false, HintText = "{=difficulty_desc}Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all.")]
@@ -36,15 +36,23 @@ namespace MarryAnyone.Settings
             "Bisexual"
         }, 0);
 
-        [SettingPropertyBool("{=polygamy}Polygamy", Order = 2, RequireRestart = false, HintText = "{=polygamy_desc}Player character can have polygamous relationships")]
-        [SettingPropertyGroup("{=other}Other")]
-        public bool IsPolygamous { get; set; } = false;
+        [SettingPropertyBool("{=becomeruler}Become Ruler", Order = 2, RequireRestart = false, HintText = "{=becomeruler_desc}Player character can become the kingdom ruler after marrying a kingdom ruler")]
+        [SettingPropertyGroup("{=kingdom}Kingdom")]
+        public bool BecomeRuler { get; set; } = false;
 
-        [SettingPropertyBool("{=incest}Incest", Order = 3, RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships")]
+        [SettingPropertyBool("{=cheating}Cheating", Order = 3, RequireRestart = false, HintText = "{=cheating_desc}Player character can marry characters that are already married")]
         [SettingPropertyGroup("{=other}Other")]
-        public bool IsIncestuous { get; set; } = false;
+        public bool Cheating { get; set; } = false;
 
-        [SettingPropertyBool("{=debug}Debug", Order = 4, RequireRestart = false)]
+        [SettingPropertyBool("{=polygamy}Polygamy", Order = 4, RequireRestart = false, HintText = "{=polygamy_desc}Player character can have polygamous relationships")]
+        [SettingPropertyGroup("{=other}Other")]
+        public bool Polygamy { get; set; } = false;
+
+        [SettingPropertyBool("{=incest}Incest", Order = 5, RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships")]
+        [SettingPropertyGroup("{=other}Other")]
+        public bool Incest { get; set; } = false;
+
+        [SettingPropertyBool("{=debug}Debug", Order = 6, RequireRestart = false)]
         [SettingPropertyGroup("{=other}Other")]
         public bool Debug { get; set; } = false;
 

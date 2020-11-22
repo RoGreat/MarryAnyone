@@ -5,7 +5,7 @@ using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 
-namespace MarryAnyone.Patches
+namespace MarryAnyone.Models.Patches
 {
     [HarmonyPatch(typeof(DefaultMarriageModel))]
     internal class DefaultMarriageModelPatch
@@ -20,14 +20,16 @@ namespace MarryAnyone.Patches
 
         public static bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            ICustomSettingsProvider settings = new MASettings();
-            bool isPolygamous = settings.IsPolygamous && (maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero);
+            ISettingsProvider settings = new MASettings();
+            bool inConversation = maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero;
+            bool isCheating = settings.Cheating && inConversation && Hero.OneToOneConversationHero.Spouse != null;
+            bool isPolygamous = settings.Polygamy && inConversation && Hero.OneToOneConversationHero.Spouse == null;
 
-            if (!maidenOrSuitor.IsAlive || Hero.MainHero.ExSpouses.Contains(maidenOrSuitor) || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
+            if (!maidenOrSuitor.IsAlive ||  maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
             {
                 return false;
             }
-            if (maidenOrSuitor.Spouse == null || isPolygamous)
+            if (maidenOrSuitor.Spouse == null && !maidenOrSuitor.ExSpouses.ToList().Where(exSpouse => exSpouse.IsAlive).Any() || isPolygamous || isCheating)
             {
                 if (maidenOrSuitor.IsFemale)
                 {
@@ -48,11 +50,11 @@ namespace MarryAnyone.Patches
 
         public static bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
-            ICustomSettingsProvider settings = new MASettings();
+            ISettingsProvider settings = new MASettings();
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
             bool isHomosexual = settings.SexualOrientation == "Homosexual" && isMainHero;
             bool isBisexual = settings.SexualOrientation == "Bisexual" && isMainHero;
-            bool isIncestuous = settings.IsIncestuous && isMainHero;
+            bool isIncestuous = settings.Incest && isMainHero;
             bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
 
             if (isIncestuous)

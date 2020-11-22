@@ -1,11 +1,16 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Patches;
+using MarryAnyone.Models.Patches;
+using MarryAnyone.Behaviors.Patches;
 using MarryAnyone.Settings;
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Localization;
+using System.Diagnostics;
+using System.Reflection;
+using System.Collections.Generic;
+using TaleWorlds.Library;
 
 namespace MarryAnyone.Behaviors
 {
@@ -38,12 +43,14 @@ namespace MarryAnyone.Behaviors
 
         private bool conversation_begin_courtship_for_hero_on_condition()
         {
-            ICustomSettingsProvider settings = new MASettings();
+            ISettingsProvider settings = new MASettings();
             MASubModule.Debug("Difficulty: " + settings.Difficulty);
             MASubModule.Debug("Orientation: " + settings.SexualOrientation);
-            MASubModule.Debug("Polygamy: " + settings.IsPolygamous);
-            MASubModule.Debug("Incest: " + settings.IsIncestuous);
-            return Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
+            MASubModule.Debug("Become Ruler: " + settings.BecomeRuler);
+            MASubModule.Debug("Cheating: " + settings.Cheating);
+            MASubModule.Debug("Polygamy: " + settings.Polygamy);
+            MASubModule.Debug("Incest: " + settings.Incest);
+            return Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
         }
 
         private bool conversation_character_agrees_to_discussion_on_condition()
@@ -54,11 +61,11 @@ namespace MarryAnyone.Behaviors
 
         private bool conversation_finalize_courtship_for_hero_on_condition()
         {
-            ICustomSettingsProvider settings = new MASettings();
+            ISettingsProvider settings = new MASettings();
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
             if (settings.Difficulty == "Realistic")
             {
-                if (DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any() && settings.IsIncestuous)
+                if (DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any() && settings.Incest)
                 {
                     MASubModule.Debug("Realistic: Incest");
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
@@ -72,7 +79,7 @@ namespace MarryAnyone.Behaviors
             }
             else
             {
-                if (DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any() && settings.IsIncestuous)
+                if (DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any() && settings.Incest)
                 {
                     if (settings.Difficulty == "Easy")
                     {
@@ -93,52 +100,86 @@ namespace MarryAnyone.Behaviors
 
         private void conversation_courtship_success_on_consequence()
         {
-            if (Hero.OneToOneConversationHero.IsFactionLeader && !Hero.OneToOneConversationHero.IsMinorFactionHero)
+            ISettingsProvider settings = new MASettings();
+            Hero hero = Hero.MainHero;
+            Hero spouse = Hero.OneToOneConversationHero;
+            Hero oldSpouse = hero.Spouse;
+            Hero cheatedSpouse = spouse.Spouse;
+            if (spouse.IsFactionLeader && !spouse.IsMinorFactionHero)
             {
-                if (Hero.MainHero.Clan.Kingdom != Hero.OneToOneConversationHero.Clan.Kingdom)
+                if (hero.Clan.Kingdom != spouse.Clan.Kingdom)
                 {
-                    ChangeKingdomAction.ApplyByJoinToKingdom(Hero.MainHero.Clan, Hero.OneToOneConversationHero.Clan.Kingdom, true);
-                    MASubModule.Debug("Joined Spouse's Kingdom");
+                    // Extra option in case people want to become a ruler
+                    if (settings.BecomeRuler)
+                    {
+                        if (hero.Clan.Kingdom == null)
+                        {
+                            ChangeKingdomAction.ApplyByCreateKingdom(hero.Clan, spouse.Clan.Kingdom, false);
+                            MASubModule.Debug("Player is Kingdom Ruler");
+                        }
+                        ChangeKingdomAction.ApplyByJoinToKingdom(spouse.Clan, hero.Clan.Kingdom, true);
+                        MASubModule.Debug("Spouse Joined Kingdom");
+                    }
+                    else
+                    {
+                        ChangeKingdomAction.ApplyByJoinToKingdom(hero.Clan, spouse.Clan.Kingdom, true);
+                        MASubModule.Debug("Joined Spouse's Kingdom");
+                    }
                 }
             }
             if (CharacterObject.OneToOneConversationCharacter.Occupation != Occupation.Lord)
             {
-                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(Hero.OneToOneConversationHero.CharacterObject, Occupation.Lord);
+                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(spouse.CharacterObject, Occupation.Lord);
                 MASubModule.Debug("Spouse to Lord");
             }
-            if (Hero.OneToOneConversationHero.Clan == null)
+            if (spouse.Clan == null)
             {
-                Hero.OneToOneConversationHero.Clan = Clan.PlayerClan;
+                spouse.Clan = Clan.PlayerClan;
                 MASubModule.Debug("Joined Player's Clan");
             }
             // Activate character if not already activated
-            if (!Hero.OneToOneConversationHero.IsActive || Hero.OneToOneConversationHero.HasMet == false)
+            if (!spouse.IsActive || spouse.HasMet == false)
             {
-                Hero.OneToOneConversationHero.HasMet = true;
-                Hero.OneToOneConversationHero.ChangeState(Hero.CharacterStates.Active);
+                spouse.HasMet = true;
+                spouse.ChangeState(Hero.CharacterStates.Active);
                 MASubModule.Debug("Activated Spouse");
             }
             // Dodge the party crash for characters
-            if (!Hero.OneToOneConversationHero.IsNoble)
+            if (!spouse.IsNoble)
             {
-                AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(Hero.OneToOneConversationHero, null, null);
+                AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(spouse, null, null);
             }
             // Apply marriage
-            ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Marriage);
-            // Finalize marriage for new nobility
-            if (!Hero.OneToOneConversationHero.IsNoble)
+            ChangeRomanticStateAction.Apply(hero, spouse, Romance.RomanceLevelEnum.Marriage);
+            MASubModule.Debug("Marriage Action Applied");
+            if (oldSpouse != null)
             {
-                AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(Hero.OneToOneConversationHero, MobileParty.MainParty, null);
-                Hero.OneToOneConversationHero.IsNoble = true;
+                PregnancyCampaignBehaviorPatch.RemoveExSpouses(oldSpouse);
+            }
+            // Finalize marriage for new nobility
+            if (!spouse.IsNoble)
+            {
+                AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(spouse, MobileParty.MainParty, null);
+                spouse.IsNoble = true;
                 MASubModule.Debug("Spouse To Noble");
             }
-            if (Hero.OneToOneConversationHero.IsPlayerCompanion)
+            else
             {
-                Hero.OneToOneConversationHero.CompanionOf = null;
+                // New fix to stop some kingdom rulers from disappearing
+                AddHeroToPartyAction.Apply(spouse, MobileParty.MainParty, true);
+            }
+            if (spouse.IsPlayerCompanion)
+            {
+                spouse.CompanionOf = null;
                 MASubModule.Debug("No Longer Companion");
             }
-            MASubModule.Debug("Marriage Action Applied");
-            PregnancyCampaignBehaviorPatch.RemoveExSpouses(Hero.OneToOneConversationHero);
+            if (settings.Cheating)
+            {
+                PregnancyCampaignBehaviorPatch.RemoveExSpouses(cheatedSpouse, false);
+                PregnancyCampaignBehaviorPatch.RemoveExSpouses(spouse, false);
+            }
+            PregnancyCampaignBehaviorPatch.RemoveExSpouses(hero);
+            PregnancyCampaignBehaviorPatch.RemoveExSpouses(spouse);
             PlayerEncounter.LeaveEncounter = true;
         }
 

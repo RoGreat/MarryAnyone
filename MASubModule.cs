@@ -14,7 +14,7 @@ namespace MarryAnyone
 
         public static void Debug(string message)
         {
-            ICustomSettingsProvider settings = new MASettings();
+            ISettingsProvider settings = new MASettings();
             if (settings.Debug)
             {
                 InformationManager.DisplayMessage(new InformationMessage(message, new Color(0.6f, 0.2f, 1f)));
