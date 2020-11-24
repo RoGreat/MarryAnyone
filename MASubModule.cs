@@ -10,28 +10,29 @@ namespace MarryAnyone
 {
     internal class MASubModule : MBSubModuleBase
     {
-        private static Harmony _harmony;
-
-        public static void Debug(string message)
+        public static void Debug(string message, bool important = false)
         {
             ISettingsProvider settings = new MASettings();
-            if (settings.Debug)
+            Color color;
+            if (important)
             {
-                InformationManager.DisplayMessage(new InformationMessage(message, new Color(0.6f, 0.2f, 1f)));
+                color = Colors.Red;
+            }
+            else
+            {
+                color = new Color(0.6f, 0.2f, 1f);
+            }
+            if (settings.Debug || important)
+            {
+                InformationManager.DisplayMessage(new InformationMessage(message, color));
             }
         }
 
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
-            _harmony = new Harmony("mod.bannerlord.anyone.marry");
-            _harmony.PatchAll();
-        }
-
-        protected override void OnSubModuleUnloaded()
-        {
-            base.OnSubModuleUnloaded();
-            _harmony.UnpatchAll();
+            MAConfig.Instance = new MAConfig();
+            new Harmony("mod.bannerlord.anyone.marry").PatchAll();
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
@@ -42,6 +43,18 @@ namespace MarryAnyone
                 CampaignGameStarter gameInitializer = (CampaignGameStarter)gameStarter;
                 campaignGameStarter.LoadGameTexts($"{BasePath.Name}Modules/MarryAnyone/ModuleData/ma_module_strings.xml");
                 AddBehaviors(gameInitializer);
+            }
+            try
+            {
+                if (MAMCMSettings.Instance is null)
+                {
+                    MASettings.UsingMCM = true;
+                }
+            }
+            catch 
+            {
+                Debug("Marry Anyone: Not using MCM", true);
+                Debug("Using config settings", true);
             }
         }
 

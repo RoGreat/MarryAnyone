@@ -6,7 +6,7 @@ using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Localization;
-using MarryAnyone.Helpers;
+using MarryAnyone.Behaviors.Helpers;
 
 namespace MarryAnyone.Behaviors
 {
@@ -40,6 +40,7 @@ namespace MarryAnyone.Behaviors
         private bool conversation_begin_courtship_for_hero_on_condition()
         {
             ISettingsProvider settings = new MASettings();
+            MASubModule.Debug("MCM: " + MASettings.UsingMCM.ToString());
             MASubModule.Debug("Difficulty: " + settings.Difficulty);
             MASubModule.Debug("Orientation: " + settings.SexualOrientation);
             MASubModule.Debug("Become Ruler: " + settings.BecomeRuler);

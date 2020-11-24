@@ -1,8 +1,17 @@
-﻿namespace MarryAnyone.Settings
+﻿using Newtonsoft.Json;
+using System.IO;
+using TaleWorlds.Library;
+
+namespace MarryAnyone.Settings
 {
     internal class MASettings : ISettingsProvider
     {
+        public static bool UsingMCM = false;
+
+        private static string _configPath = $"{BasePath.Name}Modules/MarryAnyone/config.json";
+
         private ISettingsProvider _provider;
+
         public bool Incest { get => _provider.Incest; set => _provider.Incest = value; }
         public bool Polygamy { get => _provider.Polygamy; set => _provider.Polygamy = value; }
         public bool BecomeRuler { get => _provider.BecomeRuler; set => _provider.BecomeRuler = value; }
@@ -13,14 +22,26 @@
 
         public MASettings()
         {
-            if (MAMCMSettings.Instance is { })
+            if (UsingMCM)
             {
-                _provider = MAMCMSettings.Instance;
+                if (MAMCMSettings.Instance != null)
+                {
+                    _provider = MAMCMSettings.Instance;
+                    return;
+                }
             }
-            else
+            else if (File.Exists(_configPath))
             {
-                _provider = new MADefaultSettings();
+                MAConfig config = JsonConvert.DeserializeObject<MAConfig>(File.ReadAllText(_configPath));
+                MAConfig.Instance.Polygamy = config.Polygamy;
+                MAConfig.Instance.Incest = config.Incest;
+                MAConfig.Instance.BecomeRuler = config.BecomeRuler;
+                MAConfig.Instance.Cheating = config.Cheating;
+                MAConfig.Instance.Debug = config.Debug;
+                MAConfig.Instance.Difficulty = config.Difficulty;
+                MAConfig.Instance.SexualOrientation = config.SexualOrientation;
             }
+            _provider = MAConfig.Instance;
         }
     }
 
@@ -33,16 +54,5 @@
         bool Debug { get; set; }
         string Difficulty { get; set; }
         string SexualOrientation { get; set; }
-    }
-
-    internal class MADefaultSettings : ISettingsProvider
-    {
-        public bool Polygamy { get; set; } = false;
-        public bool Incest { get; set; } = false;
-        public bool BecomeRuler { get; set; } = false;
-        public bool Cheating { get; set; } = false;
-        public bool Debug { get; set; } = false;
-        public string Difficulty { get; set; } = "Easy";
-        public string SexualOrientation { get; set; } = "Heterosexual";
     }
 }

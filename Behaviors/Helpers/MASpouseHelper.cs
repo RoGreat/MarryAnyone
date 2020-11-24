@@ -5,7 +5,7 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
 
-namespace MarryAnyone.Helpers
+namespace MarryAnyone.Behaviors.Helpers
 {
     internal static class MASpouseHelper
     {

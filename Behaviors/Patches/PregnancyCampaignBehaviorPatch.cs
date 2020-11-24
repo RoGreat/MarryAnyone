@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Helpers;
+using MarryAnyone.Behaviors.Helpers;
 using MarryAnyone.Settings;
 using System.Collections.Generic;
 using System.Linq;
