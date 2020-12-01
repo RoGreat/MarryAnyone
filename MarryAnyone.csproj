@@ -15,7 +15,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\..\..\..\Program Files %28x86%29\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\MarryAnyone\bin\Win64_Shipping_Client\</OutputPath>
+    <OutputPath>bin\Win64_Shipping_Client\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -26,7 +26,7 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>..\..\..\..\..\Program Files %28x86%29\Steam\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\MarryAnyone\bin\Win64_Shipping_Client\</OutputPath>
+    <OutputPath>\bin\Win64_Shipping_Client\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>false</Optimize>
     <DebugType>none</DebugType>
@@ -42,11 +42,28 @@
     </Reference>
     <Reference Include="Bannerlord.ButterLib">
       <HintPath>..\Bannerlord.ButterLib\bin\Win64_Shipping_Client\Bannerlord.ButterLib.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="MCMv4, Version=4.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Bannerlord.MCM.4.1.2\lib\net472\MCMv4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bannerlord.ButterLib\bin\Win64_Shipping_Client\Microsoft.Bcl.HashCode.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bannerlord.ButterLib\bin\Win64_Shipping_Client\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Bannerlord.ButterLib\bin\Win64_Shipping_Client\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json">
@@ -56,7 +73,14 @@
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Numerics">
+    <Reference Include="System.Management, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\Win64_Shipping_Client\System.Management.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\Win64_Shipping_Client\System.Numerics.Vectors.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="TaleWorlds.CampaignSystem">

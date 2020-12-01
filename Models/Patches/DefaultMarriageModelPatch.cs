@@ -20,6 +20,10 @@ namespace MarryAnyone.Models.Patches
 
         public static bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
+            if (maidenOrSuitor == null)
+            {
+                return false;
+            }
             ISettingsProvider settings = new MASettings();
             bool inConversation = maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero;
             bool isCheating = settings.Cheating && inConversation && Hero.OneToOneConversationHero.Spouse != null;
@@ -50,13 +54,26 @@ namespace MarryAnyone.Models.Patches
 
         public static bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
+            if (firstHero == null || secondHero == null)
+            {
+                return false;
+            }
             ISettingsProvider settings = new MASettings();
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
             bool isHomosexual = settings.SexualOrientation == "Homosexual" && isMainHero;
             bool isBisexual = settings.SexualOrientation == "Bisexual" && isMainHero;
             bool isIncestuous = settings.Incest && isMainHero;
             bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
-
+            
+            Clan clan = firstHero.Clan;
+            if (clan?.Leader == firstHero && !isMainHero)
+            {
+                Clan clan2 = secondHero.Clan;
+                if (clan2?.Leader == secondHero)
+                {
+                    return false;
+                }
+            }
             if (isIncestuous)
             {
                 discoverAncestors = true;

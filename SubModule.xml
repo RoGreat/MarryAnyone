@@ -1,14 +1,10 @@
 ﻿<Module>
 	<Name value="Marry Anyone"/>
 	<Id value="MarryAnyone"/>
-	<Version value="v2.0.0"/>
+	<Version value="v2.0.6"/>
 	<SingleplayerModule value="true"/>
 	<MultiplayerModule value="false"/>
 	<DependedModules>
-		<DependedModule Id="Bannerlord.Harmony" />
-    		<DependedModule Id="Bannerlord.UIExtenderEx" />
-		<DependedModule Id="Bannerlord.ButterLib"/>
-		<DependedModule Id="Bannerlord.MBOptionScreen"/>
 		<DependedModule Id="Native"/>
 		<DependedModule Id="SandBoxCore"/>
 		<DependedModule Id="Sandbox"/>
@@ -20,22 +16,7 @@
 			<Name value="MarryAnyone"/>
 			<DLLName value="MarryAnyone.dll"/>
 			<SubModuleClassType value="MarryAnyone.MASubModule"/>
-			<Tags>
-				<Tag key="DedicatedServerType" value="none" />
-				<Tag key="IsNoRenderModeElement" value="false" />
-			</Tags>
+			<Tags />
 		</SubModule>
-		<SubModule>
-      			<Name value="MCMv4" />
-      			<DLLName value="MCMv4.dll" />
-      			<SubModuleClassType value="MCM.MCMSubModule" />
-      			<Tags />
-    		</SubModule>
-    		<SubModule>
-      			<Name value="MCMv4 Basic Implementation" />
-      			<DLLName value="MCMv4.dll" />
-      			<SubModuleClassType value="MCM.Implementation.MCMImplementationSubModule" />
-      			<Tags />
-    		</SubModule>
 	</SubModules>
 </Module>
