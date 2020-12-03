@@ -1,7 +1,7 @@
 ﻿<Module>
 	<Name value="Marry Anyone"/>
 	<Id value="MarryAnyone"/>
-	<Version value="v2.0.6"/>
+	<Version value="v2.0.7"/>
 	<SingleplayerModule value="true"/>
 	<MultiplayerModule value="false"/>
 	<DependedModules>
