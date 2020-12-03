@@ -20,15 +20,15 @@ namespace MarryAnyone.Models.Patches
 
         public static bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            if (maidenOrSuitor == null)
-            {
-                return false;
-            }
             ISettingsProvider settings = new MASettings();
-            bool inConversation = maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero;
-            bool isCheating = settings.Cheating && inConversation && Hero.OneToOneConversationHero.Spouse != null;
-            bool isPolygamous = settings.Polygamy && inConversation && Hero.OneToOneConversationHero.Spouse == null;
-
+            bool inConversation, isCheating, isPolygamous;
+            inConversation = isCheating = isPolygamous = false;
+            if (Hero.OneToOneConversationHero != null)
+            {
+                inConversation = maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero;
+                isCheating = settings.Cheating && inConversation && Hero.OneToOneConversationHero.Spouse != null;
+                isPolygamous = settings.Polygamy && inConversation && Hero.OneToOneConversationHero.Spouse == null;
+            }
             if (!maidenOrSuitor.IsAlive ||  maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
             {
                 return false;
@@ -54,10 +54,6 @@ namespace MarryAnyone.Models.Patches
 
         public static bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
-            if (firstHero == null || secondHero == null)
-            {
-                return false;
-            }
             ISettingsProvider settings = new MASettings();
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
             bool isHomosexual = settings.SexualOrientation == "Homosexual" && isMainHero;
