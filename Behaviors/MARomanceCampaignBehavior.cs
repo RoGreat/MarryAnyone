@@ -40,7 +40,7 @@ namespace MarryAnyone.Behaviors
         private bool conversation_begin_courtship_for_hero_on_condition()
         {
             ISettingsProvider settings = new MASettings();
-            MASubModule.Debug("MCM: " + MASettings.UsingMCM.ToString());
+            MASubModule.Debug("MCM: " + MASettings.UsingMCM);
             MASubModule.Debug("Difficulty: " + settings.Difficulty);
             MASubModule.Debug("Orientation: " + settings.SexualOrientation);
             MASubModule.Debug("Become Ruler: " + settings.BecomeRuler);
@@ -140,16 +140,17 @@ namespace MarryAnyone.Behaviors
                 MASubModule.Debug("Joined Player's Clan");
             }
             // Activate character if not already activated
-            if (!spouse.IsActive || spouse.HasMet == false)
+            if (!spouse.IsActive)
             {
-                spouse.HasMet = true;
                 spouse.ChangeState(Hero.CharacterStates.Active);
                 MASubModule.Debug("Activated Spouse");
             }
             // Dodge the party crash for characters
-            if (!spouse.IsNoble)
+            // Found out it's any character in your party
+            if (spouse.PartyBelongedTo == MobileParty.MainParty)
             {
                 AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(spouse, null, null);
+                MASubModule.Debug("Spouse Already In Party");
             }
             // Apply marriage
             ChangeRomanticStateAction.Apply(hero, spouse, Romance.RomanceLevelEnum.Marriage);
@@ -159,9 +160,12 @@ namespace MarryAnyone.Behaviors
                 MASpouseHelper.RemoveExSpouses(oldSpouse);
             }
             // Finalize marriage for new nobility
-            if (!spouse.IsNoble)
+            if (spouse.PartyBelongedTo == null)
             {
                 AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(spouse, MobileParty.MainParty, null);
+            }
+            if (!spouse.IsNoble)
+            {
                 spouse.IsNoble = true;
                 MASubModule.Debug("Spouse To Noble");
             }
