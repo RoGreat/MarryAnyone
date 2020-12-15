@@ -145,12 +145,13 @@ namespace MarryAnyone.Behaviors
                 spouse.ChangeState(Hero.CharacterStates.Active);
                 MASubModule.Debug("Activated Spouse");
             }
-            // Dodge the party crash for characters
-            // Found out it's any character in your party
+            // Dodge the party crash for characters part 1
+            bool dodge = false;
             if (spouse.PartyBelongedTo == MobileParty.MainParty)
             {
                 AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(spouse, null, null);
-                MASubModule.Debug("Spouse Already In Party");
+                MASubModule.Debug("Spouse Already in Player's Party");
+                dodge = true;
             }
             // Apply marriage
             ChangeRomanticStateAction.Apply(hero, spouse, Romance.RomanceLevelEnum.Marriage);
@@ -159,34 +160,36 @@ namespace MarryAnyone.Behaviors
             {
                 MASpouseHelper.RemoveExSpouses(oldSpouse);
             }
-            // Finalize marriage for new nobility
-            if (spouse.PartyBelongedTo == null)
+            // Dodge the party crash for characters part 2
+            if (dodge)
             {
                 AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(spouse, MobileParty.MainParty, null);
             }
+            // Finalize marriage for new nobility
             if (!spouse.IsNoble)
             {
                 spouse.IsNoble = true;
-                MASubModule.Debug("Spouse To Noble");
-            }
-            else
-            {
-                // New fix to stop some kingdom rulers from disappearing
-                AddHeroToPartyAction.Apply(spouse, MobileParty.MainParty, true);
+                MASubModule.Debug("Spouse to Noble");
             }
             if (spouse.IsPlayerCompanion)
             {
                 spouse.CompanionOf = null;
-                MASubModule.Debug("No Longer Companion");
+                MASubModule.Debug("Spouse No Longer Companion");
             }
             if (settings.Cheating && cheatedSpouse != null)
             {
                 MASpouseHelper.RemoveExSpouses(cheatedSpouse, false);
                 MASpouseHelper.RemoveExSpouses(spouse, false);
+                MASubModule.Debug("Spouse Broke Off Past Marriage");
             }
             MASpouseHelper.RemoveExSpouses(hero);
             MASpouseHelper.RemoveExSpouses(spouse);
             PlayerEncounter.LeaveEncounter = true;
+            if (spouse.PartyBelongedTo != MobileParty.MainParty)
+            {
+                // New fix to stop some kingdom rulers from disappearing
+                AddHeroToPartyAction.Apply(spouse, MobileParty.MainParty, true);
+            }
         }
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
