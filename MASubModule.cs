@@ -37,12 +37,12 @@ namespace MarryAnyone
 
         protected override void OnGameStart(Game game, IGameStarter gameStarter)
         {
-            base.OnGameLoaded(game, gameStarter);
-            if (game.GameType is Campaign && gameStarter is CampaignGameStarter campaignGameStarter)
+            base.OnGameStart(game, gameStarter);
+            if (game.GameType is Campaign)
             {
-                CampaignGameStarter gameInitializer = (CampaignGameStarter)gameStarter;
+                CampaignGameStarter campaignGameStarter = (CampaignGameStarter)gameStarter;
                 campaignGameStarter.LoadGameTexts($"{BasePath.Name}Modules/MarryAnyone/ModuleData/ma_module_strings.xml");
-                AddBehaviors(gameInitializer);
+                AddBehaviors(campaignGameStarter);
             }
             try
             {
@@ -58,9 +58,9 @@ namespace MarryAnyone
             }
         }
 
-        private void AddBehaviors(CampaignGameStarter gameInitializer)
+        private void AddBehaviors(CampaignGameStarter campaignGameStarter)
         {
-            gameInitializer.AddBehavior(new MARomanceCampaignBehavior());
+            campaignGameStarter.AddBehavior(new MARomanceCampaignBehavior());
         }
     }
 }
