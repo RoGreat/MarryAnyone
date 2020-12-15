@@ -77,7 +77,7 @@
     </Reference>
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Bannerlord.ButterLib\bin\Win64_Shipping_Client\System.Numerics.Vectors.dll</HintPath>
+      <HintPath>..\..\..\Bannerlord.ButterLib\bin\Win64_Shipping_Client\System.Numerics.Vectors.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="TaleWorlds.CampaignSystem">

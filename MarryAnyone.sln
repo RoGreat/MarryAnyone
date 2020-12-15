@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30104.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarryAnyone", "MarryAnyone.csproj", "{AF64EDCA-2639-40D1-8B91-EEF7AC5790C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarryAnyone", "src\MarryAnyone.csproj", "{AF64EDCA-2639-40D1-8B91-EEF7AC5790C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
