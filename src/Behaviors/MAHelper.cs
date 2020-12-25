@@ -5,9 +5,9 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
 
-namespace MarryAnyone.Behaviors.Helpers
+namespace MarryAnyone.Behaviors
 {
-    internal static class MASpouseHelper
+    internal static class MAHelper
     {
         public static void RemoveExSpouses(Hero hero, bool spouse = true)
         {
@@ -36,6 +36,32 @@ namespace MarryAnyone.Behaviors.Helpers
             ExSpousesReadOnlyList = new MBReadOnlyList<Hero>(_exSpousesList);
             _exSpouses.SetValue(hero, _exSpousesList);
             ExSpouses.SetValue(hero, ExSpousesReadOnlyList);
+        }
+
+        public static void OccupationToLord(CharacterObject character, CharacterObject template)
+        {
+            if (character.Occupation != Occupation.Lord)
+            {
+                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(character, Occupation.Lord);
+                MASubModule.Debug("Occupation To Lord");
+            }
+            var _originCharacter = AccessTools.Field(typeof(CharacterObject), "_originCharacter");
+            var _originCharacterStringId = AccessTools.Field(typeof(CharacterObject), "_originCharacterStringId");
+            if (_originCharacter != null)
+            {
+                _originCharacter.SetValue(character, template);
+            }
+            else if (_originCharacterStringId != null)
+            {
+                _originCharacterStringId.SetValue(character, template.StringId);
+            }
+            // In ClanLordItemVM
+            // this.IsFamilyMember = Hero.MainHero.Clan.Lords.Contains(this._hero);
+            List<Hero> _lords = (List<Hero>)AccessTools.Field(typeof(Clan), "_lords").GetValue(Clan.PlayerClan);
+            if (!_lords.Contains(character.HeroObject))
+            {
+                _lords.Add(character.HeroObject);
+            }
         }
     }
 }

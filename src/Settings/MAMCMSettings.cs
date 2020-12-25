@@ -57,5 +57,13 @@ namespace MarryAnyone.Settings
 
         public string Difficulty { get => DifficultyDropdown.SelectedValue; set => DifficultyDropdown.SelectedValue = value; }
         public string SexualOrientation { get => SexualOrientationDropdown.SelectedValue; set => SexualOrientationDropdown.SelectedValue = value; }
+
+        [SettingPropertyBool("{=}Adoption", RequireRestart = false, HintText = "{=}Player can adopt children", IsToggle = true)]
+        [SettingPropertyGroup("{=}Adoption", GroupOrder = 1)]
+        public bool Adoption { get; set; } = false;
+
+        [SettingPropertyFloatingInteger("{=}Adoption Chance", 0f, 1f, "#0%", RequireRestart = false, HintText = "{=}Chance of child allowed for adoption")]
+        [SettingPropertyGroup("{=}Adoption", GroupOrder = 1)]
+        public float AdoptionChance { get; set; } = 0.05f;
     }
 }

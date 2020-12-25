@@ -184,13 +184,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Behaviors\Helpers\MASpouseHelper.cs" />
+    <Compile Include="Behaviors\MAHelper.cs" />
+    <Compile Include="Behaviors\MAAdoptionCampaignBehavior.cs" />
     <Compile Include="Behaviors\MARomanceCampaignBehavior.cs" />
     <Compile Include="Patches\GetHeroRelationToHeroTextShortPrefixPatch.cs" />
     <Compile Include="Behaviors\Patches\PregnancyCampaignBehaviorPatch.cs" />
     <Compile Include="Patches\EndAllCourtshipsPatch.cs" />
     <Compile Include="Patches\LeaveEncounterPatch.cs" />
-    <Compile Include="Models\Patches\DefaultMarriageModelPatch.cs" />
+    <Compile Include="Patches\DefaultMarriageModelPatch.cs" />
     <Compile Include="Behaviors\Patches\RomanceCampaignBehaviorPatch.cs" />
     <Compile Include="Settings\MAMCMSettings.cs" />
     <Compile Include="Settings\MAConfig.cs" />

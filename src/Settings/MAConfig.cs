@@ -10,5 +10,7 @@
         public bool Debug { get; set; } = false;
         public string Difficulty { get; set; } = "Easy";
         public string SexualOrientation { get; set; } = "Heterosexual";
+        public bool Adoption { get; set; } = false;
+        public float AdoptionChance { get; set; } = 0.05f;
     }
 }

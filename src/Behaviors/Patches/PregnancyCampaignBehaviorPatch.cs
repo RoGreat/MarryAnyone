@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Behaviors.Helpers;
 using MarryAnyone.Settings;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,8 +37,8 @@ namespace MarryAnyone.Behaviors.Patches
                     }
                     foreach (Hero exSpouse in hero.ExSpouses.ToList())
                     {
-                        MASpouseHelper.RemoveExSpouses(hero);
-                        MASpouseHelper.RemoveExSpouses(exSpouse);
+                        MAHelper.RemoveExSpouses(hero);
+                        MAHelper.RemoveExSpouses(exSpouse);
                     }
                     foreach (Hero exSpouse in hero.ExSpouses.ToList())
                     {
@@ -102,8 +101,8 @@ namespace MarryAnyone.Behaviors.Patches
             }
             foreach (Hero exSpouse in hero.ExSpouses.ToList())
             {
-                MASpouseHelper.RemoveExSpouses(hero);
-                MASpouseHelper.RemoveExSpouses(exSpouse);
+                MAHelper.RemoveExSpouses(hero);
+                MAHelper.RemoveExSpouses(exSpouse);
             }
         }
     }

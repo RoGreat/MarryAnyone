@@ -61,6 +61,7 @@ namespace MarryAnyone
         private void AddBehaviors(CampaignGameStarter campaignGameStarter)
         {
             campaignGameStarter.AddBehavior(new MARomanceCampaignBehavior());
+            campaignGameStarter.AddBehavior(new MAAdoptionCampaignBehavior());
         }
     }
 }

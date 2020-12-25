@@ -1,12 +1,14 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Models.Patches;
+using MarryAnyone.Patches;
 using MarryAnyone.Settings;
 using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Localization;
-using MarryAnyone.Behaviors.Helpers;
+using System.Diagnostics;
+using TaleWorlds.CampaignSystem.ViewModelCollection.ClanManagement.Categories;
+using System.Collections.Generic;
 
 namespace MarryAnyone.Behaviors
 {
@@ -16,14 +18,11 @@ namespace MarryAnyone.Behaviors
         {
             foreach (Hero hero in Hero.All)
             {
-                if ((hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero)) && hero.CharacterObject.Occupation != Occupation.Lord)
+                if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
                 {
-                    AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(hero.CharacterObject, Occupation.Lord);
-                    hero.Clan = null;
-                    hero.Clan = Clan.PlayerClan;
-                } 
+                    MAHelper.OccupationToLord(hero.CharacterObject, CharacterObject.PlayerCharacter);
+                }
             }
-
             // To begin the dialog for companions
             starter.AddPlayerLine("main_option_discussions_MA", "hero_main_options", "lord_talk_speak_diplomacy_MA", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_begin_courtship_for_hero_on_condition), null, 120, null, null);
             starter.AddDialogLine("character_agrees_to_discussion_MA", "lord_talk_speak_diplomacy_MA", "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_character_agrees_to_discussion_on_condition), null, 100, null);
@@ -97,6 +96,7 @@ namespace MarryAnyone.Behaviors
 
         private void conversation_courtship_success_on_consequence()
         {
+            // New marriages not shown right away. Need to refresh?
             ISettingsProvider settings = new MASettings();
             Hero hero = Hero.MainHero;
             Hero spouse = Hero.OneToOneConversationHero;
@@ -129,16 +129,7 @@ namespace MarryAnyone.Behaviors
                     }
                 }
             }
-            if (CharacterObject.OneToOneConversationCharacter.Occupation != Occupation.Lord)
-            {
-                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(spouse.CharacterObject, Occupation.Lord);
-                MASubModule.Debug("Spouse to Lord");
-            }
-            if (spouse.Clan == null)
-            {
-                spouse.Clan = Clan.PlayerClan;
-                MASubModule.Debug("Joined Player's Clan");
-            }
+            MAHelper.OccupationToLord(hero.CharacterObject, CharacterObject.PlayerCharacter);
             // Activate character if not already activated
             if (!spouse.IsActive)
             {
@@ -158,7 +149,7 @@ namespace MarryAnyone.Behaviors
             MASubModule.Debug("Marriage Action Applied");
             if (oldSpouse != null)
             {
-                MASpouseHelper.RemoveExSpouses(oldSpouse);
+                MAHelper.RemoveExSpouses(oldSpouse);
             }
             // Dodge the party crash for characters part 2
             if (dodge)
@@ -178,16 +169,16 @@ namespace MarryAnyone.Behaviors
             }
             if (settings.Cheating && cheatedSpouse != null)
             {
-                MASpouseHelper.RemoveExSpouses(cheatedSpouse, false);
-                MASpouseHelper.RemoveExSpouses(spouse, false);
+                MAHelper.RemoveExSpouses(cheatedSpouse, false);
+                MAHelper.RemoveExSpouses(spouse, false);
                 MASubModule.Debug("Spouse Broke Off Past Marriage");
             }
-            MASpouseHelper.RemoveExSpouses(hero);
-            MASpouseHelper.RemoveExSpouses(spouse);
+            MAHelper.RemoveExSpouses(hero);
+            MAHelper.RemoveExSpouses(spouse);
             PlayerEncounter.LeaveEncounter = true;
+            // New fix to stop some kingdom rulers from disappearing
             if (spouse.PartyBelongedTo != MobileParty.MainParty)
             {
-                // New fix to stop some kingdom rulers from disappearing
                 AddHeroToPartyAction.Apply(spouse, MobileParty.MainParty, true);
             }
         }

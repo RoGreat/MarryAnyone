@@ -19,6 +19,8 @@ namespace MarryAnyone.Settings
         public bool Debug { get => _provider.Debug; set => _provider.Debug = value; }
         public string Difficulty { get => _provider.Difficulty; set => _provider.Difficulty = value; }
         public string SexualOrientation { get => _provider.SexualOrientation; set => _provider.SexualOrientation = value;  }
+        public bool Adoption { get => _provider.Adoption; set => _provider.Adoption = value; }
+        public float AdoptionChance { get => _provider.AdoptionChance; set => _provider.AdoptionChance = value; }
 
         public MASettings()
         {
@@ -40,6 +42,8 @@ namespace MarryAnyone.Settings
                 MAConfig.Instance.Debug = config.Debug;
                 MAConfig.Instance.Difficulty = config.Difficulty;
                 MAConfig.Instance.SexualOrientation = config.SexualOrientation;
+                MAConfig.Instance.Adoption = config.Adoption;
+                MAConfig.Instance.AdoptionChance = config.AdoptionChance;
             }
             _provider = MAConfig.Instance;
         }
@@ -54,5 +58,7 @@ namespace MarryAnyone.Settings
         bool Debug { get; set; }
         string Difficulty { get; set; }
         string SexualOrientation { get; set; }
+        bool Adoption { get; set; }
+        float AdoptionChance { get; set; }
     }
 }
