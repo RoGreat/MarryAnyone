@@ -22,5 +22,9 @@
 		<string id="cheating" text="Cheating" />
 		<string id="cheating_desc" text="Player character can marry characters that are already married" />
 		<string id="relationship" text="Relationship Options" />
+		<string id="adoption" text="Adoption" />
+		<string id="adoption_desc" text="Player can adopt children" />
+		<string id="adoption_chance" text="Adoption Chance" />
+		<string id="adoption_chance_desc" text="Chance that a child is up for adoption" />
   </strings>
 </base>

@@ -10,12 +10,12 @@ namespace MarryAnyone.Settings
     // Instance is null for some reason...
     // Seems to be that setting fields are null on new game creation
     // Have to reload save in order for it to work.
-    internal class MAMCMSettings : AttributePerSaveSettings<MAMCMSettings>, ISettingsProvider
+    internal class MCMSettings : AttributePerSaveSettings<MCMSettings>, ISettingsProvider
     {
         public override string Id { get; } = "MarryAnyone_v2";
         public override string DisplayName { get; } = new TextObject("{=marryanyone}Marry Anyone {VERSION}", new Dictionary<string, TextObject>
         {
-            { "VERSION", new TextObject(typeof(MAMCMSettings).Assembly.GetName().Version.ToString(3)) }
+            { "VERSION", new TextObject(typeof(MCMSettings).Assembly.GetName().Version.ToString(3)) }
         }).ToString();
 
         [SettingPropertyDropdown("{=difficulty}Difficulty", Order = 0, RequireRestart = false, HintText = "{=difficulty_desc}Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all")]
@@ -58,12 +58,12 @@ namespace MarryAnyone.Settings
         public string Difficulty { get => DifficultyDropdown.SelectedValue; set => DifficultyDropdown.SelectedValue = value; }
         public string SexualOrientation { get => SexualOrientationDropdown.SelectedValue; set => SexualOrientationDropdown.SelectedValue = value; }
 
-        [SettingPropertyBool("{=}Adoption", RequireRestart = false, HintText = "{=}Player can adopt children", IsToggle = true)]
-        [SettingPropertyGroup("{=}Adoption", GroupOrder = 1)]
+        [SettingPropertyBool("{=adoption}Adoption", RequireRestart = false, HintText = "{=adoption_desc}Player can adopt children", IsToggle = true)]
+        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 1)]
         public bool Adoption { get; set; } = false;
 
-        [SettingPropertyFloatingInteger("{=}Adoption Chance", 0f, 1f, "#0%", RequireRestart = false, HintText = "{=}Chance of child allowed for adoption")]
-        [SettingPropertyGroup("{=}Adoption", GroupOrder = 1)]
+        [SettingPropertyFloatingInteger("{=adoption_chance}Adoption Chance", 0f, 1f, "#0%", RequireRestart = false, HintText = "{=adoption_)chance_desc}Chance that a child is up for adoption")]
+        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 1)]
         public float AdoptionChance { get; set; } = 0.05f;
     }
 }

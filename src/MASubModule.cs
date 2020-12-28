@@ -10,11 +10,11 @@ namespace MarryAnyone
 {
     internal class MASubModule : MBSubModuleBase
     {
-        public static void Debug(string message, bool important = false)
+        public static void Print(string message, bool notification = false)
         {
             ISettingsProvider settings = new MASettings();
             Color color;
-            if (important)
+            if (notification)
             {
                 color = Colors.Red;
             }
@@ -22,7 +22,7 @@ namespace MarryAnyone
             {
                 color = new Color(0.6f, 0.2f, 1f);
             }
-            if (settings.Debug || important)
+            if (settings.Debug || notification)
             {
                 InformationManager.DisplayMessage(new InformationMessage(message, color));
             }
@@ -41,20 +41,20 @@ namespace MarryAnyone
             if (game.GameType is Campaign)
             {
                 CampaignGameStarter campaignGameStarter = (CampaignGameStarter)gameStarter;
-                campaignGameStarter.LoadGameTexts($"{BasePath.Name}Modules/MarryAnyone/ModuleData/ma_module_strings.xml");
+                campaignGameStarter.LoadGameTexts(BasePath.Name + "Modules/MarryAnyone/ModuleData/ma_module_strings.xml");
                 AddBehaviors(campaignGameStarter);
             }
             try
             {
-                if (MAMCMSettings.Instance is null)
+                if (MCMSettings.Instance is null)
                 {
                     MASettings.UsingMCM = true;
                 }
             }
             catch 
             {
-                Debug("Marry Anyone: Not using MCM", true);
-                Debug("Using config settings", true);
+                Print("Marry Anyone: Not using MCM", true);
+                Print("Using config settings", true);
             }
         }
 

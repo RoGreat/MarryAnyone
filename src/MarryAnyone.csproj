@@ -193,8 +193,9 @@
     <Compile Include="Patches\LeaveEncounterPatch.cs" />
     <Compile Include="Patches\DefaultMarriageModelPatch.cs" />
     <Compile Include="Behaviors\Patches\RomanceCampaignBehaviorPatch.cs" />
-    <Compile Include="Settings\MAMCMSettings.cs" />
+    <Compile Include="Settings\MCMSettings.cs" />
     <Compile Include="Settings\MAConfig.cs" />
+    <Compile Include="Settings\ISettingsProvider.cs" />
     <Compile Include="Settings\MASettings.cs" />
     <Compile Include="MASubModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

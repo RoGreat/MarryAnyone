@@ -9,14 +9,14 @@ namespace MarryAnyone.Behaviors
 {
     internal static class MAHelper
     {
-        public static void RemoveExSpouses(Hero hero, bool spouse = true)
+        public static void RemoveExSpouses(Hero hero, bool isCheating = false)
         {
             FieldInfo _exSpouses = AccessTools.Field(typeof(Hero), "_exSpouses");
             List<Hero> _exSpousesList = (List<Hero>)_exSpouses.GetValue(hero);
             FieldInfo ExSpouses = AccessTools.Field(typeof(Hero), "ExSpouses");
             MBReadOnlyList<Hero> ExSpousesReadOnlyList;
 
-            if (spouse)
+            if (!isCheating)
             {
                 _exSpousesList = _exSpousesList.Distinct().ToList();
                 if (_exSpousesList.Contains(hero.Spouse))
@@ -38,29 +38,14 @@ namespace MarryAnyone.Behaviors
             ExSpouses.SetValue(hero, ExSpousesReadOnlyList);
         }
 
-        public static void OccupationToLord(CharacterObject character, CharacterObject template)
+        public static void OccupationToLord(CharacterObject character)
         {
             if (character.Occupation != Occupation.Lord)
             {
                 AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(character, Occupation.Lord);
-                MASubModule.Debug("Occupation To Lord");
-            }
-            var _originCharacter = AccessTools.Field(typeof(CharacterObject), "_originCharacter");
-            var _originCharacterStringId = AccessTools.Field(typeof(CharacterObject), "_originCharacterStringId");
-            if (_originCharacter != null)
-            {
-                _originCharacter.SetValue(character, template);
-            }
-            else if (_originCharacterStringId != null)
-            {
-                _originCharacterStringId.SetValue(character, template.StringId);
-            }
-            // In ClanLordItemVM
-            // this.IsFamilyMember = Hero.MainHero.Clan.Lords.Contains(this._hero);
-            List<Hero> _lords = (List<Hero>)AccessTools.Field(typeof(Clan), "_lords").GetValue(Clan.PlayerClan);
-            if (!_lords.Contains(character.HeroObject))
-            {
-                _lords.Add(character.HeroObject);
+                MASubModule.Print("Occupation To Lord");
+                AccessTools.Field(typeof(CharacterObject), "_originCharacter").SetValue(character, CharacterObject.PlayerCharacter);
+                AccessTools.Field(typeof(CharacterObject), "_originCharacterStringId").SetValue(character, CharacterObject.PlayerCharacter.StringId);
             }
         }
     }

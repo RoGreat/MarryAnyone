@@ -8,7 +8,7 @@ namespace MarryAnyone.Settings
     {
         public static bool UsingMCM = false;
 
-        private static string _configPath = $"{BasePath.Name}Modules/MarryAnyone/config.json";
+        private static string _configPath = BasePath.Name + "Modules/MarryAnyone/config.json";
 
         private ISettingsProvider _provider;
 
@@ -26,9 +26,9 @@ namespace MarryAnyone.Settings
         {
             if (UsingMCM)
             {
-                if (MAMCMSettings.Instance != null)
+                if (MCMSettings.Instance != null)
                 {
-                    _provider = MAMCMSettings.Instance;
+                    _provider = MCMSettings.Instance;
                     return;
                 }
             }
@@ -47,18 +47,5 @@ namespace MarryAnyone.Settings
             }
             _provider = MAConfig.Instance;
         }
-    }
-
-    internal interface ISettingsProvider
-    {
-        bool Polygamy { get; set; }
-        bool Incest { get; set; }
-        bool BecomeRuler { get; set; }
-        bool Cheating { get; set; }
-        bool Debug { get; set; }
-        string Difficulty { get; set; }
-        string SexualOrientation { get; set; }
-        bool Adoption { get; set; }
-        float AdoptionChance { get; set; }
     }
 }

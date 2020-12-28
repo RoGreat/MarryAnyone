@@ -1,42 +1,46 @@
 ﻿using HarmonyLib;
 using Helpers;
-using MarryAnyone.Patches;
 using MarryAnyone.Settings;
-using MountAndBlade.CampaignBehaviors;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Core;
-using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
-using TaleWorlds.ObjectSystem;
 
 namespace MarryAnyone.Behaviors
 {
     internal class MAAdoptionCampaignBehavior : CampaignBehaviorBase
     {
+        private static void RefreshClanVM(Hero hero)
+        {
+            // In ClanLordItemVM
+            // this.IsFamilyMember = Hero.MainHero.Clan.Lords.Contains(this._hero);
+            List<Hero> _lords = (List<Hero>)AccessTools.Field(typeof(Clan), "_lords").GetValue(Clan.PlayerClan);
+            if (!_lords.Contains(hero))
+            {
+                _lords.Add(hero);
+            }
+        }
+
         protected void AddDialogs(CampaignGameStarter starter)
         {
             foreach (Hero hero in Hero.All)
             {
                 if (Hero.MainHero.Children.Contains(hero))
                 {
-                    CharacterObject character = hero.CharacterObject;
-                    int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
-                    _childTemplate = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == character.Culture && t.Age <= becomeChildAge && t.IsFemale == character.IsFemale && t.Occupation == Occupation.Lord);
-                    MAHelper.OccupationToLord(hero.CharacterObject, _childTemplate);
+                    MAHelper.OccupationToLord(hero.CharacterObject);
+                    RefreshClanVM(hero);
                 }
             }
 
             // Children
-            starter.AddPlayerLine("adoption_discussion_MA", "town_or_village_children_player_no_rhyme", "adoption_child_MA", "{=adoption_offer_child}The look on your face tells me you have no parents to go back to. I can be your {?PLAYER.GENDER}mother{?}father{\\?} if you want one.", new ConversationSentence.OnConditionDelegate(conversation_adopt_child_on_condition), null, 120, null, null);
-            starter.AddDialogLine("character_adoption_response_MA", "adoption_child_MA", "close_window", "{=adoption_response_child}Really? Well I guess that makes you my {?PLAYER.GENDER}Ma{?}Pa{\\?} now!", null, new ConversationSentence.OnConsequenceDelegate(conversation_adopt_child_on_consequence), 100, null);
+            starter.AddPlayerLine("adoption_discussion_MA", "town_or_village_children_player_no_rhyme", "adoption_child_MA", "{=adoption_offer_child}I can tell you have no parents to go back to child. I can be your {?PLAYER.GENDER}mother{?}father{\\?} if that is the case.", new ConversationSentence.OnConditionDelegate(conversation_adopt_child_on_condition), null, 120, null, null);
+            starter.AddDialogLine("character_adoption_response_MA", "adoption_child_MA", "close_window", "{=adoption_response_child}You want to be my {?PLAYER.GENDER}Ma{?}Pa{\\?}? Okay then![rf:happy][rb:very_positive]", null, new ConversationSentence.OnConsequenceDelegate(conversation_adopt_child_on_consequence), 100, null);
             // Teens
-            starter.AddPlayerLine("adoption_discussion_MA", "town_or_village_player", "adoption_teen_MA", "{=adoption_offer_teen}It would be a shame to see such a promising young {?CONVERSATION_CHARACTER.GENDER}woman{?}man{\\?} go without a family. Wish to join mine?", new ConversationSentence.OnConditionDelegate(conversation_adopt_child_on_condition), null, 120, null, null);
-            starter.AddDialogLine("character_adoption_response_MA", "adoption_teen_MA", "close_window", "{=adoption_response_teen}Yes, thanks for letting me be a part of your family {?PLAYER.GENDER}milady{?}sir{\\?}.", null, new ConversationSentence.OnConsequenceDelegate(conversation_adopt_child_on_consequence), 100, null);
+            starter.AddPlayerLine("adoption_discussion_MA", "town_or_village_player", "adoption_teen_MA", "{=adoption_offer_teen}Do you not have any parents to take care of you young {?CONVERSATION_CHARACTER.GENDER}woman{?}man{\\?}? You are welcome to be a part of my family.", new ConversationSentence.OnConditionDelegate(conversation_adopt_child_on_condition), null, 120, null, null);
+            starter.AddDialogLine("character_adoption_response_MA", "adoption_teen_MA", "close_window", "{=adoption_response_teen}Thanks for allowing me to be a part of your family {?PLAYER.GENDER}milady{?}sir{\\?}. I gratefully accept![rf:happy][rb:very_positive]", null, new ConversationSentence.OnConsequenceDelegate(conversation_adopt_child_on_consequence), 100, null);
         }
 
         private static int _agent;
@@ -47,8 +51,8 @@ namespace MarryAnyone.Behaviors
 
         private bool conversation_adopt_child_on_condition()
         {
-            StringHelpers.SetCharacterProperties("CONVERSATION_CHARACTER", CharacterObject.OneToOneConversationCharacter, null, null, false);
             ISettingsProvider settings = new MASettings();
+            StringHelpers.SetCharacterProperties("CONVERSATION_CHARACTER", CharacterObject.OneToOneConversationCharacter, null, null, false);
             _agent = Math.Abs(Campaign.Current.ConversationManager.OneToOneConversationAgent.GetHashCode());
             if (_notAdoptableAgents.Contains(_agent))
             {
@@ -60,8 +64,10 @@ namespace MarryAnyone.Behaviors
             }
             if (Campaign.Current.ConversationManager.OneToOneConversationAgent.Age < Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
+                MASubModule.Print("Adoption: " + settings.Adoption);
+                MASubModule.Print("Adoption Chance: " + settings.AdoptionChance);
                 // You only roll once!
-                if (MBRandom.RandomFloat <= settings.AdoptionChance)
+                if (MBRandom.RandomFloat < settings.AdoptionChance)
                 {
                     _adoptableAgents.Add(_agent);
                     return true;
@@ -97,15 +103,11 @@ namespace MarryAnyone.Behaviors
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment);
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment2);
             }
-
-            MAHelper.OccupationToLord(hero.CharacterObject, _childTemplate);
+            MAHelper.OccupationToLord(hero.CharacterObject);
+            AccessTools.Method(typeof(HeroDeveloper), "CheckInitialLevel").Invoke(hero.HeroDeveloper, null);
             BodyProperties bodyPropertiesValue = agent.BodyPropertiesValue;
             AccessTools.Property(typeof(Hero), "StaticBodyProperties").SetValue(hero, bodyPropertiesValue.StaticProperties);
-
             hero.HasMet = true;
-            hero.ChangeState(Hero.CharacterStates.Active);
-
-            // Fundamental difference
             if (Hero.MainHero.IsFemale)
             {
                 hero.Mother = Hero.MainHero;
@@ -114,8 +116,8 @@ namespace MarryAnyone.Behaviors
             {
                 hero.Father = Hero.MainHero;
             }
-            hero.UpdateHomeSettlement();
             hero.IsNoble = true;
+            RefreshClanVM(hero);
 
             // Notable fixes for the most part
             // In case these issues apply to a child for some reason
@@ -133,7 +135,10 @@ namespace MarryAnyone.Behaviors
                 hero.Issue.CompleteIssueWithCancel();
             }
             CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
+            MASubModule.Print(Hero.MainHero.Name + " adopted " + hero.Name, true);
         }
+
+        // Looked at DecideBornSettlement from HeroCreator
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
