@@ -56,18 +56,26 @@ namespace MarryAnyone.Behaviors
             _agent = Math.Abs(Campaign.Current.ConversationManager.OneToOneConversationAgent.GetHashCode());
             if (_notAdoptableAgents.Contains(_agent))
             {
+                MASubModule.Print("Cannot Adopt");
                 return false;
             }
             if (_adoptableAgents.Contains(_agent))
             {
+                MASubModule.Print("Can Adopt");
                 return true;
             }
             if (Campaign.Current.ConversationManager.OneToOneConversationAgent.Age < Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
                 MASubModule.Print("Adoption: " + settings.Adoption);
+                if (!settings.Adoption)
+                {
+                    return false;
+                }
                 MASubModule.Print("Adoption Chance: " + settings.AdoptionChance);
                 // You only roll once!
-                if (MBRandom.RandomFloat < settings.AdoptionChance)
+                float random = MBRandom.RandomFloat;
+                MASubModule.Print("Random Number: " + random);
+                if (random < settings.AdoptionChance)
                 {
                     _adoptableAgents.Add(_agent);
                     return true;
