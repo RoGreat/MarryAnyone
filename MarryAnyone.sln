@@ -1,25 +1,29 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.30104.148
+VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarryAnyone", "src\MarryAnyone.csproj", "{AF64EDCA-2639-40D1-8B91-EEF7AC5790C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MarryAnyone", "MarryAnyone.csproj", "{E83AE9B8-02B5-4683-BFF7-A1BE36607794}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AF64EDCA-2639-40D1-8B91-EEF7AC5790C7}.Debug|x64.ActiveCfg = Debug|x64
-		{AF64EDCA-2639-40D1-8B91-EEF7AC5790C7}.Debug|x64.Build.0 = Debug|x64
-		{AF64EDCA-2639-40D1-8B91-EEF7AC5790C7}.Release|x64.ActiveCfg = Release|x64
-		{AF64EDCA-2639-40D1-8B91-EEF7AC5790C7}.Release|x64.Build.0 = Release|x64
+		{E83AE9B8-02B5-4683-BFF7-A1BE36607794}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{E83AE9B8-02B5-4683-BFF7-A1BE36607794}.Debug|x64.ActiveCfg = Debug|x64
+		{E83AE9B8-02B5-4683-BFF7-A1BE36607794}.Debug|x64.Build.0 = Debug|x64
+		{E83AE9B8-02B5-4683-BFF7-A1BE36607794}.Release|Any CPU.ActiveCfg = Release|x64
+		{E83AE9B8-02B5-4683-BFF7-A1BE36607794}.Release|x64.ActiveCfg = Release|x64
+		{E83AE9B8-02B5-4683-BFF7-A1BE36607794}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B77A6EF8-7093-43E3-8496-0C23325B88A7}
+		SolutionGuid = {B02AC9F9-D18E-4FB3-A43C-B4B302BF2902}
 	EndGlobalSection
 EndGlobal
