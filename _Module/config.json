@@ -1,0 +1,13 @@
+{
+	"Difficulty": "Easy",
+	"SexualOrientation": "Heterosexual",
+	
+	"Polygamy": false,
+	"Incest": false,
+	"Cheating": false,
+	
+	"Adoption": false,
+	"AdoptionChance": 0.05,
+	
+	"Debug": false
+}
