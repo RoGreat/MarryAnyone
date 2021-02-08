@@ -18,7 +18,7 @@
 	
 	<!-- Versions -->
 	<PropertyGroup>
-		<GameVersion>1.5.7</GameVersion>
+		<GameVersion>1.5.8</GameVersion>
 		<MCMVersion>4.1.2.6</MCMVersion>
 	</PropertyGroup>
 	

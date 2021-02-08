@@ -135,8 +135,10 @@ namespace MarryAnyone.Behaviors
             hero.IsNoble = true;
             RefreshClanVM(hero);
 
+            // A bit unnecessary, but also OwnedParties does not exist anymore in e1.5.8
             // Notable fixes for the most part
             // In case these issues apply to a child for some reason
+            /*
             foreach (PartyBase party in hero.OwnedParties.ToList())
             {
                 MobileParty mobileParty = party.MobileParty;
@@ -150,6 +152,8 @@ namespace MarryAnyone.Behaviors
             {
                 hero.Issue.CompleteIssueWithCancel();
             }
+            */
+
             CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
             MASubModule.Print(Hero.MainHero.Name + " adopted " + hero.Name, true);
         }
