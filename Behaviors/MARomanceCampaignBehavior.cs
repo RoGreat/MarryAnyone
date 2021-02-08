@@ -16,17 +16,10 @@ namespace MarryAnyone.Behaviors
         {
             // In ClanLordItemVM
             // this.IsFamilyMember = Hero.MainHero.Clan.Lords.Contains(this._hero);
-            List<Hero> _lords = (List<Hero>)AccessTools.Field(typeof(Clan), "_lords").GetValue(Clan.PlayerClan);
+            List<Hero> _lords = (List<Hero>)AccessTools.Field(typeof(Clan), "_lordsCache").GetValue(Clan.PlayerClan);
             if (!_lords.Contains(hero))
             {
-                if (_lords.Count > 1)
-                {
-                    _lords.Insert(1, hero);
-                }
-                else
-                {
-                    _lords.Add(hero);
-                }
+                _lords.Add(hero);
             }
         }
 
