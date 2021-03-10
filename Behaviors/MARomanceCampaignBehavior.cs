@@ -2,7 +2,6 @@
 using MarryAnyone.Patches;
 using MarryAnyone.Settings;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -12,6 +11,7 @@ namespace MarryAnyone.Behaviors
 {
     internal class MARomanceCampaignBehavior : CampaignBehaviorBase
     {
+        /*
         private static void RefreshClanVM(Hero hero)
         {
             // In ClanLordItemVM
@@ -22,15 +22,16 @@ namespace MarryAnyone.Behaviors
                 _lords.Add(hero);
             }
         }
+        */
 
         protected void AddDialogs(CampaignGameStarter starter)
         {
-            foreach (Hero hero in Hero.All)
+            foreach (Hero hero in Hero.All.ToList())
             {
                 if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
-                    RefreshClanVM(hero);
+                    // RefreshClanVM(hero);
                 }
             }
             // To begin the dialog for companions
@@ -126,20 +127,41 @@ namespace MarryAnyone.Behaviors
                     if (hero.Clan.Kingdom?.Leader != hero)
                     {
                         // Join kingdom due to lowborn status
+                        // Need to separate out new player's clan and previous player's clan
+                        // ChangeKingdomAction.ApplyByJoinToKingdom(hero.Clan, spouse.Clan.Kingdom);
+                        if (hero.Clan.Leader == Hero.MainHero)
+                        {
+                            ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(hero.Clan);
+                            if (hero.Clan.Leader == Hero.MainHero)
+                            {
+                                MASubModule.Print("No Heirs");
+                                AccessTools.Field(typeof(Clan), "_isEliminated").SetValue(hero.Clan, true);
+                                MASubModule.Print("Eliminated Player Clan");
+                            }
+                        }
+                        foreach (Hero companion in hero.Clan.Companions.ToList())
+                        {
+                            MASubModule.Print(companion.Name.ToString());
+                            RemoveCompanionAction.ApplyByFire(hero.Clan, companion);
+                            AddCompanionAction.Apply(spouse.Clan, companion);
+                        }
                         hero.Clan = spouse.Clan;
+                        var current = Traverse.Create<Campaign>().Property("Current").GetValue<Campaign>();
+                        Traverse.Create(current).Property("PlayerDefaultFaction").SetValue(spouse.Clan);
                         MASubModule.Print("Lowborn Player Married to Kingdom Ruler");
                     }
                     else
                     {
                         ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(spouse.Clan);
-                        spouse.Clan = hero.Clan;
+                        // ChangeKingdomAction.ApplyByJoinToKingdom(spouse.Clan, hero.Clan.Kingdom);
+                        // spouse.Clan = hero.Clan;
                         MASubModule.Print("Kingdom Ruler Stepped Down and Married to Player");
                     }
                 }
-                if (MobileParty.ConversationParty is not null)
-                {
-                    DisbandPartyAction.ApplyDisband(MobileParty.ConversationParty);
-                }
+                //if (MobileParty.ConversationParty is not null)
+                //{
+                //    DisbandPartyAction.ApplyDisband(MobileParty.ConversationParty);
+                //}
             }
             // New nobility
             MAHelper.OccupationToLord(hero.CharacterObject);
@@ -148,7 +170,7 @@ namespace MarryAnyone.Behaviors
                 spouse.IsNoble = true;
                 MASubModule.Print("Spouse to Noble");
             }
-            RefreshClanVM(spouse);
+            // RefreshClanVM(spouse);
             // Dodge the party crash for characters part 1
             bool dodge = false;
             if (spouse.PartyBelongedTo == MobileParty.MainParty)
