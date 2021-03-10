@@ -26,7 +26,7 @@ namespace MarryAnyone.Behaviors
 
         protected void AddDialogs(CampaignGameStarter starter)
         {
-            foreach (Hero hero in Hero.All)
+            foreach (Hero hero in Hero.All.ToList())
             {
                 if (Hero.MainHero.Children.Contains(hero))
                 {
@@ -136,7 +136,7 @@ namespace MarryAnyone.Behaviors
             RefreshClanVM(hero);
 
             // A bit unnecessary, but also OwnedParties does not exist anymore in e1.5.8
-            // Notable fixes for the most part
+            // Notable fixes for the most part, needs to be resolved for the Recruit Everyone mod
             // In case these issues apply to a child for some reason
             /*
             foreach (PartyBase party in hero.OwnedParties.ToList())
@@ -148,11 +148,11 @@ namespace MarryAnyone.Behaviors
                     DisbandPartyAction.ApplyDisband(mobileParty);
                 }
             }
+            */
             if (hero.Issue is not null)
             {
                 hero.Issue.CompleteIssueWithCancel();
             }
-            */
 
             CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
             MASubModule.Print(Hero.MainHero.Name + " adopted " + hero.Name, true);
