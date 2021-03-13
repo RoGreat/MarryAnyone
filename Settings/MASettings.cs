@@ -20,6 +20,8 @@ namespace MarryAnyone.Settings
         public string SexualOrientation { get => _provider.SexualOrientation; set => _provider.SexualOrientation = value;  }
         public bool Adoption { get => _provider.Adoption; set => _provider.Adoption = value; }
         public float AdoptionChance { get => _provider.AdoptionChance; set => _provider.AdoptionChance = value; }
+        //public bool RetryCourtship { get => _provider.RetryCourtship; set => _provider.RetryCourtship = value; }
+        //public float CourtshipCooldown { get => _provider.CourtshipCooldown; set => _provider.CourtshipCooldown = value; }
 
         public MASettings()
         {
@@ -44,6 +46,8 @@ namespace MarryAnyone.Settings
                     MAConfig.Instance.SexualOrientation = config.SexualOrientation;
                     MAConfig.Instance.Adoption = config.Adoption;
                     MAConfig.Instance.AdoptionChance = config.AdoptionChance;
+                    //MAConfig.Instance.RetryCourtship = config.RetryCourtship;
+                    //MAConfig.Instance.CourtshipCooldown = config.CourtshipCooldown;
                 }
             }
             if (MAConfig.Instance is null)

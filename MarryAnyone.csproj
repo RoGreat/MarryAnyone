@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.2.1</Version>
+		<Version>2.2.2</Version>
 		<Authors>RoGreat</Authors>
 	</PropertyGroup>
 	
@@ -23,7 +23,7 @@
 	</PropertyGroup>
 	
 	<!-- Referenced from Zijistark's HousesCalradia -->
-	<!-- Also has soft MCM dependency -->
+	<!-- Also has soft MCM dependency version -->
 	<ItemGroup>
     <SubModuleOverrides Include="MCMVersion">
       <Regex>\$mcmversion\$</Regex>
@@ -45,7 +45,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.25">
+    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.27">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -63,8 +63,7 @@
 
 	<!-- Bannerlord Assemblies -->
   <ItemGroup>
-    <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.*.dll" 
-							 Exclude="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.Native.dll">
+    <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.*.dll" Exclude="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.Native.dll">
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
     </Reference>
@@ -82,6 +81,10 @@
     </Reference>
 		<Reference Include="$(GameFolder)\Modules\StoryMode\bin\Win64_Shipping_Client\*.dll">
       <HintPath>%(Identity)</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\Newtonsoft.Json.dll">
+			<HintPath>%(Identity)</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
