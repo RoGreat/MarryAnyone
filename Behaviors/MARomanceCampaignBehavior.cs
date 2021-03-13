@@ -152,7 +152,7 @@ namespace MarryAnyone.Behaviors
                 }
             }
             // New nobility
-            MAHelper.OccupationToLord(hero.CharacterObject);
+            MAHelper.OccupationToLord(spouse.CharacterObject);
             if (!spouse.IsNoble)
             {
                 spouse.IsNoble = true;
