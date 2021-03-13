@@ -15,10 +15,10 @@ namespace MarryAnyone.Settings
     {
         public override string Id { get; } = "MarryAnyone_v2";
 
-        public override string DisplayName => TextObjectHelper.Create("{=marryanyone}Marry Anyone {VERSION}", new Dictionary<string, TextObject>() 
+        public override string DisplayName => TextObjectHelper.Create("{=marryanyone}Marry Anyone {VERSION}", new Dictionary<string, TextObject?>
         {
-            { "VERSION", TextObjectHelper.Create(typeof(MCMSettings).Assembly.GetName().Version?.ToString(3) ?? "")! }
-        })!.ToString();
+            { "VERSION", TextObjectHelper.Create(typeof(MCMSettings).Assembly.GetName().Version?.ToString(3) ?? "ERROR") }
+        })?.ToString() ?? "ERROR";
 
         [SettingPropertyDropdown("{=difficulty}Difficulty", Order = 0, RequireRestart = false, HintText = "{=difficulty_desc}Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all")]
         [SettingPropertyGroup("{=general}General")]
@@ -60,8 +60,16 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 1)]
         public bool Adoption { get; set; } = false;
 
-        [SettingPropertyFloatingInteger("{=adoption_chance}Adoption Chance", 0f, 1f, "#0%", RequireRestart = false, HintText = "{=adoption_)chance_desc}Chance that a child is up for adoption")]
+        [SettingPropertyFloatingInteger("{=adoption_chance}Adoption Chance", 0f, 1f, "#0%", RequireRestart = false, HintText = "{=adoption_chance_desc}Chance that a child is up for adoption")]
         [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 1)]
         public float AdoptionChance { get; set; } = 0.05f;
+
+        //[SettingPropertyBool("{=retry_courtship}Retry Courtship", RequireRestart = false, HintText = "{=retry_courtship_desc}Player can retry courtship after failure")]
+        //[SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 2)]
+        //public bool RetryCourtship { get; set; } = true;
+
+        //[SettingPropertyFloatingInteger("{=courtship_cooldown}Courtship Cooldown", 0f, 10f, "##.00 'days'", RequireRestart = false, HintText = "{=courtship_cooldown_desc}Time between courtship events")]
+        //[SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 2)]
+        //public float CourtshipCooldown { get; set; } = 1f;
     }
 }

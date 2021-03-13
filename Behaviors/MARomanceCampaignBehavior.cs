@@ -11,19 +11,6 @@ namespace MarryAnyone.Behaviors
 {
     internal class MARomanceCampaignBehavior : CampaignBehaviorBase
     {
-        /*
-        private static void RefreshClanVM(Hero hero)
-        {
-            // In ClanLordItemVM
-            // this.IsFamilyMember = Hero.MainHero.Clan.Lords.Contains(this._hero);
-            List<Hero> _lords = (List<Hero>)AccessTools.Field(typeof(Clan), "_lordsCache").GetValue(Clan.PlayerClan);
-            if (!_lords.Contains(hero))
-            {
-                _lords.Add(hero);
-            }
-        }
-        */
-
         protected void AddDialogs(CampaignGameStarter starter)
         {
             foreach (Hero hero in Hero.All.ToList())
@@ -31,7 +18,6 @@ namespace MarryAnyone.Behaviors
                 if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
-                    // RefreshClanVM(hero);
                 }
             }
             // To begin the dialog for companions
@@ -135,15 +121,23 @@ namespace MarryAnyone.Behaviors
                             if (hero.Clan.Leader == Hero.MainHero)
                             {
                                 MASubModule.Print("No Heirs");
-                                AccessTools.Field(typeof(Clan), "_isEliminated").SetValue(hero.Clan, true);
+                                DestroyClanAction.Apply(hero.Clan);
                                 MASubModule.Print("Eliminated Player Clan");
                             }
                         }
                         foreach (Hero companion in hero.Clan.Companions.ToList())
                         {
-                            MASubModule.Print(companion.Name.ToString());
+                            bool inParty = false;
+                            if (companion.PartyBelongedTo == MobileParty.MainParty)
+                            {
+                                inParty = true;
+                            }
                             RemoveCompanionAction.ApplyByFire(hero.Clan, companion);
                             AddCompanionAction.Apply(spouse.Clan, companion);
+                            if (inParty)
+                            {
+                                AddHeroToPartyAction.Apply(companion, MobileParty.MainParty, true);
+                            }
                         }
                         hero.Clan = spouse.Clan;
                         var current = Traverse.Create<Campaign>().Property("Current").GetValue<Campaign>();
@@ -153,15 +147,9 @@ namespace MarryAnyone.Behaviors
                     else
                     {
                         ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(spouse.Clan);
-                        // ChangeKingdomAction.ApplyByJoinToKingdom(spouse.Clan, hero.Clan.Kingdom);
-                        // spouse.Clan = hero.Clan;
                         MASubModule.Print("Kingdom Ruler Stepped Down and Married to Player");
                     }
                 }
-                //if (MobileParty.ConversationParty is not null)
-                //{
-                //    DisbandPartyAction.ApplyDisband(MobileParty.ConversationParty);
-                //}
             }
             // New nobility
             MAHelper.OccupationToLord(hero.CharacterObject);
@@ -170,7 +158,6 @@ namespace MarryAnyone.Behaviors
                 spouse.IsNoble = true;
                 MASubModule.Print("Spouse to Noble");
             }
-            // RefreshClanVM(spouse);
             // Dodge the party crash for characters part 1
             bool dodge = false;
             if (spouse.PartyBelongedTo == MobileParty.MainParty)

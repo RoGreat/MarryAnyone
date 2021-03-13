@@ -58,7 +58,7 @@ namespace MarryAnyone.Behaviors.Patches
                     }
                     if (_spouses.Where(spouse => spouse is not null).Count() > 1)
                     {
-                        List<int> attractionGoal = new List<int>();
+                        List<int> attractionGoal = new();
                         int attraction = 0;
                         foreach (Hero spouse in _spouses)
                         {

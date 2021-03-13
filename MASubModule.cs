@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Behaviors;
 using MarryAnyone.Settings;
+using System.Diagnostics;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -51,7 +52,7 @@ namespace MarryAnyone
                     MASettings.UsingMCM = true;
                 }
             }
-            catch 
+            catch
             {
                 Print("Marry Anyone: Not using MCM", true);
                 Print("Using config settings", true);

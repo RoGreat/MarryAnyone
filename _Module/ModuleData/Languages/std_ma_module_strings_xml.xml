@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<base xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" type="string">
+  <tags>
+    <tag language="English" />
+  </tags>  
+	<strings>
+		<string id="fatherhusband" text="Father-husband"/>
+		<string id="motherwife" text="Mother-wife"/>
+		<string id="brotherhusband" text="Brother-husband"/>
+		<string id="sisterwife" text="Sister-wife"/>
+		<string id="sonhusband" text="Son-husband"/>
+		<string id="daughterwife" text="Daughter-wife"/>
+		<string id="exhusband" text="Ex-husband"/>
+		<string id="exwife" text="Ex-wife"/>
+		<string id="husband" text="Husband"/>
+		<string id="wife" text="Wife"/>
+		<string id="husbands_wife" text="Husband's wife"/>
+		<string id="husbands_husband" text="Husband's husband"/>
+		<string id="wifes_husband" text="Wife's husband"/>
+		<string id="wifes_wife" text="Wife's wife"/>
+		<string id="adoptedson" text="Adopted son"/>
+		<string id="adopteddaughter" text="Adopted daughter"/>
+		<string id="adoptivemother" text="Adoptive mother"/>
+		<string id="adoptivefather" text="Adoptive father"/>
+	</strings>
+</base>

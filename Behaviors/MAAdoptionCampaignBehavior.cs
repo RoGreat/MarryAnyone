@@ -16,10 +16,11 @@ namespace MarryAnyone.Behaviors
         {
             // In ClanLordItemVM
             // this.IsFamilyMember = Hero.MainHero.Clan.Lords.Contains(this._hero);
-            List<Hero> _lords = (List<Hero>)AccessTools.Field(typeof(Clan), "_lords").GetValue(Clan.PlayerClan);
-            if (!_lords.Contains(hero))
+            // In Clan was _lords now _lordsCache
+            List<Hero> _lordsCache = (List<Hero>)AccessTools.Field(typeof(Clan), "_lordsCache").GetValue(Clan.PlayerClan);
+            if (!_lordsCache.Contains(hero))
             {
-                _lords.Add(hero);
+                _lordsCache.Add(hero);
             }
         }
 
@@ -113,7 +114,7 @@ namespace MarryAnyone.Behaviors
             if (_childTemplate is not null)
             {
                 Equipment equipment = _childTemplate.FirstCivilianEquipment.Clone(false);
-                Equipment equipment2 = new Equipment(false);
+                Equipment equipment2 = new(false);
                 equipment2.FillFrom(equipment, false);
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment);
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment2);
