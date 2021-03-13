@@ -24,6 +24,7 @@ namespace MarryAnyone.Behaviors
             }
         }
 
+
         protected void AddDialogs(CampaignGameStarter starter)
         {
             foreach (Hero hero in Hero.All.ToList())
