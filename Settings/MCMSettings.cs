@@ -64,12 +64,8 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 1)]
         public float AdoptionChance { get; set; } = 0.05f;
 
-        //[SettingPropertyBool("{=retry_courtship}Retry Courtship", RequireRestart = false, HintText = "{=retry_courtship_desc}Player can retry courtship after failure")]
-        //[SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 2)]
-        //public bool RetryCourtship { get; set; } = true;
-
-        //[SettingPropertyFloatingInteger("{=courtship_cooldown}Courtship Cooldown", 0f, 10f, "##.00 'days'", RequireRestart = false, HintText = "{=courtship_cooldown_desc}Time between courtship events")]
-        //[SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 2)]
-        //public float CourtshipCooldown { get; set; } = 1f;
+        [SettingPropertyBool("{=retry_courtship}Retry Courtship", RequireRestart = false, HintText = "{=retry_courtship_desc}Player can retry courtship after failure")]
+        [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 2)]
+        public bool RetryCourtship { get; set; } = false;
     }
 }

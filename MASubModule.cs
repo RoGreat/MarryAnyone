@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Behaviors;
 using MarryAnyone.Settings;
-using System.Diagnostics;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
@@ -44,18 +43,15 @@ namespace MarryAnyone
                 CampaignGameStarter campaignGameStarter = (CampaignGameStarter)gameStarter;
                 campaignGameStarter.LoadGameTexts(BasePath.Name + "Modules/MarryAnyone/ModuleData/ma_module_strings.xml");
                 AddBehaviors(campaignGameStarter);
-            }
-            try
-            {
-                if (MCMSettings.Instance is null)
+                if (MCMSettings.Instance is not null)
                 {
                     MASettings.UsingMCM = true;
                 }
-            }
-            catch
-            {
-                Print("Marry Anyone: Not using MCM", true);
-                Print("Using config settings", true);
+                else
+                {
+                    Print("Marry Anyone: Not using MCM", true);
+                    Print("Using config settings", true);
+                }
             }
         }
 

@@ -5,14 +5,13 @@ using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Core;
+using TaleWorlds.LinQuick;
 
 namespace MarryAnyone.Behaviors.Patches
 {
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "DailyTickHero")]
     internal class PregnancyCampaignBehaviorPatch
     {
-        private static List<Hero>? _spouses;
-
         private static void Prefix(Hero hero)
         {
             ISettingsProvider settings = new MASettings();
@@ -56,7 +55,7 @@ namespace MarryAnyone.Behaviors.Patches
                             MASubModule.Print("ExSpouse to Spouses: " + exSpouse.Name);
                         }
                     }
-                    if (_spouses.Where(spouse => spouse is not null).Count() > 1)
+                    if (_spouses.WhereQ(spouse => spouse is not null).Count() > 1)
                     {
                         List<int> attractionGoal = new();
                         int attraction = 0;
@@ -83,7 +82,7 @@ namespace MarryAnyone.Behaviors.Patches
                     }
                     else if (hero.Spouse is null)
                     {
-                        hero.Spouse = _spouses.Where(spouse => spouse is not null).FirstOrDefault();
+                        hero.Spouse = _spouses.WhereQ(spouse => spouse is not null).FirstOrDefault();
                     }
                     if (hero.Spouse is not null)
                     {
@@ -105,5 +104,7 @@ namespace MarryAnyone.Behaviors.Patches
                 MAHelper.RemoveExSpouses(exSpouse);
             }
         }
+
+        private static List<Hero>? _spouses;
     }
 }

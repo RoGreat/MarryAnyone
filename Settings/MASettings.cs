@@ -8,10 +8,6 @@ namespace MarryAnyone.Settings
     {
         public static bool UsingMCM = false;
 
-        private static readonly string _configPath = BasePath.Name + "Modules/MarryAnyone/config.json";
-
-        private readonly ISettingsProvider _provider;
-
         public bool Incest { get => _provider.Incest; set => _provider.Incest = value; }
         public bool Polygamy { get => _provider.Polygamy; set => _provider.Polygamy = value; }
         public bool Cheating { get => _provider.Cheating; set => _provider.Cheating = value; }
@@ -20,8 +16,7 @@ namespace MarryAnyone.Settings
         public string SexualOrientation { get => _provider.SexualOrientation; set => _provider.SexualOrientation = value;  }
         public bool Adoption { get => _provider.Adoption; set => _provider.Adoption = value; }
         public float AdoptionChance { get => _provider.AdoptionChance; set => _provider.AdoptionChance = value; }
-        //public bool RetryCourtship { get => _provider.RetryCourtship; set => _provider.RetryCourtship = value; }
-        //public float CourtshipCooldown { get => _provider.CourtshipCooldown; set => _provider.CourtshipCooldown = value; }
+        public bool RetryCourtship { get => _provider.RetryCourtship; set => _provider.RetryCourtship = value; }
 
         public MASettings()
         {
@@ -46,8 +41,7 @@ namespace MarryAnyone.Settings
                     MAConfig.Instance.SexualOrientation = config.SexualOrientation;
                     MAConfig.Instance.Adoption = config.Adoption;
                     MAConfig.Instance.AdoptionChance = config.AdoptionChance;
-                    //MAConfig.Instance.RetryCourtship = config.RetryCourtship;
-                    //MAConfig.Instance.CourtshipCooldown = config.CourtshipCooldown;
+                    MAConfig.Instance.RetryCourtship = config.RetryCourtship;
                 }
             }
             if (MAConfig.Instance is null)
@@ -56,5 +50,9 @@ namespace MarryAnyone.Settings
             }
             _provider = MAConfig.Instance;
         }
+
+        private readonly ISettingsProvider _provider;
+
+        private static readonly string _configPath = BasePath.Name + "Modules/MarryAnyone/config.json";
     }
 }

@@ -16,7 +16,7 @@ namespace MarryAnyone.Behaviors
         {
             // In ClanLordItemVM
             // this.IsFamilyMember = Hero.MainHero.Clan.Lords.Contains(this._hero);
-            // In Clan was _lords now _lordsCache
+            // In the class "Clan" the field "_lords" is now "_lordsCache"
             List<Hero> _lordsCache = (List<Hero>)AccessTools.Field(typeof(Clan), "_lordsCache").GetValue(Clan.PlayerClan);
             if (!_lordsCache.Contains(hero))
             {
@@ -154,7 +154,6 @@ namespace MarryAnyone.Behaviors
             {
                 hero.Issue.CompleteIssueWithCancel();
             }
-
             CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
             MASubModule.Print(Hero.MainHero.Name + " adopted " + hero.Name, true);
         }
