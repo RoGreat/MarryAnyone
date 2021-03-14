@@ -24,5 +24,8 @@
 		<string id="adoption_desc" text="Player can adopt children" />
 		<string id="adoption_chance" text="Adoption Chance" />
 		<string id="adoption_chance_desc" text="Chance that a child is up for adoption" />
+		<string id="courtship" text="Courtship" />
+		<string id="retry_courtship" text="Retry Courtship" />
+		<string id="retry_courtship_desc" text="Player can retry courtship after failure" />
   </strings>
 </base>

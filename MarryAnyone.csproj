@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.2.2</Version>
+		<Version>2.2.3</Version>
 		<Authors>RoGreat</Authors>
 	</PropertyGroup>
 	
@@ -19,7 +19,7 @@
 	<!-- Versions -->
 	<PropertyGroup>
 		<GameVersion>1.5.8</GameVersion>
-		<MCMVersion>4.1.2.7</MCMVersion>
+		<MCMVersion>4.3.5</MCMVersion>
 	</PropertyGroup>
 	
 	<!-- Referenced from Zijistark's HousesCalradia -->
@@ -45,7 +45,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.27">
+    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.30">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -83,7 +83,7 @@
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\Newtonsoft.Json.dll">
+		<Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\Newtonsoft.Json.dll">
 			<HintPath>%(Identity)</HintPath>
       <Private>False</Private>
     </Reference>

@@ -10,7 +10,6 @@
         string SexualOrientation { get; set; }
         bool Adoption { get; set; }
         float AdoptionChance { get; set; }
-        //bool RetryCourtship { get; set; }
-        //float CourtshipCooldown { get; set; }
+        bool RetryCourtship { get; set; }
     }
 }

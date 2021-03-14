@@ -47,28 +47,29 @@ namespace MarryAnyone.Patches
                 return GameTexts.FindText("str_daughterwife", null);
             }
             // Don't need to add in all of this...
-            //if (baseHero.Mother is null != (baseHero.Father is null))
-            //{
-            //    if (baseHero.Mother == queriedHero)
-            //    {
-            //        return GameTexts.FindText("str_adoptivemother", null);
-            //    }
-            //    if (baseHero.Father == queriedHero)
-            //    {
-            //        return GameTexts.FindText("str_adoptivefather", null);
-            //    }
-            //}
-            //if (queriedHero.Mother is null != (queriedHero.Father is null))
-            //{
-            //    if (baseHero.Children.Contains(queriedHero))
-            //    {
-            //        if (!queriedHero.IsFemale)
-            //        {
-            //            return GameTexts.FindText("str_adoptedson", null);
-            //        }
-            //        return GameTexts.FindText("str_adopteddaughter", null);
-            //    }
-            //}
+            // I will check and see if this looks alright
+            if (baseHero.Mother is null != (baseHero.Father is null))
+            {
+                if (baseHero.Mother == queriedHero)
+                {
+                    return GameTexts.FindText("str_adoptivemother", null);
+                }
+                if (baseHero.Father == queriedHero)
+                {
+                    return GameTexts.FindText("str_adoptivefather", null);
+                }
+            }
+            if (queriedHero.Mother is null != (queriedHero.Father is null))
+            {
+                if (baseHero.Children.Contains(queriedHero))
+                {
+                    if (!queriedHero.IsFemale)
+                    {
+                        return GameTexts.FindText("str_adoptedson", null);
+                    }
+                    return GameTexts.FindText("str_adopteddaughter", null);
+                }
+            }
             if (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero))
             {
                 if (!queriedHero.IsAlive || !baseHero.IsAlive)

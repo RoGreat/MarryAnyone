@@ -11,7 +11,6 @@
         public string SexualOrientation { get; set; } = "Heterosexual";
         public bool Adoption { get; set; } = false;
         public float AdoptionChance { get; set; } = 0.05f;
-        //public bool RetryCourtship { get; set; } = true;
-        //public float CourtshipCooldown { get; set; } = 1f;
+        public bool RetryCourtship { get; set; } = false;
     }
 }
