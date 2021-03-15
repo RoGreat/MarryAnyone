@@ -43,13 +43,21 @@ namespace MarryAnyone
                 CampaignGameStarter campaignGameStarter = (CampaignGameStarter)gameStarter;
                 campaignGameStarter.LoadGameTexts(BasePath.Name + "Modules/MarryAnyone/ModuleData/ma_module_strings.xml");
                 AddBehaviors(campaignGameStarter);
-                if (MCMSettings.Instance is not null)
+                try
                 {
-                    MASettings.UsingMCM = true;
+                    if (MCMSettings.Instance is not null)
+                    {
+                        MASettings.UsingMCM = true;
+                    }
+                    else
+                    {
+                        Print("Marry Anyone: Not using compatible MCM version", true);
+                        Print("Using config settings", true);
+                    }
                 }
-                else
+                catch
                 {
-                    Print("Marry Anyone: Not using MCM", true);
+                    Print("Marry Anyone: Not using compatible MCM version", true);
                     Print("Using config settings", true);
                 }
             }

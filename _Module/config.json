@@ -9,7 +9,7 @@
 	"Adoption": false,
 	"AdoptionChance": 0.05,
 	
-	"RetryCourtship": false
+	"RetryCourtship": false,
 	
 	"Debug": false
 }
