@@ -19,7 +19,7 @@
 	<!-- Versions -->
 	<PropertyGroup>
 		<GameVersion>1.5.8</GameVersion>
-		<MCMVersion>4.3.5</MCMVersion>
+		<MCMVersion>4.3.6</MCMVersion>
 	</PropertyGroup>
 	
 	<!-- Referenced from Zijistark's HousesCalradia -->
@@ -49,7 +49,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Bannerlord.MCM" Version="$(MCMVersion)" />
+    <PackageReference Include="Bannerlord.MCM" Version="4.3.6" />
     <PackageReference Include="Lib.Harmony" Version="2.0.4" />
     <PackageReference Include="IsExternalInit" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
