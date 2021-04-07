@@ -56,16 +56,20 @@ namespace MarryAnyone.Settings
         public string Difficulty { get => DifficultyDropdown.SelectedValue; set => DifficultyDropdown.SelectedValue = value; }
         public string SexualOrientation { get => SexualOrientationDropdown.SelectedValue; set => SexualOrientationDropdown.SelectedValue = value; }
 
-        [SettingPropertyBool("{=adoption}Adoption", RequireRestart = false, HintText = "{=adoption_desc}Player can adopt children", IsToggle = true)]
-        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 1)]
+        [SettingPropertyBool("{=adoption}Adoption", RequireRestart = false, HintText = "{=adoption_desc}Player can adopt children in towns and villages", IsToggle = true)]
+        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 2)]
         public bool Adoption { get; set; } = false;
 
         [SettingPropertyFloatingInteger("{=adoption_chance}Adoption Chance", 0f, 1f, "#0%", RequireRestart = false, HintText = "{=adoption_chance_desc}Chance that a child is up for adoption")]
-        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 1)]
+        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 2)]
         public float AdoptionChance { get; set; } = 0.05f;
 
+        [SettingPropertyBool("{=adoption_titles}Adoption Titles", RequireRestart = false, HintText = "{=adoption_titles_desc}Encyclopedia displays children without a parent as adopted")]
+        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 2)]
+        public bool AdoptionTitles { get; set; } = false;
+
         [SettingPropertyBool("{=retry_courtship}Retry Courtship", RequireRestart = false, HintText = "{=retry_courtship_desc}Player can retry courtship after failure")]
-        [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 2)]
+        [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 1)]
         public bool RetryCourtship { get; set; } = false;
     }
 }
