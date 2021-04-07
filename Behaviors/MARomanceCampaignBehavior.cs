@@ -13,6 +13,25 @@ namespace MarryAnyone.Behaviors
     {
         protected void AddDialogs(CampaignGameStarter starter)
         {
+            // Putting settings here because at this point MCM should kick in
+            try
+            {
+                if (MCMSettings.Instance is not null)
+                {
+                    MASettings.UsingMCM = true;
+                }
+                else
+                {
+                    MASubModule.Print("Marry Anyone: Not using compatible MCM version", true);
+                    MASubModule.Print("Using config settings", true);
+                }
+            }
+            catch
+            {
+                MASubModule.Print("Marry Anyone: Not detecting MCM", true);
+                MASubModule.Print("Using config settings", true);
+            }
+
             foreach (Hero hero in Hero.All.ToList())
             {
                 if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
@@ -20,6 +39,23 @@ namespace MarryAnyone.Behaviors
                     MAHelper.OccupationToLord(hero.CharacterObject);
                 }
             }
+
+            //Not the culprit since bartering marriage works differently
+            //foreach (Romance.RomanticState romanticState in Romance.RomanticStateList.ToList())
+            //{
+            //    if (romanticState.Level == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage)
+            //    {
+            //        if (romanticState.Person1 == Hero.MainHero)
+            //        {
+            //            EndOtherRomances(romanticState.Person2);
+            //        }
+            //        else if (romanticState.Person2 == Hero.MainHero)
+            //        {
+            //            EndOtherRomances(romanticState.Person1);
+            //        }
+            //    }
+            //}
+
             // To begin the dialog for companions
             starter.AddPlayerLine("main_option_discussions_MA", "hero_main_options", "lord_talk_speak_diplomacy_MA", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_begin_courtship_for_hero_on_condition), null, 120, null, null);
             starter.AddDialogLine("character_agrees_to_discussion_MA", "lord_talk_speak_diplomacy_MA", "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_character_agrees_to_discussion_on_condition), null, 100, null);
@@ -59,9 +95,12 @@ namespace MarryAnyone.Behaviors
             ISettingsProvider settings = new MASettings();
             bool discoverAncestors = DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any();
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
+            // In case the other character is already engaged, break it off
+            //EndOtherRomances(Hero.OneToOneConversationHero);
             if (settings.Difficulty == "Realistic")
             {
-                if ((Clan.PlayerClan.Lords.Contains(Hero.OneToOneConversationHero) || discoverAncestors) && settings.Incest)
+                // Will have to skill skip due to issues with bartering marriage within clans
+                if ((Hero.MainHero.Clan.Lords.Contains(Hero.OneToOneConversationHero) /*&& Hero.MainHero.Clan.Leader == Hero.MainHero*/ || discoverAncestors) && settings.Incest)
                 {
                     MASubModule.Print("Realistic: Incest");
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
@@ -75,7 +114,7 @@ namespace MarryAnyone.Behaviors
             }
             else
             {
-                if ((Clan.PlayerClan.Lords.Contains(Hero.OneToOneConversationHero) || discoverAncestors) && settings.Incest)
+                if ((Hero.MainHero.Clan.Lords.Contains(Hero.OneToOneConversationHero) /*&& Hero.MainHero.Clan.Leader == Hero.MainHero*/ || discoverAncestors) && settings.Incest)
                 {
                     if (settings.Difficulty == "Easy")
                     {
@@ -208,6 +247,30 @@ namespace MarryAnyone.Behaviors
                 AddHeroToPartyAction.Apply(spouse, MobileParty.MainParty, true);
             }
         }
+
+        //Not working out because this actually isn't the issue
+        //private void EndOtherRomances(Hero engaged)
+        //{
+        //    foreach (Romance.RomanticState romanticState in Romance.RomanticStateList.ToList())
+        //    {
+        //        bool otherRomance1 = (romanticState.Person1 == engaged) && (romanticState.Person2 != Hero.MainHero);
+        //        bool otherRomance2 = (romanticState.Person2 == engaged) && (romanticState.Person1 != Hero.MainHero);
+        //        if (romanticState.Level == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage)
+        //        {
+        //            if (otherRomance1)
+        //            {
+        //                romanticState.Level = Romance.RomanceLevelEnum.Ended;
+        //                MASubModule.Print(engaged.Name.ToString() + " broke up with " + romanticState.Person2.Name.ToString());
+        //            }
+        //            else if (otherRomance2)
+        //            {
+        //                romanticState.Level = Romance.RomanceLevelEnum.Ended;
+        //                MASubModule.Print(engaged.Name.ToString() + " broke up with " + romanticState.Person1.Name.ToString());
+        //            }
+        //            MASubModule.Print(romanticState.Person1.Name.ToString() + " and " + romanticState.Person2.Name.ToString());
+        //        }
+        //    }
+        //}
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {

@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.2.5</Version>
+		<Version>2.2.6</Version>
 		<Authors>RoGreat</Authors>
 	</PropertyGroup>
 	
@@ -68,10 +68,6 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="$(GameFolder)\Modules\Native\bin\Win64_Shipping_Client\*.dll">
-      <HintPath>%(Identity)</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="$(GameFolder)\Modules\SandBox\bin\Win64_Shipping_Client\*.dll">
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
     </Reference>

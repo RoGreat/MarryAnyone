@@ -21,9 +21,11 @@
 		<string id="cheating_desc" text="Player character can marry characters that are already married" />
 		<string id="relationship" text="Relationship Options" />
 		<string id="adoption" text="Adoption" />
-		<string id="adoption_desc" text="Player can adopt children" />
+		<string id="adoption_desc" text="Player can adopt children in towns and villages" />
 		<string id="adoption_chance" text="Adoption Chance" />
 		<string id="adoption_chance_desc" text="Chance that a child is up for adoption" />
+		<string id="adoption_titles" text="Adoption Titles" />
+		<string id="adoption_titles_desc" text="Encyclopedia displays children without a parent as adopted" />
 		<string id="courtship" text="Courtship" />
 		<string id="retry_courtship" text="Retry Courtship" />
 		<string id="retry_courtship_desc" text="Player can retry courtship after failure" />

@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Settings;
+using System.Linq;
 using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone.Patches
@@ -12,7 +13,7 @@ namespace MarryAnyone.Patches
             ISettingsProvider settings = new MASettings();
             if (settings.Polygamy)
             {
-                foreach (Romance.RomanticState romanticState in Romance.RomanticStateList)
+                foreach (Romance.RomanticState romanticState in Romance.RomanticStateList.ToList())
                 {
                     if (forHero == Hero.MainHero && romanticState.Level == Romance.RomanceLevelEnum.Marriage)
                     {

@@ -154,7 +154,9 @@ namespace MarryAnyone.Behaviors
             {
                 hero.Issue.CompleteIssueWithCancel();
             }
-            CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
+            // Conflicts since this is already synced up and already exists inside the create a hero function
+            // This probably did not work this way until e1.5.9 so I am concerned about this not being the case on e1.5.8
+            // CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
             MASubModule.Print(Hero.MainHero.Name + " adopted " + hero.Name, true);
         }
 
