@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.2.6</Version>
+		<Version>2.2.7</Version>
 		<Authors>RoGreat</Authors>
 	</PropertyGroup>
 	
@@ -19,7 +19,7 @@
 	<!-- Versions -->
 	<PropertyGroup>
 		<GameVersion>1.5.9</GameVersion>
-		<MCMVersion>4.3.6</MCMVersion>
+		<MCMVersion>4.3.7</MCMVersion>
 	</PropertyGroup>
 	
 	<!-- Referenced from Zijistark's HousesCalradia -->
@@ -45,11 +45,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.30">
+    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.31">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Bannerlord.MCM" Version="4.3.6" />
+    <PackageReference Include="Bannerlord.MCM" Version="$(MCMVersion)" />
     <PackageReference Include="Lib.Harmony" Version="2.0.4" />
     <PackageReference Include="IsExternalInit" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>

@@ -53,7 +53,7 @@ namespace MarryAnyone.Behaviors
         private bool conversation_adopt_child_on_condition()
         {
             ISettingsProvider settings = new MASettings();
-            StringHelpers.SetCharacterProperties("CONVERSATION_CHARACTER", CharacterObject.OneToOneConversationCharacter, null, null, false);
+            StringHelpers.SetCharacterProperties("CONVERSATION_CHARACTER", CharacterObject.OneToOneConversationCharacter);
             _agent = Math.Abs(Campaign.Current.ConversationManager.OneToOneConversationAgent.GetHashCode());
             if (_adoptableAgents is null || _notAdoptableAgents is null)
             {
@@ -136,20 +136,6 @@ namespace MarryAnyone.Behaviors
             hero.IsNoble = true;
             RefreshClanVM(hero);
 
-            // A bit unnecessary, but also OwnedParties does not exist anymore in e1.5.8
-            // Notable fixes for the most part, needs to be resolved for the Recruit Everyone mod
-            // In case these issues apply to a child for some reason
-            /*
-            foreach (PartyBase party in hero.OwnedParties.ToList())
-            {
-                MobileParty mobileParty = party.MobileParty;
-                if (mobileParty is not null)
-                {
-                    mobileParty.CurrentSettlement = mobileParty.HomeSettlement;
-                    DisbandPartyAction.ApplyDisband(mobileParty);
-                }
-            }
-            */
             if (hero.Issue is not null)
             {
                 hero.Issue.CompleteIssueWithCancel();
