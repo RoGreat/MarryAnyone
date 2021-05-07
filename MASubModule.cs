@@ -4,28 +4,24 @@ using MarryAnyone.Settings;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
-using TaleWorlds.MountAndBlade;
+using NoHarmony;
+using TaleWorlds.CampaignSystem.SandBox.GameComponents;
+using MarryAnyone.Models;
 
 namespace MarryAnyone
 {
-    internal class MASubModule : MBSubModuleBase
+    internal class MASubModule : NoHarmonyLoader
     {
-        public static void Print(string message, bool notification = false)
+        public override void NoHarmonyInit()
         {
-            ISettingsProvider settings = new MASettings();
-            Color color;
-            if (notification)
-            {
-                color = Colors.Red;
-            }
-            else
-            {
-                color = new Color(0.6f, 0.2f, 1f);
-            }
-            if (settings.Debug || notification)
-            {
-                InformationManager.DisplayMessage(new InformationMessage(message, color));
-            }
+            Logging = false;
+            LogFile = "MANoHarmony.txt";
+            LogDateFormat = "MM/dd/yy HH:mm:ss.fff";
+        }
+
+        public override void NoHarmonyLoad()
+        {
+            ReplaceModel<MADefaultMarriageModel, DefaultMarriageModel>();
         }
 
         protected override void OnSubModuleLoad()

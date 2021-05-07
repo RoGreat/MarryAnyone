@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Patches;
+using MarryAnyone.Models;
 using MarryAnyone.Settings;
 using System;
 using System.Linq;
@@ -22,14 +22,14 @@ namespace MarryAnyone.Behaviors
                 }
                 else
                 {
-                    MASubModule.Print("Marry Anyone: Not using compatible MCM version", true);
-                    MASubModule.Print("Using config settings", true);
+                    MAHelper.Print("Marry Anyone: Not using compatible MCM version", true);
+                    MAHelper.Print("Using config settings", true);
                 }
             }
             catch
             {
-                MASubModule.Print("Marry Anyone: Not detecting MCM", true);
-                MASubModule.Print("Using config settings", true);
+                MAHelper.Print("Marry Anyone: Not detecting MCM", true);
+                MAHelper.Print("Using config settings", true);
             }
 
             foreach (Hero hero in Hero.All.ToList())
@@ -58,12 +58,12 @@ namespace MarryAnyone.Behaviors
             ISettingsProvider settings = new MASettings();
             if (Hero.OneToOneConversationHero.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
-                MASubModule.Print("MCM: " + MASettings.UsingMCM);
-                MASubModule.Print("Difficulty: " + settings.Difficulty);
-                MASubModule.Print("Orientation: " + settings.SexualOrientation);
-                MASubModule.Print("Cheating: " + settings.Cheating);
-                MASubModule.Print("Polygamy: " + settings.Polygamy);
-                MASubModule.Print("Incest: " + settings.Incest);
+                MAHelper.Print("MCM: " + MASettings.UsingMCM);
+                MAHelper.Print("Difficulty: " + settings.Difficulty);
+                MAHelper.Print("Orientation: " + settings.SexualOrientation);
+                MAHelper.Print("Cheating: " + settings.Cheating);
+                MAHelper.Print("Polygamy: " + settings.Polygamy);
+                MAHelper.Print("Incest: " + settings.Incest);
             }
             return Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
         }
@@ -78,7 +78,7 @@ namespace MarryAnyone.Behaviors
         {
             ISettingsProvider settings = new MASettings();
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-            bool incest = (Hero.MainHero.Clan.Lords.Contains(Hero.OneToOneConversationHero) || DefaultMarriageModelPatch.DiscoverAncestors(Hero.MainHero, 3).Intersect(DefaultMarriageModelPatch.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any()) && settings.Incest;
+            bool incest = (Hero.MainHero.Clan.Lords.Contains(Hero.OneToOneConversationHero) || MADefaultMarriageModel.DiscoverAncestors(Hero.MainHero, 3).Intersect(MADefaultMarriageModel.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any()) && settings.Incest;
             // In case the other character is already engaged, break it off
             //EndOtherRomances(Hero.OneToOneConversationHero);
             if (settings.Difficulty == "Realistic")
@@ -86,12 +86,12 @@ namespace MarryAnyone.Behaviors
                 // Will have to skill skip due to issues with bartering marriage within clans
                 if (incest)
                 {
-                    MASubModule.Print("Realistic: Incest");
+                    MAHelper.Print("Realistic: Incest");
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
                 }
                 if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
                 {
-                    MASubModule.Print("Realistic: Noble");
+                    MAHelper.Print("Realistic: Noble");
                     return false;
                 }
                 return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
@@ -102,15 +102,15 @@ namespace MarryAnyone.Behaviors
                 {
                     if (settings.Difficulty == "Easy")
                     {
-                        MASubModule.Print("Easy: Incest");
+                        MAHelper.Print("Easy: Incest");
                         return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
                     }
-                    MASubModule.Print("Very Easy: Incest");
+                    MAHelper.Print("Very Easy: Incest");
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
                 }
                 if (settings.Difficulty == "Easy" && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))
                 {
-                    MASubModule.Print("Easy: Noble");
+                    MAHelper.Print("Easy: Noble");
                     return false;
                 }
                 return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
@@ -143,9 +143,9 @@ namespace MarryAnyone.Behaviors
                             ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(hero.Clan);
                             if (hero.Clan.Leader == Hero.MainHero)
                             {
-                                MASubModule.Print("No Heirs");
+                                MAHelper.Print("No Heirs");
                                 DestroyClanAction.Apply(hero.Clan);
-                                MASubModule.Print("Eliminated Player Clan");
+                                MAHelper.Print("Eliminated Player Clan");
                             }
                         }
                         foreach (Hero companion in hero.Clan.Companions.ToList())
@@ -165,12 +165,12 @@ namespace MarryAnyone.Behaviors
                         hero.Clan = spouse.Clan;
                         var current = Traverse.Create<Campaign>().Property("Current").GetValue<Campaign>();
                         Traverse.Create(current).Property("PlayerDefaultFaction").SetValue(spouse.Clan);
-                        MASubModule.Print("Lowborn Player Married to Kingdom Ruler");
+                        MAHelper.Print("Lowborn Player Married to Kingdom Ruler");
                     }
                     else
                     {
                         ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(spouse.Clan);
-                        MASubModule.Print("Kingdom Ruler Stepped Down and Married to Player");
+                        MAHelper.Print("Kingdom Ruler Stepped Down and Married to Player");
                     }
                 }
             }
@@ -179,19 +179,19 @@ namespace MarryAnyone.Behaviors
             if (!spouse.IsNoble)
             {
                 spouse.IsNoble = true;
-                MASubModule.Print("Spouse to Noble");
+                MAHelper.Print("Spouse to Noble");
             }
             // Dodge the party crash for characters part 1
             bool dodge = false;
             if (spouse.PartyBelongedTo == MobileParty.MainParty)
             {
                 AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(spouse, null, null);
-                MASubModule.Print("Spouse Already in Player's Party");
+                MAHelper.Print("Spouse Already in Player's Party");
                 dodge = true;
             }
             // Apply marriage
             ChangeRomanticStateAction.Apply(hero, spouse, Romance.RomanceLevelEnum.Marriage);
-            MASubModule.Print("Marriage Action Applied");
+            MAHelper.Print("Marriage Action Applied");
             if (oldSpouse is not null)
             {
                 MAHelper.RemoveExSpouses(oldSpouse);
@@ -209,18 +209,18 @@ namespace MarryAnyone.Behaviors
             if (!spouse.IsActive)
             {
                 spouse.ChangeState(Hero.CharacterStates.Active);
-                MASubModule.Print("Activated Spouse");
+                MAHelper.Print("Activated Spouse");
             }
             if (spouse.IsPlayerCompanion)
             {
                 spouse.CompanionOf = null;
-                MASubModule.Print("Spouse No Longer Companion");
+                MAHelper.Print("Spouse No Longer Companion");
             }
             if (settings.Cheating && cheatedSpouse is not null)
             {
                 MAHelper.RemoveExSpouses(cheatedSpouse, true);
                 MAHelper.RemoveExSpouses(spouse, true);
-                MASubModule.Print("Spouse Broke Off Past Marriage");
+                MAHelper.Print("Spouse Broke Off Past Marriage");
             }
             MAHelper.RemoveExSpouses(hero);
             MAHelper.RemoveExSpouses(spouse);

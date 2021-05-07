@@ -6,7 +6,7 @@ using TaleWorlds.CampaignSystem.ViewModelCollection;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
-namespace MarryAnyone.Patches
+namespace MarryAnyone.Patches.Helpers
 {
     [HarmonyPatch(typeof(CampaignUIHelper), "GetHeroRelationToHeroTextShort")]
     internal class GetHeroRelationToHeroTextShortPatch

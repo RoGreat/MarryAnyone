@@ -1,24 +1,14 @@
-﻿using HarmonyLib;
-using MarryAnyone.Settings;
+﻿using MarryAnyone.Settings;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 
-namespace MarryAnyone.Patches
+namespace MarryAnyone.Models
 {
-    [HarmonyPatch(typeof(DefaultMarriageModel))]
-    internal class DefaultMarriageModelPatch
+    internal class MADefaultMarriageModel : DefaultMarriageModel
     {
-        [HarmonyPrefix]
-        [HarmonyPatch("IsSuitableForMarriage")]
-        private static bool Prefix1(ref bool __result, Hero maidenOrSuitor)
-        {
-            __result = IsSuitableForMarriage(maidenOrSuitor);
-            return false;
-        }
-
-        public static bool IsSuitableForMarriage(Hero maidenOrSuitor)
+        public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
             ISettingsProvider settings = new MASettings();
             bool inConversation, isCheating, isPolygamous;
@@ -44,15 +34,7 @@ namespace MarryAnyone.Patches
             return false;
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch("IsCoupleSuitableForMarriage")]
-        private static bool Prefix2(ref bool __result, Hero firstHero, Hero secondHero)
-        {
-            __result = IsCoupleSuitableForMarriage(firstHero, secondHero);
-            return false;
-        }
-
-        public static bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
+        public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
             ISettingsProvider settings = new MASettings();
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
