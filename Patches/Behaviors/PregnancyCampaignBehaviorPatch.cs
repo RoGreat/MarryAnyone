@@ -7,7 +7,7 @@ using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Core;
 using TaleWorlds.LinQuick;
 
-namespace MarryAnyone.Behaviors.Patches
+namespace MarryAnyone.Patches.Behaviors
 {
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "DailyTickHero")]
     internal class PregnancyCampaignBehaviorPatch
@@ -20,18 +20,18 @@ namespace MarryAnyone.Behaviors.Patches
             {
                 if (Hero.MainHero == hero || Hero.MainHero == hero.Spouse || hero.ExSpouses.Contains(Hero.MainHero))
                 {
-                    MASubModule.Print("Female Hero: " + hero.Name);
+                    MAHelper.Print("Female Hero: " + hero.Name);
                     if (hero.Spouse is not null)
                     {
                         if (hero.IsFemale == hero.Spouse.IsFemale)
                         {
-                            MASubModule.Print("Spouse Same Gender: " + hero.Spouse.Name);
+                            MAHelper.Print("Spouse Same Gender: " + hero.Spouse.Name);
                             hero.Spouse = null;
                         }
                         else
                         {
                             _spouses.Add(hero.Spouse);
-                            MASubModule.Print("Spouse to Spouses: " + hero.Spouse.Name);
+                            MAHelper.Print("Spouse to Spouses: " + hero.Spouse.Name);
                         }
                     }
                     foreach (Hero exSpouse in hero.ExSpouses.ToList())
@@ -43,16 +43,16 @@ namespace MarryAnyone.Behaviors.Patches
                     {
                         if (hero.IsFemale == exSpouse.IsFemale)
                         {
-                            MASubModule.Print("ExSpouse Same Gender: " + exSpouse.Name);
+                            MAHelper.Print("ExSpouse Same Gender: " + exSpouse.Name);
                         }
                         else if (!exSpouse.IsAlive)
                         {
-                            MASubModule.Print("ExSpouse Dead: " + exSpouse.Name);
+                            MAHelper.Print("ExSpouse Dead: " + exSpouse.Name);
                         }
                         else
                         {
                             _spouses.Add(exSpouse);
-                            MASubModule.Print("ExSpouse to Spouses: " + exSpouse.Name);
+                            MAHelper.Print("ExSpouse to Spouses: " + exSpouse.Name);
                         }
                     }
                     if (_spouses.WhereQ(spouse => spouse is not null).Count() > 1)
@@ -63,17 +63,17 @@ namespace MarryAnyone.Behaviors.Patches
                         {
                             attraction += Romance.GetAttractionValueAsPercent(hero, spouse);
                             attractionGoal.Add(attraction);
-                            MASubModule.Print("Spouse: " + spouse.Name);
-                            MASubModule.Print("Attraction: " + attraction.ToString());
+                            MAHelper.Print("Spouse: " + spouse.Name);
+                            MAHelper.Print("Attraction: " + attraction.ToString());
                         }
                         int attractionRandom = MBRandom.RandomInt(attraction);
-                        MASubModule.Print("Random: " + attractionRandom.ToString());
+                        MAHelper.Print("Random: " + attractionRandom.ToString());
                         int i = 0;
                         while (i < _spouses.Count)
                         {
                             if (attractionRandom < attractionGoal[i])
                             {
-                                MASubModule.Print("Index: " + i.ToString());
+                                MAHelper.Print("Index: " + i.ToString());
                                 break;
                             }
                             i++;
@@ -87,9 +87,9 @@ namespace MarryAnyone.Behaviors.Patches
                     if (hero.Spouse is not null)
                     {
                         hero.Spouse.Spouse = hero;
-                        MASubModule.Print("Spouse Assigned:");
-                        MASubModule.Print("   Hero: " + hero.Spouse.Spouse);
-                        MASubModule.Print("   Spouse: " + hero.Spouse);
+                        MAHelper.Print("Spouse Assigned:");
+                        MAHelper.Print("   Hero: " + hero.Spouse.Spouse);
+                        MAHelper.Print("   Spouse: " + hero.Spouse);
                     }
                 }
             }

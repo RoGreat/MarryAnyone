@@ -6,7 +6,7 @@ using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Localization;
 
 // Add dialog in case of cheating...
-namespace MarryAnyone.Behaviors.Patches
+namespace MarryAnyone.Patches.Behaviors
 {
     [HarmonyPatch(typeof(RomanceCampaignBehavior))]
     internal class RomanceCampaignBehaviorPatch
@@ -16,6 +16,17 @@ namespace MarryAnyone.Behaviors.Patches
         private static void Postfix1(ref bool __result)
         {
             __result = Hero.OneToOneConversationHero is not null && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) is null && Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero);
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch("RomanceCourtshipAttemptCooldown", MethodType.Getter)]
+        private static void Postfix2(ref CampaignTime __result)
+        {
+            ISettingsProvider settings = new MASettings();
+            if (settings.RetryCourtship)
+            {
+                __result = CampaignTime.DaysFromNow(1f);
+            }
         }
 
         [HarmonyPrefix]
@@ -34,9 +45,9 @@ namespace MarryAnyone.Behaviors.Patches
                 return false;
             }
             bool flag = Hero.MainHero.IsFemale && settings.SexualOrientation == "Heterosexual" || !Hero.MainHero.IsFemale && settings.SexualOrientation == "Homosexual" || !Hero.OneToOneConversationHero.IsFemale && settings.SexualOrientation == "Bisexual";
-            MASubModule.Print("Courtship Possible: " + Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
-            MASubModule.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
-            MASubModule.Print("Retry Courtship: " + settings.RetryCourtship.ToString());
+            MAHelper.Print("Courtship Possible: " + Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
+            MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
+            MAHelper.Print("Retry Courtship: " + settings.RetryCourtship.ToString());
 
             if (Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested)
             {

@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.2.7</Version>
+		<Version>2.3.0</Version>
 		<Authors>RoGreat</Authors>
 	</PropertyGroup>
 	
@@ -50,6 +50,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Bannerlord.MCM" Version="$(MCMVersion)" />
+    <PackageReference Include="Bannerlord_NoHarmonyLoader" Version="1.0.0" />
     <PackageReference Include="Lib.Harmony" Version="2.0.4" />
     <PackageReference Include="IsExternalInit" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>

@@ -62,25 +62,25 @@ namespace MarryAnyone.Behaviors
             }
             if (_notAdoptableAgents.Contains(_agent))
             {
-                MASubModule.Print("Cannot Adopt");
+                MAHelper.Print("Cannot Adopt");
                 return false;
             }
             if (_adoptableAgents.Contains(_agent))
             {
-                MASubModule.Print("Can Adopt");
+                MAHelper.Print("Can Adopt");
                 return true;
             }
             if (Campaign.Current.ConversationManager.OneToOneConversationAgent.Age < Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
-                MASubModule.Print("Adoption: " + settings.Adoption);
+                MAHelper.Print("Adoption: " + settings.Adoption);
                 if (!settings.Adoption)
                 {
                     return false;
                 }
-                MASubModule.Print("Adoption Chance: " + settings.AdoptionChance);
+                MAHelper.Print("Adoption Chance: " + settings.AdoptionChance);
                 // You only roll once!
                 float random = MBRandom.RandomFloat;
-                MASubModule.Print("Random Number: " + random);
+                MAHelper.Print("Random Number: " + random);
                 if (random < settings.AdoptionChance)
                 {
                     _adoptableAgents.Add(_agent);
@@ -143,7 +143,7 @@ namespace MarryAnyone.Behaviors
             // Conflicts since this is already synced up and already exists inside the create a hero function
             // This probably did not work this way until e1.5.9 so I am concerned about this not being the case on e1.5.8
             // CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
-            MASubModule.Print(Hero.MainHero.Name + " adopted " + hero.Name, true);
+            MAHelper.Print(Hero.MainHero.Name + " adopted " + hero.Name, true);
         }
 
         // Looked at DecideBornSettlement from HeroCreator
