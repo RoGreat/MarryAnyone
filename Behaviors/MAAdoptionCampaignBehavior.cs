@@ -3,28 +3,17 @@ using Helpers;
 using MarryAnyone.Settings;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
+using SandBox;
+using System.Linq;
 
 namespace MarryAnyone.Behaviors
 {
     internal class MAAdoptionCampaignBehavior : CampaignBehaviorBase
     {
-        private static void RefreshClanVM(Hero hero)
-        {
-            // In ClanLordItemVM
-            // this.IsFamilyMember = Hero.MainHero.Clan.Lords.Contains(this._hero);
-            // In the class "Clan" the field "_lords" is now "_lordsCache"
-            List<Hero> _lordsCache = (List<Hero>)AccessTools.Field(typeof(Clan), "_lordsCache").GetValue(Clan.PlayerClan);
-            if (!_lordsCache.Contains(hero))
-            {
-                _lordsCache.Add(hero);
-            }
-        }
-
-
         protected void AddDialogs(CampaignGameStarter starter)
         {
             foreach (Hero hero in Hero.All.ToList())
@@ -32,7 +21,6 @@ namespace MarryAnyone.Behaviors
                 if (Hero.MainHero.Children.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
-                    RefreshClanVM(hero);
                 }
             }
 
@@ -94,37 +82,35 @@ namespace MarryAnyone.Behaviors
             return false;
         }
 
-        private static CharacterObject? _childTemplate;
-
         private void conversation_adopt_child_on_consequence()
         {
-            // Same system as Recruit Everyone pretty much
-            // Add in Deliver Offspring into the mix
+            // Similar system from Recruit Everyone
             if (_notAdoptableAgents is not null)
             {
                 _notAdoptableAgents.Add(_agent);
             }
-
             Agent agent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
             CharacterObject character = CharacterObject.OneToOneConversationCharacter;
 
-            Hero hero = HeroCreator.CreateSpecialHero(character, Settlement.CurrentSettlement, Clan.PlayerClan, null, (int)agent.Age);
-
+            // Add a bit of the DeliverOffspring method into the mix
+            Hero hero = HeroCreator.CreateSpecialHero(character, Settlement.CurrentSettlement, null, null, (int)agent.Age);
             int becomeChildAge = Campaign.Current.Models.AgeModel.BecomeChildAge;
-            _childTemplate = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == character.Culture && t.Age <= becomeChildAge && t.IsFemale == character.IsFemale && t.Occupation == Occupation.Lord);
-            if (_childTemplate is not null)
+            CharacterObject characterObject = CharacterObject.ChildTemplates.FirstOrDefault((CharacterObject t) => t.Culture == character.Culture && t.Age <= becomeChildAge && t.IsFemale == character.IsFemale && t.Occupation == Occupation.Lord);
+            if (characterObject is not null)
             {
-                Equipment equipment = _childTemplate.FirstCivilianEquipment.Clone(false);
+                Equipment equipment = characterObject.FirstCivilianEquipment.Clone(false);
                 Equipment equipment2 = new(false);
                 equipment2.FillFrom(equipment, false);
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment);
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment2);
             }
-            MAHelper.OccupationToLord(hero.CharacterObject);
+            MAHelper.OccupationToLord(character);
+            hero.Clan = Clan.PlayerClan;
             AccessTools.Method(typeof(HeroDeveloper), "CheckInitialLevel").Invoke(hero.HeroDeveloper, null);
+            hero.CharacterObject.IsFemale = character.IsFemale;
             BodyProperties bodyPropertiesValue = agent.BodyPropertiesValue;
             AccessTools.Property(typeof(Hero), "StaticBodyProperties").SetValue(hero, bodyPropertiesValue.StaticProperties);
-            hero.HasMet = true;
+            // Selects player as the parent
             if (Hero.MainHero.IsFemale)
             {
                 hero.Mother = Hero.MainHero;
@@ -134,19 +120,35 @@ namespace MarryAnyone.Behaviors
                 hero.Father = Hero.MainHero;
             }
             hero.IsNoble = true;
-            RefreshClanVM(hero);
+            hero.HasMet = true;
 
-            if (hero.Issue is not null)
-            {
-                hero.Issue.CompleteIssueWithCancel();
-            }
-            // Conflicts since this is already synced up and already exists inside the create a hero function
-            // This probably did not work this way until e1.5.9 so I am concerned about this not being the case on e1.5.8
-            // CampaignEventDispatcher.Instance.OnHeroCreated(hero, false);
-            MAHelper.Print(Hero.MainHero.Name + " adopted " + hero.Name, true);
+            // Too much work to try and implement the log
+            /*
+            CharacterAdoptedLogEntry characterAdoptedLogEntry = new(hero, Hero.MainHero);
+            Campaign.Current.CampaignInformationManager.NewMapNoticeAdded(new AdoptionMapNotification(hero, Hero.MainHero, characterAdoptedLogEntry.GetEncyclopediaText()));
+            */
+
+            // Cool idea. Might put this into Recruit Everyone, too!
+            AccessTools.Field(typeof(Agent), "_name").SetValue(agent, hero.Name);
+            OnHeroAdopted(Hero.MainHero, hero);
+            // Follows you! I like this feature :3
+            Campaign.Current.ConversationManager.ConversationEndOneShot += FollowMainAgent;
         }
 
-        // Looked at DecideBornSettlement from HeroCreator
+        private static void FollowMainAgent()
+        {
+            DailyBehaviorGroup behaviorGroup = ConversationMission.OneToOneConversationAgent.GetComponent<CampaignAgentComponent>().AgentNavigator.GetBehaviorGroup<DailyBehaviorGroup>();
+            behaviorGroup.AddBehavior<FollowAgentBehavior>().SetTargetAgent(Agent.Main);
+            behaviorGroup.SetScriptedBehavior<FollowAgentBehavior>();
+        }
+
+        private void OnHeroAdopted(Hero adopter, Hero adoptedHero)
+        {
+            TextObject textObject = new("{=adopted}{ADOPTER.LINK} adopted {ADOPTED_HERO.LINK}.", null);
+            StringHelpers.SetCharacterProperties("ADOPTER", adopter.CharacterObject, textObject);
+            StringHelpers.SetCharacterProperties("ADOPTED_HERO", adoptedHero.CharacterObject, textObject);
+            InformationManager.AddQuickInformation(textObject, 0, null, "event:/ui/notification/child_born");
+        }
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {

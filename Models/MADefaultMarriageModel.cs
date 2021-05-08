@@ -8,32 +8,6 @@ namespace MarryAnyone.Models
 {
     internal class MADefaultMarriageModel : DefaultMarriageModel
     {
-        public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
-        {
-            ISettingsProvider settings = new MASettings();
-            bool inConversation, isCheating, isPolygamous;
-            inConversation = isCheating = isPolygamous = false;
-            if (Hero.OneToOneConversationHero is not null)
-            {
-                inConversation = maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero;
-                isCheating = settings.Cheating && inConversation && Hero.OneToOneConversationHero.Spouse is not null;
-                isPolygamous = settings.Polygamy && inConversation && Hero.OneToOneConversationHero.Spouse is null;
-            }
-            if (!maidenOrSuitor.IsAlive ||  maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
-            {
-                return false;
-            }
-            if (maidenOrSuitor.Spouse is null && !maidenOrSuitor.ExSpouses.Where(exSpouse => exSpouse.IsAlive).Any() || isPolygamous || isCheating)
-            {
-                if (maidenOrSuitor.IsFemale)
-                {
-                    return maidenOrSuitor.Age >= Campaign.Current.Models.MarriageModel.MinimumMarriageAgeFemale;
-                }
-                return maidenOrSuitor.Age >= Campaign.Current.Models.MarriageModel.MinimumMarriageAgeMale;
-            }
-            return false;
-        }
-
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
             ISettingsProvider settings = new MASettings();
@@ -42,7 +16,7 @@ namespace MarryAnyone.Models
             bool isBisexual = settings.SexualOrientation == "Bisexual" && isMainHero;
             bool isIncestuous = settings.Incest && isMainHero;
             bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
-            
+
             Clan clan = firstHero.Clan;
             if (clan?.Leader == firstHero && !isMainHero)
             {
@@ -85,6 +59,32 @@ namespace MarryAnyone.Models
                 }
             }
             yield break;
+        }
+
+        public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
+        {
+            ISettingsProvider settings = new MASettings();
+            bool inConversation, isCheating, isPolygamous;
+            inConversation = isCheating = isPolygamous = false;
+            if (Hero.OneToOneConversationHero is not null)
+            {
+                inConversation = maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero;
+                isCheating = settings.Cheating && inConversation && Hero.OneToOneConversationHero.Spouse is not null;
+                isPolygamous = settings.Polygamy && inConversation && Hero.OneToOneConversationHero.Spouse is null;
+            }
+            if (!maidenOrSuitor.IsAlive || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
+            {
+                return false;
+            }
+            if (maidenOrSuitor.Spouse is null && !maidenOrSuitor.ExSpouses.Any(exSpouse => exSpouse.IsAlive) || isPolygamous || isCheating)
+            {
+                if (maidenOrSuitor.IsFemale)
+                {
+                    return maidenOrSuitor.CharacterObject.Age >= Campaign.Current.Models.MarriageModel.MinimumMarriageAgeFemale;
+                }
+                return maidenOrSuitor.CharacterObject.Age >= Campaign.Current.Models.MarriageModel.MinimumMarriageAgeMale;
+            }
+            return false;
         }
     }
 }
