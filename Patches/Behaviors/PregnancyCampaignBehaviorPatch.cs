@@ -1,11 +1,9 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Settings;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Core;
-using TaleWorlds.LinQuick;
 
 namespace MarryAnyone.Patches.Behaviors
 {
@@ -14,56 +12,43 @@ namespace MarryAnyone.Patches.Behaviors
     {
         private static void Prefix(Hero hero)
         {
-            ISettingsProvider settings = new MASettings();
-            _spouses = new List<Hero>();
+            bool mainHero = hero == Hero.MainHero || hero == Hero.MainHero.Spouse;
             if (hero.IsFemale && hero.IsAlive && hero.Age > Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
-                if (Hero.MainHero == hero || Hero.MainHero == hero.Spouse || hero.ExSpouses.Contains(Hero.MainHero))
+                // Associated with MainHero, going through female pregnancy behavior
+                // Those that are the main hero or spouses/exspouses of main hero
+                if (mainHero || Hero.MainHero.ExSpouses.Contains(hero))
                 {
-                    MAHelper.Print("Female Hero: " + hero.Name);
+                    if (hero.Spouse is null && (hero.ExSpouses.IsEmpty() || hero.ExSpouses is null))
+                    {
+                        return;
+                    }
+                    _spouses = new List<Hero>();
+                    MAHelper.Print("Female Hero: " + hero);
                     if (hero.Spouse is not null)
                     {
-                        if (hero.IsFemale == hero.Spouse.IsFemale)
-                        {
-                            MAHelper.Print("Spouse Same Gender: " + hero.Spouse.Name);
-                            hero.Spouse = null;
-                        }
-                        else
-                        {
-                            _spouses.Add(hero.Spouse);
-                            MAHelper.Print("Spouse to Spouses: " + hero.Spouse.Name);
-                        }
+                        _spouses.Add(hero.Spouse);
+                        MAHelper.Print("Spouse to Collection: " + hero.Spouse);
                     }
-                    foreach (Hero exSpouse in hero.ExSpouses.ToList())
+                    foreach (Hero exSpouse in hero.ExSpouses.Distinct().ToList())   
                     {
-                        MAHelper.RemoveExSpouses(hero);
-                        MAHelper.RemoveExSpouses(exSpouse);
-                    }
-                    foreach (Hero exSpouse in hero.ExSpouses.ToList())
-                    {
-                        if (hero.IsFemale == exSpouse.IsFemale)
-                        {
-                            MAHelper.Print("ExSpouse Same Gender: " + exSpouse.Name);
-                        }
-                        else if (!exSpouse.IsAlive)
-                        {
-                            MAHelper.Print("ExSpouse Dead: " + exSpouse.Name);
-                        }
-                        else
+                        if (exSpouse.IsAlive)
                         {
                             _spouses.Add(exSpouse);
-                            MAHelper.Print("ExSpouse to Spouses: " + exSpouse.Name);
+                            hero.Spouse = exSpouse;
+                            MAHelper.Print("ExSpouse to Collection: " + exSpouse);
                         }
                     }
-                    if (_spouses.WhereQ(spouse => spouse is not null).Count() > 1)
+                    if (_spouses.Count() > 1)
                     {
+                        // The shuffle!
                         List<int> attractionGoal = new();
                         int attraction = 0;
                         foreach (Hero spouse in _spouses)
                         {
                             attraction += Romance.GetAttractionValueAsPercent(hero, spouse);
                             attractionGoal.Add(attraction);
-                            MAHelper.Print("Spouse: " + spouse.Name);
+                            MAHelper.Print("Spouse: " + spouse);
                             MAHelper.Print("Attraction: " + attraction.ToString());
                         }
                         int attractionRandom = MBRandom.RandomInt(attraction);
@@ -80,24 +65,27 @@ namespace MarryAnyone.Patches.Behaviors
                         }
                         hero.Spouse = _spouses[i];
                     }
-                    else if (hero.Spouse is null)
+                    if (hero.Spouse is null)
                     {
-                        hero.Spouse = _spouses.WhereQ(spouse => spouse is not null).FirstOrDefault();
+                        MAHelper.Print("   No Spouse");
                     }
-                    if (hero.Spouse is not null)
+                    else
                     {
-                        hero.Spouse.Spouse = hero;
-                        MAHelper.Print("Spouse Assigned:");
-                        MAHelper.Print("   Hero: " + hero.Spouse.Spouse);
-                        MAHelper.Print("   Spouse: " + hero.Spouse);
+                        MAHelper.Print("   Spouse Assigned: " + hero.Spouse);
                     }
                 }
             }
-            if (settings.SexualOrientation == "Homosexual" && (hero == Hero.MainHero || hero.Spouse == Hero.MainHero))
+            // Outside of female pregnancy behavior
+            if (hero.Spouse is not null && mainHero)
             {
-                hero.Spouse = null;
-                return;
+                if (hero.IsFemale == hero.Spouse.IsFemale)
+                {
+                    // Decided to do this at the end so that you are not always going out with the opposite gender
+                    MAHelper.Print("   Spouse Unassigned: " + hero.Spouse);
+                    hero.Spouse = null;
+                }
             }
+            // Remove any extra duplicate exspouses
             foreach (Hero exSpouse in hero.ExSpouses.ToList())
             {
                 MAHelper.RemoveExSpouses(hero);

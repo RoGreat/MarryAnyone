@@ -1,39 +1,60 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Models;
 using MarryAnyone.Settings;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.IO;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
 namespace MarryAnyone.Behaviors
 {
     internal class MARomanceCampaignBehavior : CampaignBehaviorBase
     {
-        protected void AddDialogs(CampaignGameStarter starter)
+        private void DontShowAgain()
         {
-            // Putting settings here because at this point MCM should kick in
             try
             {
-                if (MCMSettings.Instance is not null)
+                string json = File.ReadAllText(MASettings._configPath);
+                JObject? jObject = JsonConvert.DeserializeObject(json) as JObject;
+                JToken jToken = jObject!.SelectToken("Warning");
+                jToken.Replace(false);
+                File.WriteAllText(MASettings._configPath, jObject.ToString());
+            }
+            catch (Exception exception)
+            {
+                InformationManager.DisplayMessage(new InformationMessage("Marry Anyone: " + exception.Message, Colors.Red));
+            }
+        }
+
+        protected void AddDialogs(CampaignGameStarter starter)
+        {
+            // Made the warnings look more sophisticated
+            // Seems I have to load in settings right around here, looks strange
+            new MASettings();
+            if (MCMSettings.Instance is not null)
+            {
+                MASettings.UsingMCM = true;
+            }
+            else if (MAConfig.Instance!.Warning)
+            {
+                if (!File.Exists(MASettings._configPath))
                 {
-                    MASettings.UsingMCM = true;
+                    InformationManager.ShowInquiry(new InquiryData(GameTexts.FindText("str_warning").ToString(), GameTexts.FindText("str_no_config_info").ToString(), true, true, GameTexts.FindText("str_ok").ToString(), GameTexts.FindText("str_dontshowagain").ToString(), null, new Action(DontShowAgain)), false);
                 }
                 else
                 {
-                    MAHelper.Print("Marry Anyone: Not using compatible MCM version", true);
-                    MAHelper.Print("Using config settings", true);
+                    InformationManager.ShowInquiry(new InquiryData(GameTexts.FindText("str_warning").ToString(), GameTexts.FindText("str_no_mcm_info").ToString(), true, true, GameTexts.FindText("str_ok").ToString(), GameTexts.FindText("str_dontshowagain").ToString(), null, new Action(DontShowAgain)), false);
                 }
-            }
-            catch
-            {
-                MAHelper.Print("Marry Anyone: Not detecting MCM", true);
-                MAHelper.Print("Using config settings", true);
             }
 
             foreach (Hero hero in Hero.All.ToList())
             {
+                // The old fix for occupations not sticking
                 if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
@@ -74,19 +95,23 @@ namespace MarryAnyone.Behaviors
             return true;
         }
 
+        // This will either skip or continue romance
+        // CoupleAgreedOnMarriage = triggers marriage before bartering
+        // CourtshipStarted = skip everything
+        // return false = carry out entire romance
         private bool conversation_finalize_courtship_for_hero_on_condition()
         {
             ISettingsProvider settings = new MASettings();
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-            bool incest = (Hero.MainHero.Clan.Lords.Contains(Hero.OneToOneConversationHero) || MADefaultMarriageModel.DiscoverAncestors(Hero.MainHero, 3).Intersect(MADefaultMarriageModel.DiscoverAncestors(Hero.OneToOneConversationHero, 3)).Any()) && settings.Incest;
-            // In case the other character is already engaged, break it off
-            //EndOtherRomances(Hero.OneToOneConversationHero);
+            bool clanLeader = Hero.MainHero.Clan.Leader == Hero.MainHero && Hero.MainHero.Clan.Lords.Contains(Hero.OneToOneConversationHero);
+
             if (settings.Difficulty == "Realistic")
             {
-                // Will have to skill skip due to issues with bartering marriage within clans
-                if (incest)
+                // Skip issues with bartering marriage within clans
+                // If you are the leader of the clan then it is a problem
+                if (clanLeader)
                 {
-                    MAHelper.Print("Realistic: Incest");
+                    MAHelper.Print("Realistic: Clan Leader");
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
                 }
                 if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
@@ -98,14 +123,14 @@ namespace MarryAnyone.Behaviors
             }
             else
             {
-                if (incest)
+                if (clanLeader)
                 {
                     if (settings.Difficulty == "Easy")
                     {
-                        MAHelper.Print("Easy: Incest");
+                        MAHelper.Print("Easy: Clan Leader");
                         return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
                     }
-                    MAHelper.Print("Very Easy: Incest");
+                    MAHelper.Print("Very Easy: Clan Leader");
                     return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
                 }
                 if (settings.Difficulty == "Easy" && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))
@@ -113,13 +138,13 @@ namespace MarryAnyone.Behaviors
                     MAHelper.Print("Easy: Noble");
                     return false;
                 }
+                MAHelper.Print("Very Easy");
                 return Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
             }
         }
 
         private void conversation_courtship_success_on_consequence()
         {
-            // New marriages not shown right away. Need to refresh?
             ISettingsProvider settings = new MASettings();
             Hero hero = Hero.MainHero;
             Hero spouse = Hero.OneToOneConversationHero;
@@ -136,8 +161,6 @@ namespace MarryAnyone.Behaviors
                     if (hero.Clan.Kingdom?.Leader != hero)
                     {
                         // Join kingdom due to lowborn status
-                        // Need to separate out new player's clan and previous player's clan
-                        // ChangeKingdomAction.ApplyByJoinToKingdom(hero.Clan, spouse.Clan.Kingdom);
                         if (hero.Clan.Leader == Hero.MainHero)
                         {
                             ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(hero.Clan);

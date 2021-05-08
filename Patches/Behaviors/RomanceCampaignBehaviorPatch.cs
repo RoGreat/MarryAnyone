@@ -5,7 +5,6 @@ using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Localization;
 
-// Add dialog in case of cheating...
 namespace MarryAnyone.Patches.Behaviors
 {
     [HarmonyPatch(typeof(RomanceCampaignBehavior))]

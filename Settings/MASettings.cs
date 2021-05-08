@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.IO;
+using TaleWorlds.Core;
 using TaleWorlds.Library;
 
 namespace MarryAnyone.Settings
@@ -33,17 +35,25 @@ namespace MarryAnyone.Settings
             {
                 if (File.Exists(_configPath))
                 {
-                    MAConfig config = JsonConvert.DeserializeObject<MAConfig>(File.ReadAllText(_configPath));
-                    MAConfig.Instance.Polygamy = config.Polygamy;
-                    MAConfig.Instance.Incest = config.Incest;
-                    MAConfig.Instance.Cheating = config.Cheating;
-                    MAConfig.Instance.Debug = config.Debug;
-                    MAConfig.Instance.Difficulty = config.Difficulty;
-                    MAConfig.Instance.SexualOrientation = config.SexualOrientation;
-                    MAConfig.Instance.Adoption = config.Adoption;
-                    MAConfig.Instance.AdoptionChance = config.AdoptionChance;
-                    MAConfig.Instance.AdoptionTitles = config.AdoptionTitles;
-                    MAConfig.Instance.RetryCourtship = config.RetryCourtship;
+                    try
+                    {
+                        MAConfig config = JsonConvert.DeserializeObject<MAConfig>(File.ReadAllText(_configPath));
+                        MAConfig.Instance.Polygamy = config.Polygamy;
+                        MAConfig.Instance.Incest = config.Incest;
+                        MAConfig.Instance.Cheating = config.Cheating;
+                        MAConfig.Instance.Debug = config.Debug;
+                        MAConfig.Instance.Warning = config.Warning;
+                        MAConfig.Instance.Difficulty = config.Difficulty;
+                        MAConfig.Instance.SexualOrientation = config.SexualOrientation;
+                        MAConfig.Instance.Adoption = config.Adoption;
+                        MAConfig.Instance.AdoptionChance = config.AdoptionChance;
+                        MAConfig.Instance.AdoptionTitles = config.AdoptionTitles;
+                        MAConfig.Instance.RetryCourtship = config.RetryCourtship;
+                    }
+                    catch (Exception exception)
+                    {
+                        InformationManager.DisplayMessage(new InformationMessage("Marry Anyone: " + exception.Message, Colors.Red));
+                    }
                 }
             }
             if (MAConfig.Instance is null)
@@ -55,6 +65,6 @@ namespace MarryAnyone.Settings
 
         private readonly ISettingsProvider _provider;
 
-        private static readonly string _configPath = BasePath.Name + "Modules/MarryAnyone/config.json";
+        public static readonly string _configPath = BasePath.Name + "Modules/MarryAnyone/config.json";
     }
 }

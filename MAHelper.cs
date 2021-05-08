@@ -11,20 +11,12 @@ namespace MarryAnyone
 {
     internal static class MAHelper
     {
-        public static void Print(string message, bool notification = false)
+        public static void Print(string message)
         {
             ISettingsProvider settings = new MASettings();
-            Color color;
-            if (notification)
-            {
-                color = Colors.Red;
-            }
-            else
-            {
-                // My custom purple
-                color = new Color(0.6f, 0.2f, 1f);
-            }
-            if (settings.Debug || notification)
+            // My custom purple!
+            Color color = new(0.6f, 0.2f, 1f);
+            if (settings.Debug)
             {
                 InformationManager.DisplayMessage(new InformationMessage(message, color));
             }
@@ -37,9 +29,12 @@ namespace MarryAnyone
             FieldInfo ExSpouses = AccessTools.Field(typeof(Hero), "ExSpouses");
             MBReadOnlyList<Hero> ExSpousesReadOnlyList;
 
+            // Not cheating
             if (!isCheating)
             {
+                // Get exspouse list without duplicates
                 _exSpousesList = _exSpousesList.Distinct().ToList();
+                // If exspouse is already a spouse, then remove it
                 if (_exSpousesList.Contains(hero.Spouse))
                 {
                     _exSpousesList.Remove(hero.Spouse);
@@ -47,8 +42,9 @@ namespace MarryAnyone
             }
             else
             {
+                // If cheating, then remove the first exspouse
                 _exSpousesList = _exSpousesList.ToList();
-                Hero exSpouse = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).FirstOrDefault();
+                Hero exSpouse = _exSpousesList.FirstOrDefault(exSpouse => exSpouse.IsAlive);
                 if (exSpouse is not null)
                 {
                     _exSpousesList.Remove(exSpouse);
