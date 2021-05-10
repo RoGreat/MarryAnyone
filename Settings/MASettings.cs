@@ -32,9 +32,11 @@ namespace MarryAnyone.Settings
             if (MCMSettings.Instance is { } settings)
             {
                 _provider = settings;
+                NoMCMWarning = NoConfigWarning = false;
                 UsingMCM = true;
                 return;
             }
+            UsingMCM = false;
             MAConfig.Instance = new MAConfig();
             if (File.Exists(ConfigPath))
             {
@@ -54,6 +56,7 @@ namespace MarryAnyone.Settings
                     MAConfig.Instance.AdoptionTitles = config.AdoptionTitles;
                     MAConfig.Instance.RetryCourtship = config.RetryCourtship;
                     NoMCMWarning = true;
+                    NoConfigWarning = false;
                 }
                 catch (Exception exception)
                 {
@@ -63,6 +66,7 @@ namespace MarryAnyone.Settings
             else
             {
                 NoConfigWarning = true;
+                NoMCMWarning = false;
             }
             _provider = MAConfig.Instance;
         }
