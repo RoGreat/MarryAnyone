@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using MarryAnyone.Settings;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
@@ -7,36 +8,61 @@ using TaleWorlds.Core;
 
 namespace MarryAnyone.Patches.Behaviors
 {
+    // Add in a setting for enabling polyamory so it does not have to be a harem
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "DailyTickHero")]
     internal class PregnancyCampaignBehaviorPatch
     {
         private static void Prefix(Hero hero)
         {
-            bool mainHero = hero == Hero.MainHero || hero == Hero.MainHero.Spouse;
+            ISettingsProvider settings = new MASettings();
             if (hero.IsFemale && hero.IsAlive && hero.Age > Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
-                // Associated with MainHero, going through female pregnancy behavior
-                // Those that are the main hero or spouses/exspouses of main hero
-                if (mainHero || Hero.MainHero.ExSpouses.Contains(hero))
+                // If you are the MainHero go through advanced process
+                if (hero == Hero.MainHero || hero == Hero.MainHero.Spouse || Hero.MainHero.ExSpouses.Contains(hero))
                 {
                     if (hero.Spouse is null && (hero.ExSpouses.IsEmpty() || hero.ExSpouses is null))
                     {
+                        MAHelper.Print("    No Spouse");
                         return;
                     }
                     _spouses = new List<Hero>();
-                    MAHelper.Print("Female Hero: " + hero);
+                    MAHelper.Print("Hero: " + hero);
                     if (hero.Spouse is not null)
                     {
                         _spouses.Add(hero.Spouse);
                         MAHelper.Print("Spouse to Collection: " + hero.Spouse);
                     }
-                    foreach (Hero exSpouse in hero.ExSpouses.Distinct().ToList())   
+                    if (settings.Polyamory && hero != Hero.MainHero)
                     {
-                        if (exSpouse.IsAlive)
+                        MAHelper.Print("Polyamory");
+                        if (hero.Spouse != Hero.MainHero)
                         {
-                            _spouses.Add(exSpouse);
-                            hero.Spouse = exSpouse;
-                            MAHelper.Print("ExSpouse to Collection: " + exSpouse);
+                            _spouses.Add(Hero.MainHero);
+                            MAHelper.Print("Main Hero to Collection: " + Hero.MainHero);
+                        }
+                        if (Hero.MainHero.Spouse is not null && Hero.MainHero.Spouse != hero)
+                        {
+                            _spouses.Add(Hero.MainHero.Spouse);
+                            MAHelper.Print("Main Hero Spouse to Collection: " + Hero.MainHero.Spouse);
+                        }
+                        foreach (Hero exSpouse in Hero.MainHero.ExSpouses.Distinct().ToList())
+                        {
+                            if (exSpouse != hero && exSpouse.IsAlive)
+                            {
+                                _spouses.Add(exSpouse);
+                                MAHelper.Print("Main Hero ExSpouse to Collection: " + exSpouse);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (Hero exSpouse in hero.ExSpouses.Distinct().ToList())
+                        {
+                            if (exSpouse.IsAlive)
+                            {
+                                _spouses.Add(exSpouse);
+                                MAHelper.Print("ExSpouse to Collection: " + exSpouse);
+                            }
                         }
                     }
                     if (_spouses.Count() > 1)
@@ -49,21 +75,30 @@ namespace MarryAnyone.Patches.Behaviors
                             attraction += Romance.GetAttractionValueAsPercent(hero, spouse);
                             attractionGoal.Add(attraction);
                             MAHelper.Print("Spouse: " + spouse);
-                            MAHelper.Print("Attraction: " + attraction.ToString());
+                            MAHelper.Print("Attraction: " + attraction);
                         }
                         int attractionRandom = MBRandom.RandomInt(attraction);
-                        MAHelper.Print("Random: " + attractionRandom.ToString());
+                        MAHelper.Print("Random: " + attractionRandom);
                         int i = 0;
                         while (i < _spouses.Count)
                         {
                             if (attractionRandom < attractionGoal[i])
                             {
-                                MAHelper.Print("Index: " + i.ToString());
+                                MAHelper.Print("Index: " + i);
                                 break;
                             }
                             i++;
                         }
                         hero.Spouse = _spouses[i];
+                        _spouses[i].Spouse = hero;
+                    }
+                    else
+                    {
+                        hero.Spouse = _spouses.FirstOrDefault();
+                        if (hero.Spouse is not null)
+                        {
+                            _spouses.FirstOrDefault().Spouse = hero;
+                        }
                     }
                     if (hero.Spouse is null)
                     {
@@ -76,12 +111,13 @@ namespace MarryAnyone.Patches.Behaviors
                 }
             }
             // Outside of female pregnancy behavior
-            if (hero.Spouse is not null && mainHero)
+            if (hero.Spouse is not null)
             {
                 if (hero.IsFemale == hero.Spouse.IsFemale)
                 {
                     // Decided to do this at the end so that you are not always going out with the opposite gender
                     MAHelper.Print("   Spouse Unassigned: " + hero.Spouse);
+                    hero.Spouse.Spouse = null;
                     hero.Spouse = null;
                 }
             }

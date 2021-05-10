@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Settings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -14,12 +15,17 @@ namespace MarryAnyone
         public static void Print(string message)
         {
             ISettingsProvider settings = new MASettings();
-            // My custom purple!
-            Color color = new(0.6f, 0.2f, 1f);
             if (settings.Debug)
             {
+                // Custom purple!
+                Color color = new(0.6f, 0.2f, 1f);
                 InformationManager.DisplayMessage(new InformationMessage(message, color));
             }
+        }
+
+        public static void Error(Exception exception)
+        {
+            InformationManager.DisplayMessage(new InformationMessage("Marry Anyone: " + exception.Message, Colors.Red));
         }
 
         public static void RemoveExSpouses(Hero hero, bool isCheating = false)

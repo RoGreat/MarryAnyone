@@ -1,12 +1,11 @@
 ﻿using HarmonyLib;
+using NoHarmony;
 using MarryAnyone.Behaviors;
-using MarryAnyone.Settings;
+using MarryAnyone.Models;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
-using NoHarmony;
 using TaleWorlds.CampaignSystem.SandBox.GameComponents;
-using MarryAnyone.Models;
 
 namespace MarryAnyone
 {
@@ -27,7 +26,6 @@ namespace MarryAnyone
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
-            MAConfig.Instance = new MAConfig();
             new Harmony("mod.bannerlord.anyone.marry").PatchAll();
         }
 
@@ -44,6 +42,7 @@ namespace MarryAnyone
 
         private void AddBehaviors(CampaignGameStarter campaignGameStarter)
         {
+            campaignGameStarter.AddBehavior(new MAPerSaveCampaignBehavior());
             campaignGameStarter.AddBehavior(new MARomanceCampaignBehavior());
             campaignGameStarter.AddBehavior(new MAAdoptionCampaignBehavior());
         }

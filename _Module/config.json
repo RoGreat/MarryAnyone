@@ -2,12 +2,13 @@
 	"Difficulty": "Easy",
 	"SexualOrientation": "Heterosexual",
 	"Polygamy": false,
+	"Polyamory": false,
 	"Incest": false,
 	"Cheating": false,
 	"Adoption": false,
 	"AdoptionChance": 0.05,
 	"AdoptionTitles": false,
 	"RetryCourtship": false,
-	"Warning": true,
-	"Debug": false
+	"Debug": false,
+	"Warning": true
 }

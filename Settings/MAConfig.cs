@@ -4,6 +4,7 @@
     {
         public static MAConfig? Instance;
         public bool Polygamy { get; set; } = false;
+        public bool Polyamory { get; set; } = false;
         public bool Incest { get; set; } = false;
         public bool Cheating { get; set; } = false;
         public bool Debug { get; set; } = false;
