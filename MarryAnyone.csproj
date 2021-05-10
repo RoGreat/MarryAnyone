@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.3.0</Version>
+		<Version>2.3.1</Version>
 		<Authors>RoGreat</Authors>
 	</PropertyGroup>
 	
@@ -19,7 +19,7 @@
 	<!-- Versions -->
 	<PropertyGroup>
 		<GameVersion>1.5.9</GameVersion>
-		<MCMVersion>4.3.7</MCMVersion>
+		<MCMVersion>4.3.10</MCMVersion>
 	</PropertyGroup>
 	
 	<!-- Referenced from Zijistark's HousesCalradia -->

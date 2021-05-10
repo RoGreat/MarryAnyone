@@ -42,9 +42,13 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool Cheating { get; set; } = false;
 
-        [SettingPropertyBool("{=polygamy}Polygamy", RequireRestart = false, HintText = "{=polygamy_desc}Player character can have polygamous relationships")]
+        [SettingPropertyBool("{=polygamy}Polygamy", Order = 1, RequireRestart = false, HintText = "{=polygamy_desc}Player character can have polygamous relationships")]
         [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool Polygamy { get; set; } = false;
+
+        [SettingPropertyBool("{=polyamory}Polyamory", Order = 2, RequireRestart = false, HintText = "{=polyamory_desc}Player character's spouses can have relationships with each other")]
+        [SettingPropertyGroup("{=relationship}Relationship Options")]
+        public bool Polyamory { get; set; } = false;
 
         [SettingPropertyBool("{=incest}Incest", RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships")]
         [SettingPropertyGroup("{=relationship}Relationship Options")]

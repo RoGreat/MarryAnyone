@@ -1,57 +1,17 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Settings;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.IO;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.Core;
-using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
 namespace MarryAnyone.Behaviors
 {
     internal class MARomanceCampaignBehavior : CampaignBehaviorBase
     {
-        private void DontShowAgain()
-        {
-            try
-            {
-                string json = File.ReadAllText(MASettings._configPath);
-                JObject? jObject = JsonConvert.DeserializeObject(json) as JObject;
-                JToken jToken = jObject!.SelectToken("Warning");
-                jToken.Replace(false);
-                File.WriteAllText(MASettings._configPath, jObject.ToString());
-            }
-            catch (Exception exception)
-            {
-                InformationManager.DisplayMessage(new InformationMessage("Marry Anyone: " + exception.Message, Colors.Red));
-            }
-        }
-
         protected void AddDialogs(CampaignGameStarter starter)
         {
-            // Made the warnings look more sophisticated
-            // Seems I have to load in settings right around here, looks strange
-            new MASettings();
-            if (MCMSettings.Instance is not null)
-            {
-                MASettings.UsingMCM = true;
-            }
-            else if (MAConfig.Instance!.Warning)
-            {
-                if (!File.Exists(MASettings._configPath))
-                {
-                    InformationManager.ShowInquiry(new InquiryData(GameTexts.FindText("str_warning").ToString(), GameTexts.FindText("str_no_config_info").ToString(), true, true, GameTexts.FindText("str_ok").ToString(), GameTexts.FindText("str_dontshowagain").ToString(), null, new Action(DontShowAgain)), false);
-                }
-                else
-                {
-                    InformationManager.ShowInquiry(new InquiryData(GameTexts.FindText("str_warning").ToString(), GameTexts.FindText("str_no_mcm_info").ToString(), true, true, GameTexts.FindText("str_ok").ToString(), GameTexts.FindText("str_dontshowagain").ToString(), null, new Action(DontShowAgain)), false);
-                }
-            }
-
             foreach (Hero hero in Hero.All.ToList())
             {
                 // The old fix for occupations not sticking

@@ -3,6 +3,7 @@
     internal interface ISettingsProvider
     {
         bool Polygamy { get; set; }
+        bool Polyamory { get; set; }
         bool Incest { get; set; }
         bool Cheating { get; set; }
         bool Debug { get; set; }

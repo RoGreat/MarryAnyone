@@ -12,6 +12,8 @@
 		<string id="orientation_desc" text="Player character can choose what gender the player can marry" />
 		<string id="polygamy" text="Polygamy" />
 		<string id="polygamy_desc" text="Player character can have polygamous relationships" />
+		<string id="polyamory" text="Polyamory" />
+		<string id="polyamory_desc" text="Player character's spouses can have relationships with each other" />
 		<string id="incest" text="Incest" />
 		<string id="incest_desc" text="Player character can have incestuous relationships" />
 		<string id="debug" text="Debug" />
