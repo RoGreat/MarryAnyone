@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Settings;
+using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ViewModelCollection;
@@ -65,29 +66,29 @@ namespace MarryAnyone.Patches.Helpers
 
         private static TextObject GetHeroRelationToHeroTextShort(Hero queriedHero, Hero baseHero)
         {
-            if (baseHero.Father == queriedHero && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero)))
+            if (baseHero.Father == queriedHero && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
-                return GameTexts.FindText("str_fatherhusband", null);
+                return GameTexts.FindText("str_fatherhusband");
             }
-            if (baseHero.Mother == queriedHero && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero)))
+            if (baseHero.Mother == queriedHero && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
-                return GameTexts.FindText("str_motherwife", null);
+                return GameTexts.FindText("str_motherwife");
             }
-            if (baseHero.Siblings.Contains(queriedHero) && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero)))
+            if (baseHero.Siblings.Contains(queriedHero) && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 if (!queriedHero.IsFemale)
                 {
-                    return GameTexts.FindText("str_brotherhusband", null);
+                    return GameTexts.FindText("str_brotherhusband");
                 }
-                return GameTexts.FindText("str_sisterwife", null);
+                return GameTexts.FindText("str_sisterwife");
             }
-            if (baseHero.Children.Contains(queriedHero) && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero)))
+            if (baseHero.Children.Contains(queriedHero) && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 if (!queriedHero.IsFemale)
                 {
-                    return GameTexts.FindText("str_sonhusband", null);
+                    return GameTexts.FindText("str_sonhusband");
                 }
-                return GameTexts.FindText("str_daughterwife", null);
+                return GameTexts.FindText("str_daughterwife");
             }
             ISettingsProvider settings = new MASettings();
             if (settings.AdoptionTitles && settings.Adoption)
@@ -96,11 +97,11 @@ namespace MarryAnyone.Patches.Helpers
                 {
                     if (baseHero.Mother == queriedHero)
                     {
-                        return GameTexts.FindText("str_adoptivemother", null);
+                        return GameTexts.FindText("str_adoptivemother");
                     }
                     if (baseHero.Father == queriedHero)
                     {
-                        return GameTexts.FindText("str_adoptivefather", null);
+                        return GameTexts.FindText("str_adoptivefather");
                     }
                 }
                 if ((queriedHero.Mother is null) != (queriedHero.Father is null))
@@ -109,61 +110,87 @@ namespace MarryAnyone.Patches.Helpers
                     {
                         if (!queriedHero.IsFemale)
                         {
-                            return GameTexts.FindText("str_adoptedson", null);
+                            return GameTexts.FindText("str_adoptedson");
                         }
-                        return GameTexts.FindText("str_adopteddaughter", null);
+                        return GameTexts.FindText("str_adopteddaughter");
                     }
                 }
             }
-            if (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero))
+            if (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero))
             {
                 if (!queriedHero.IsAlive || !baseHero.IsAlive)
                 {
                     if (!queriedHero.IsFemale)
                     {
-                        return GameTexts.FindText("str_exhusband", null);
+                        return GameTexts.FindText("str_exhusband");
                     }
-                    return GameTexts.FindText("str_exwife", null);
+                    return GameTexts.FindText("str_exwife");
                 }
                 else if (!queriedHero.IsFemale)
                 {
-                    return GameTexts.FindText("str_husband", null);
+                    return GameTexts.FindText("str_husband");
                 }
-                return GameTexts.FindText("str_wife", null);
+                return GameTexts.FindText("str_wife");
             }
 
-            // Spouse is Spouse
-            Hero spouse = baseHero.Spouse;
-            // Spouse is ExSpouse
-            Hero spouse2 = baseHero.ExSpouses.FirstOrDefault(spouse => spouse.IsAlive);
-            // Find ExSpouse in Spouse
-            Hero? otherSpouse = spouse?.ExSpouses.FirstOrDefault(exSpouse => exSpouse == queriedHero);
-            // Find ExSpouse in ExSpouse
-            Hero? otherSpouse2 = spouse2?.ExSpouses.FirstOrDefault(exSpouse => exSpouse == queriedHero);
-            // Find Spouse in ExSpouse
-            Hero? otherSpouse3 = spouse2?.Spouse;
-            if (otherSpouse == queriedHero || otherSpouse2 == queriedHero || otherSpouse3 == queriedHero)
+            // Revamped spouse's spouse
+            if (baseHero.Spouse is not null)
             {
-                // Find out spouse's gender
-                if ((!spouse?.IsFemale ?? false) || (!spouse2?.IsFemale ?? false))  // Male spouse
+                // Spouse to ExSpouse
+                foreach (Hero spouse in baseHero.Spouse.ExSpouses)
                 {
-                    // Find out spouse of spouse's gender
-                    if (!queriedHero.IsFemale)  // Male other spouse
+                    List<Hero> otherSpouses = spouse.ExSpouses.Where(x => x.IsAlive).ToList();
+                    foreach (Hero otherSpouse in otherSpouses)
                     {
-                        return GameTexts.FindText("str_husbands_husband", null);
+                        if (otherSpouse == queriedHero)
+                        {
+                            return SpousesSpouse(spouse, queriedHero);
+                        }
                     }
-                    return GameTexts.FindText("str_husbands_wife", null);
                 }
-                if ((spouse?.IsFemale ?? false) || (spouse2?.IsFemale ?? false))    // Female spouse
+            }
+            List<Hero> spouses = baseHero.ExSpouses.Where(x => x.IsAlive).ToList();
+            foreach (Hero spouse in spouses)
+            {
+                // ExSpouse to Spouse
+                if (spouse.Spouse == queriedHero)
                 {
-                    if (!queriedHero.IsFemale)  // Female other spouse
+                    return SpousesSpouse(spouse, queriedHero);
+                }
+                List<Hero> otherSpouses = spouse.ExSpouses.Where(x => x.IsAlive).ToList();
+                // ExSpouse to ExSpouse
+                foreach (Hero otherSpouse in otherSpouses)
+                {
+                    if (otherSpouse == queriedHero)
                     {
-                        return GameTexts.FindText("str_wifes_husband", null);
+                        return SpousesSpouse(spouse, queriedHero);
                     }
-                    return GameTexts.FindText("str_wifes_wife", null);
                 }
             }
             return TextObject.Empty;
+        }
+
+        private static TextObject SpousesSpouse(Hero spouse, Hero queriedHero)
+        {
+            ISettingsProvider settings = new MASettings();
+            // Find out spouse's gender
+            // Male spouse
+            if (!spouse.IsFemale)
+            {
+                // Find out spouse's spouse's gender
+                if (!queriedHero.IsFemale)
+                {
+                    // Male other spouse
+                    return settings.Polyamory ? FindText("str_husband") : FindText("str_husbands_husband");
+                }
+                // Female other spouse
+                return settings.Polyamory ? FindText("str_wife") : FindText("str_husbands_wife");
+            }
+            if (!queriedHero.IsFemale)
+            {
+                return settings.Polyamory ? FindText("str_husband") : FindText("str_wifes_husband");
+            }
+            return settings.Polyamory ? FindText("str_wife") : FindText("str_wifes_wife");
         }
     }
 }

@@ -18,6 +18,8 @@ namespace MarryAnyone.Behaviors
                 if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
+                    hero.Clan = null;
+                    hero.Clan = Clan.PlayerClan;
                 }
             }
 

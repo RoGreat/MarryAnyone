@@ -27,7 +27,7 @@ namespace MarryAnyone.Patches.Behaviors
                     }
                     _spouses = new List<Hero>();
                     MAHelper.Print("Hero: " + hero);
-                    if (hero.Spouse is not null)
+                    if (hero.Spouse is not null && hero == Hero.MainHero)
                     {
                         _spouses.Add(hero.Spouse);
                         MAHelper.Print("Spouse to Collection: " + hero.Spouse);
@@ -56,12 +56,21 @@ namespace MarryAnyone.Patches.Behaviors
                     }
                     else
                     {
-                        foreach (Hero exSpouse in hero.ExSpouses.Distinct().ToList())
+                        // Taken out of polyamory mode
+                        if (hero.Spouse != Hero.MainHero && hero != Hero.MainHero)
                         {
-                            if (exSpouse.IsAlive)
+                            _spouses.Add(Hero.MainHero);
+                            MAHelper.Print("Spouse is Main Hero: " + Hero.MainHero);
+                        }
+                        if (hero == Hero.MainHero)
+                        {
+                            foreach (Hero exSpouse in hero.ExSpouses.Distinct().ToList())
                             {
-                                _spouses.Add(exSpouse);
-                                MAHelper.Print("ExSpouse to Collection: " + exSpouse);
+                                if (exSpouse.IsAlive)
+                                {
+                                    _spouses.Add(exSpouse);
+                                    MAHelper.Print("ExSpouse to Collection: " + exSpouse);
+                                }
                             }
                         }
                     }
@@ -94,10 +103,11 @@ namespace MarryAnyone.Patches.Behaviors
                     }
                     else
                     {
-                        hero.Spouse = _spouses.FirstOrDefault();
-                        if (hero.Spouse is not null)
+                        var spouse = _spouses.FirstOrDefault();
+                        if (spouse is not null)
                         {
-                            _spouses.FirstOrDefault().Spouse = hero;
+                            hero.Spouse = spouse;
+                            spouse.Spouse = hero;
                         }
                     }
                     if (hero.Spouse is null)
@@ -121,7 +131,32 @@ namespace MarryAnyone.Patches.Behaviors
                     hero.Spouse = null;
                 }
             }
-            // Remove any extra duplicate exspouses
+        }
+
+        private static void Postfix(Hero hero)
+        {
+            // Make things looks better in the encyclopedia
+            ISettingsProvider settings = new MASettings();
+            if (hero == Hero.MainHero)
+            {
+                MAHelper.Print("Post Pregnancy Check: " + hero);
+                MAHelper.Print("   Main Hero Spouse Unassigned");
+                hero.Spouse = null;
+            }
+            if (Hero.MainHero.ExSpouses.Contains(hero) || hero.Spouse == Hero.MainHero)
+            {
+                if (hero.Spouse is null || hero.Spouse != Hero.MainHero)
+                {
+                    MAHelper.Print("Post Pregnancy Check: " + hero);
+                    MAHelper.Print("   Spouse is Main Hero");
+                    if (!settings.Polyamory)
+                    {
+                        // Remove any extra duplicate exspouses
+                        MAHelper.RemoveExSpouses(hero, true);
+                    }
+                    hero.Spouse = Hero.MainHero;
+                }
+            }
             foreach (Hero exSpouse in hero.ExSpouses.ToList())
             {
                 MAHelper.RemoveExSpouses(hero);

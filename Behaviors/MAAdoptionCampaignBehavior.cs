@@ -21,6 +21,8 @@ namespace MarryAnyone.Behaviors
                 if (Hero.MainHero.Children.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
+                    hero.Clan = null;
+                    hero.Clan = Clan.PlayerClan;
                 }
             }
 
@@ -104,7 +106,7 @@ namespace MarryAnyone.Behaviors
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment);
                 EquipmentHelper.AssignHeroEquipmentFromEquipment(hero, equipment2);
             }
-            MAHelper.OccupationToLord(character);
+            MAHelper.OccupationToLord(hero.CharacterObject);
             hero.Clan = Clan.PlayerClan;
             AccessTools.Method(typeof(HeroDeveloper), "CheckInitialLevel").Invoke(hero.HeroDeveloper, null);
             hero.CharacterObject.IsFemale = character.IsFemale;
@@ -133,6 +135,19 @@ namespace MarryAnyone.Behaviors
             OnHeroAdopted(Hero.MainHero, hero);
             // Follows you! I like this feature :3
             Campaign.Current.ConversationManager.ConversationEndOneShot += FollowMainAgent;
+
+            int heroComesOfAge = Campaign.Current.Models.AgeModel.HeroComesOfAge;
+            var instance = Traverse.Create<CampaignEventDispatcher>().Property("Instance").GetValue<CampaignEventDispatcher>();
+            if (hero.Age > becomeChildAge || (hero.Age == becomeChildAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
+            {
+                // CampaignEventDispatcher.Instance.OnHeroGrowsOutOfInfancy(hero);
+                Traverse.Create(instance).Method("OnHeroGrowsOutOfInfancy", new Type[] { typeof(Hero) }).GetValue(new object[] { hero });
+            }
+            if (hero.Age > heroComesOfAge || (hero.Age == heroComesOfAge && hero.BirthDay.GetDayOfYear < CampaignTime.Now.GetDayOfYear))
+            {
+                // CampaignEventDispatcher.Instance.OnHeroComesOfAge(hero);
+                Traverse.Create(instance).Method("OnHeroComesOfAge", new Type[] { typeof(Hero) }).GetValue(new object[] { hero });
+            }
         }
 
         private static void FollowMainAgent()
