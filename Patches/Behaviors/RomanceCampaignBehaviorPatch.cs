@@ -44,7 +44,7 @@ namespace MarryAnyone.Patches.Behaviors
                 return false;
             }
             bool flag = Hero.MainHero.IsFemale && settings.SexualOrientation == "Heterosexual" || !Hero.MainHero.IsFemale && settings.SexualOrientation == "Homosexual" || !Hero.OneToOneConversationHero.IsFemale && settings.SexualOrientation == "Bisexual";
-            Romance.RomanceLevelEnum romanceLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
+            Romance.RomanceLevelEnum romanceLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero); // better to use a local variable
             MAHelper.Print("Courtship Possible: " + Romance.MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
             MAHelper.Print("Romantic Level: " + romanceLevel.ToString());
             MAHelper.Print("Retry Courtship: " + settings.RetryCourtship.ToString());
