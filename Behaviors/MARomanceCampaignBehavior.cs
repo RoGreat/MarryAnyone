@@ -12,17 +12,6 @@ namespace MarryAnyone.Behaviors
     {
         protected void AddDialogs(CampaignGameStarter starter)
         {
-            foreach (Hero hero in Hero.All.ToList())
-            {
-                // The old fix for occupations not sticking
-                if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
-                {
-                    MAHelper.OccupationToLord(hero.CharacterObject);
-                    hero.Clan = null;
-                    hero.Clan = Clan.PlayerClan;
-                }
-            }
-
             // To begin the dialog for companions
             starter.AddPlayerLine("main_option_discussions_MA", "hero_main_options", "lord_talk_speak_diplomacy_MA", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_begin_courtship_for_hero_on_condition), null, 120, null, null);
             starter.AddDialogLine("character_agrees_to_discussion_MA", "lord_talk_speak_diplomacy_MA", "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_character_agrees_to_discussion_on_condition), null, 100, null);
@@ -52,39 +41,20 @@ namespace MarryAnyone.Behaviors
                     MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
                 }
 
+                // OnNeNousDitPasTout/GrandesMaree Patch
                 // In Fact we can't go through Romance.RomanceLevelEnum.Untested
                 // because for the next modification, there will be another romance status
                 // And we must have only have one romance status for each relation
-
-                //bool areMarried = Util.Util.AreMarried(Hero.MainHero, Hero.OneToOneConversationHero);
-                //if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Ended
-                //        && settings.RetryCourtship
-                //        && !areMarried)
-                //{
-                //    // Patch if not a spouse and Romance ended and Retry => reset the romance lvl
-                //    => RomanceCampaignBehaviorPatch.conversation_player_can_open_courtship_on_condition
-                //
-                //    Util.Util.CleanRomance(Hero.MainHero, Hero.OneToOneConversationHero);
-                //    ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Untested);
-                //    MAHelper.Print("PATCH Ended New Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
-                //}
-                //else
-                //{
-
-                // Patch can be removed (can stayed too ;) ), i have Crashed my save 
-                // with my test and need to restore data.
                 if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested)
+                {
+                    Util.Util.CleanRomance(Hero.MainHero, Hero.OneToOneConversationHero);
+                    bool areMarried = Util.Util.AreMarried(Hero.MainHero, Hero.OneToOneConversationHero);
+                    if (areMarried)
                     {
-                        Util.Util.CleanRomance(Hero.MainHero, Hero.OneToOneConversationHero);
-                        bool areMarried = Util.Util.AreMarried(Hero.MainHero, Hero.OneToOneConversationHero);
-                        if (areMarried)
-                        {
-                            ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Ended);
-                            MAHelper.Print("PATCH Married New Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
-                        }
+                        ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Ended);
+                        MAHelper.Print("PATCH Married New Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
                     }
-                //}
-
+                }
             }
             return Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
         }
@@ -257,6 +227,17 @@ namespace MarryAnyone.Behaviors
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
+            foreach (Hero hero in Hero.All.ToList())
+            {
+                // The old fix for occupations not sticking
+                if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
+                {
+                    MAHelper.OccupationToLord(hero.CharacterObject);
+                    hero.Clan = null;
+                    hero.Clan = Clan.PlayerClan;
+                }
+            }
+
             AddDialogs(campaignGameStarter);
         }
 
