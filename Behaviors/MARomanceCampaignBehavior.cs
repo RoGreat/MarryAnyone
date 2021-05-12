@@ -39,12 +39,50 @@ namespace MarryAnyone.Behaviors
             ISettingsProvider settings = new MASettings();
             if (Hero.OneToOneConversationHero.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
-                MAHelper.Print("MCM: " + MASettings.UsingMCM);
-                MAHelper.Print("Difficulty: " + settings.Difficulty);
-                MAHelper.Print("Orientation: " + settings.SexualOrientation);
-                MAHelper.Print("Cheating: " + settings.Cheating);
-                MAHelper.Print("Polygamy: " + settings.Polygamy);
-                MAHelper.Print("Incest: " + settings.Incest);
+                if (settings.Debug)
+                {
+                    MAHelper.Print("MCM: " + MASettings.UsingMCM);
+                    MAHelper.Print("Difficulty: " + settings.Difficulty);
+                    MAHelper.Print("Orientation: " + settings.SexualOrientation);
+                    MAHelper.Print("Cheating: " + settings.Cheating);
+                    MAHelper.Print("Polygamy: " + settings.Polygamy);
+                    MAHelper.Print("Incest: " + settings.Incest);
+                    MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
+                }
+
+                // In Fact we can't go through Romance.RomanceLevelEnum.Untested
+                // because for the next modification, there will be another romance status
+                // And we must have only have one romance status for each relation
+
+                //bool areMarried = Util.Util.AreMarried(Hero.MainHero, Hero.OneToOneConversationHero);
+                //if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Ended
+                //        && settings.RetryCourtship
+                //        && !areMarried)
+                //{
+                //    // Patch if not a spouse and Romance ended and Retry => reset the romance lvl
+                //    => RomanceCampaignBehaviorPatch.conversation_player_can_open_courtship_on_condition
+                //
+                //    Util.Util.CleanRomance(Hero.MainHero, Hero.OneToOneConversationHero);
+                //    ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Untested);
+                //    MAHelper.Print("PATCH Ended New Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
+                //}
+                //else
+                //{
+
+                // Patch can be removed (can stayed too ;) ), i have Crashed my save 
+                // with my test and need to restore data.
+                if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested)
+                    {
+                        Util.Util.CleanRomance(Hero.MainHero, Hero.OneToOneConversationHero);
+                        bool areMarried = Util.Util.AreMarried(Hero.MainHero, Hero.OneToOneConversationHero);
+                        if (areMarried)
+                        {
+                            ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Ended);
+                            MAHelper.Print("PATCH Married New Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
+                        }
+                    }
+                //}
+
             }
             return Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
         }
