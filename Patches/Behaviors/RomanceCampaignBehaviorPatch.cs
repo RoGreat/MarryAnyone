@@ -102,6 +102,7 @@ namespace MarryAnyone.Patches.Behaviors
                 if (settings.RetryCourtship)
                 {
                     if (romanceLevel == Romance.RomanceLevelEnum.Ended)
+                        // OnNeNousDitPasTout/GrandesMaree Patch
                         // Patch we must have only have one romance status for each relation
                         Util.Util.CleanRomance(Hero.MainHero, Hero.OneToOneConversationHero);
 

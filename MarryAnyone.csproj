@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.3.3</Version>
-		<Authors>RoGreat</Authors>
+		<Version>2.3.4</Version>
+		<Authors>RoGreat, GrandesMarees</Authors>
 	</PropertyGroup>
 	
 	<!-- Setup -->
@@ -32,7 +32,6 @@
   </ItemGroup>
 	
   <PropertyGroup>
-	  <GameFolder Condition="1 == 1">E:\Mount &amp; Blade II 159 Steam</GameFolder>
 	  <!--Windows-->
     <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 261550@InstallLocation)</GameFolder>
     <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
@@ -46,7 +45,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.35">
+    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.39">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

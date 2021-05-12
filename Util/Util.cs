@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaleWorlds.CampaignSystem;
 using static TaleWorlds.CampaignSystem.Romance;
 
 namespace MarryAnyone.Util
 {
+    // OnNeNousDitPasTout/GrandesMaree Patch
     internal static class Util
     {
-
         public static bool AreMarried(Hero hero, Hero otherHero)
         {
+
             if (otherHero == null)
                 return false;
 
@@ -21,6 +19,7 @@ namespace MarryAnyone.Util
             //    MAHelper.Print(String.Format("AreMarried FAIL car {0} n'a aucune épouse", hero.Name));
             //    return false;
             //}
+
             if (hero.Spouse != null && hero.Spouse == otherHero)
             {
                 MAHelper.Print(String.Format("AreMarried SUCCESS because {0} marry {1}", hero.Name, otherHero.Name));
