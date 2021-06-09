@@ -75,5 +75,27 @@ namespace MarryAnyone.Settings
         [SettingPropertyBool("{=retry_courtship}Retry Courtship", RequireRestart = false, HintText = "{=retry_courtship_desc}Player can retry courtship after failure")]
         [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 1)]
         public bool RetryCourtship { get; set; } = false;
+
+        [SettingPropertyDropdown("{=Pregnancies}Pregnancies", Order = 1, RequireRestart = false, 
+            HintText = "{=Pregnancies_desc}Controls or disables which partner can become pregnant.")]
+        [SettingPropertyGroup("{=general}General")]
+        public DropdownDefault<string> PregnancyModeSetting { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "Disabled",
+            "Player",
+            "Partner",
+            "Random"
+        }, 0);
+
+        public string pregnancyMode { get => PregnancyModeSetting.SelectedValue; set => PregnancyModeSetting.SelectedValue = value; }
+
+
+
+        [SettingPropertyFloatingInteger("{=Fertility_Bonus}Fertility Bonus", 1f, 10f, "0%", Order = 4, RequireRestart = false,
+            HintText = "{=Fertility_Bonus_Desc}Adds modifier to chance of pregnancy. 100% = No Bonus, 200% = 2x chance. Note: May not do much after ~6-8 kids due to the base pregnancy calculations."),
+            SettingPropertyGroup("{=general}General")]
+        public float FertilityBonus { get; set; } = 1.0f;
+
+
     }
 }
