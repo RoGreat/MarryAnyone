@@ -26,6 +26,7 @@ namespace MarryAnyone.Settings
         public float AdoptionChance { get => _provider.AdoptionChance; set => _provider.AdoptionChance = value; }
         public bool AdoptionTitles { get => _provider.AdoptionTitles; set => _provider.AdoptionTitles = value; }
         public bool RetryCourtship { get => _provider.RetryCourtship; set => _provider.RetryCourtship = value; }
+        public string pregnancyMode { get => _provider.pregnancyMode; set => _provider.pregnancyMode = value; }
 
         public MASettings()
         {
