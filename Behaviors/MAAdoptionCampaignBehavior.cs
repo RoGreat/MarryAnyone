@@ -16,7 +16,7 @@ namespace MarryAnyone.Behaviors
     {
         protected void AddDialogs(CampaignGameStarter starter)
         {
-            foreach (Hero hero in Hero.All.ToList())
+            foreach (Hero hero in Hero.AllAliveHeroes.ToList())
             {
                 if (Hero.MainHero.Children.Contains(hero))
                 {
