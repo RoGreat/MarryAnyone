@@ -81,7 +81,7 @@ namespace MarryAnyone.Patches.Behaviors
                         int attraction = 0;
                         foreach (Hero spouse in _spouses)
                         {
-                            attraction += Romance.GetAttractionValueAsPercent(hero, spouse);
+                            attraction += Campaign.Current.Models.RomanceModel.GetAttractionValuePercentage(hero, spouse);
                             attractionGoal.Add(attraction);
                             MAHelper.Print("Spouse: " + spouse);
                             MAHelper.Print("Attraction: " + attraction);
