@@ -29,12 +29,17 @@ namespace MarryAnyone.Behaviors
             starter.AddDialogLine("character_agrees_to_discussion_MA", "lord_talk_speak_diplomacy_MA", "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_character_agrees_to_discussion_on_condition), null, 100, null);
 
             // From previous iteration
-            starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
+            //starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
             starter.AddDialogLine("hero_courtship_persuasion_2_success", "lord_start_courtship_response_3", "lord_conclude_courtship_stage_2", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), null, 120, null);
 
-            starter.AddPlayerLine("hero_romance_task", "hero_main_options", "lord_start_courtship_response_3", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), null, 140, null, null);
+            //starter.AddPlayerLine("hero_romance_task", "hero_main_options", "lord_start_courtship_response_3", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), null, 140, null, null);
+            starter.AddPlayerLine("hero_romance_task_pt3a", "hero_main_options", "hero_courtship_final_barter", "{=2aW6NC3Q}Let us discuss the final terms of our marriage.", new ConversationSentence.OnConditionDelegate(this.conversation_finalize_courtship_for_hero_on_condition), null, 100, null, null);
+            starter.AddPlayerLine("hero_romance_task_pt3b", "hero_main_options", "hero_courtship_final_barter", "{=jd4qUGEA}I wish to discuss the final terms of my marriage with {COURTSHIP_PARTNER}.", new ConversationSentence.OnConditionDelegate(this.conversation_finalize_courtship_for_other_on_condition), null, 100, null, null);
 
             starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_courtship_success_on_consequence), 140, null);
+
+            starter.AddDialogLine("hero_courtship_final_barter_setup", "hero_courtship_final_barter_conclusion", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(this.conversation_marriage_barter_successful_on_condition), new ConversationSentence.OnConsequenceDelegate(this.conversation_courtship_success_on_consequence), 100, null);
+            starter.AddDialogLine("hero_courtship_final_barter_setup", "hero_courtship_final_barter_conclusion", "close_window", "{=iunPaMFv}I guess we should put this aside, for now. But perhaps we can speak again at a later date.", () => !this.conversation_marriage_barter_successful_on_condition(), null, 100, null);
         }
 
         private bool conversation_begin_courtship_for_hero_on_condition()
@@ -64,46 +69,62 @@ namespace MarryAnyone.Behaviors
         // return false = carry out entire romance
         private bool conversation_finalize_courtship_for_hero_on_condition()
         {
-            ISettingsProvider settings = new MASettings();
-            Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-            bool clanLeader = Hero.MainHero.Clan.Leader == Hero.MainHero && Hero.MainHero.Clan.Lords.Contains(Hero.OneToOneConversationHero);
+            return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) 
+                && (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero)
+                && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+        }
 
-            if (settings.Difficulty == "Realistic")
+        private bool conversation_finalize_courtship_for_other_on_condition()
+        {
+
+            if (Hero.OneToOneConversationHero != null)
             {
-                // Skip issues with bartering marriage within clans
-                // If you are the leader of the clan then it is a problem
-                if (clanLeader)
+                Clan clan = Hero.OneToOneConversationHero.Clan;
+                if (clan != null && clan.Leader == Hero.OneToOneConversationHero)
                 {
-                    MAHelper.Print("Realistic: Clan Leader");
-                    return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
-                }
-                if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
-                {
-                    MAHelper.Print("Realistic: Noble");
-                    return false;
-                }
-                return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
-            }
-            else
-            {
-                if (clanLeader)
-                {
-                    if (settings.Difficulty == "Easy")
+                    foreach (Hero hero in clan.Lords)
                     {
-                        MAHelper.Print("Easy: Clan Leader");
-                        return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+                        // Trace
+                        //if (Romance.GetRomanticLevel(Hero.MainHero, hero) == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage)
+                        //{
+                        //    MAHelper.Print(String.Format("TEST:: va tester le hero {0} possible {1} RLvl {2}", hero.Name
+                        //                                , Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, hero)
+                        //                                , Romance.GetRomanticLevel(Hero.MainHero, hero)));
+
+                        //    Hero other = Romance.GetCourtedHeroInOtherClan(Hero.MainHero, hero);
+                        //    if (other != null)
+                        //        MAHelper.Print(String.Format("TEST:: other hero {0}", other.Name));
+                        //    other = Romance.GetCourtedHeroInOtherClan(hero, Hero.MainHero);
+                        //    if (other != null)
+                        //        MAHelper.Print(String.Format("TEST::2d other hero {0}", other.Name));
+
+                        //    if (!Campaign.Current.Models.MarriageModel.IsSuitableForMarriage(hero))
+                        //        MAHelper.Print(String.Format("TEST::hero {0} not suitable for mariage", hero.Name)); 
+
+                        //    if (!Campaign.Current.Models.MarriageModel.IsSuitableForMarriage(Hero.MainHero))
+                        //        MAHelper.Print(String.Format("TEST::hero {0} not suitable for mariage", Hero.MainHero.Name));
+
+                        //    if (!Campaign.Current.Models.MarriageModel.IsCoupleSuitableForMarriage(Hero.MainHero, hero))
+                        //        MAHelper.Print("NOT Suitable"); 
+
+                        //}
+                        if (hero != Hero.OneToOneConversationHero 
+                            && Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, hero) 
+                            && Romance.GetRomanticLevel(Hero.MainHero, hero) == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage)
+                        {
+                            MBTextManager.SetTextVariable("COURTSHIP_PARTNER", hero.Name, false);
+                            MAHelper.Print("TEST SUCCESS");
+                            return true;
+                        }
                     }
-                    MAHelper.Print("Very Easy: Clan Leader");
-                    return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
                 }
-                if (settings.Difficulty == "Easy" && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))
-                {
-                    MAHelper.Print("Easy: Noble");
-                    return false;
-                }
-                MAHelper.Print("Very Easy");
-                return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
             }
+            return false;
+        }
+
+        private bool conversation_marriage_barter_successful_on_condition()
+        {
+            return Campaign.Current.BarterManager.LastBarterIsAccepted;
         }
 
         private void conversation_courtship_success_on_consequence()
