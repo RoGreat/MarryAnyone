@@ -15,7 +15,7 @@ namespace MarryAnyone.Models
             bool isHomosexual = settings.SexualOrientation == "Homosexual" && isMainHero;
             bool isBisexual = settings.SexualOrientation == "Bisexual" && isMainHero;
             bool isIncestuous = settings.Incest && isMainHero;
-            bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
+            bool discoverAncestors = DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
 
             Clan clan = firstHero.Clan;
             if (clan?.Leader == firstHero && !isMainHero)
@@ -26,19 +26,30 @@ namespace MarryAnyone.Models
                     return false;
                 }
             }
-            if (isIncestuous)
+            if (!isIncestuous)
             {
-                discoverAncestors = true;
+                if (discoverAncestors)
+                {
+                    List<Hero> ancetresEnCommun = DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).ToList<Hero>();
+                    MAHelper.Print(string.Format("SuitableForMarriage:: Ancetres en commun {0}", string.Join(", ", ancetresEnCommun.Select<Hero, string>(x => x.Name.ToString()))));
+                    return false;
+                }
             }
             if (isHomosexual)
             {
-                return firstHero.IsFemale == secondHero.IsFemale && discoverAncestors && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+                MAHelper.Print(string.Format("SuitableForMarriage::Homo entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
+                        , (firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero))));
+                return firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
             }
             if (isBisexual)
             {
-                return discoverAncestors && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+                MAHelper.Print(string.Format("SuitableForMarriage::Bi entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
+                        , (IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero))));
+                return IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
             }
-            return firstHero.IsFemale != secondHero.IsFemale && discoverAncestors && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+            MAHelper.Print(string.Format("SuitableForMarriage::Hétéro entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
+                    , (firstHero.IsFemale != secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero))));
+            return firstHero.IsFemale != secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
         }
 
         public static IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)
@@ -69,14 +80,14 @@ namespace MarryAnyone.Models
             if (Hero.OneToOneConversationHero is not null)
             {
                 inConversation = maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero;
-                isCheating = settings.Cheating && inConversation && Hero.OneToOneConversationHero.Spouse is not null;
-                isPolygamous = settings.Polygamy && inConversation && Hero.OneToOneConversationHero.Spouse is null;
+                isCheating = settings.Cheating && inConversation;
+                isPolygamous = settings.Polygamy && inConversation;
             }
             if (!maidenOrSuitor.IsAlive || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
             {
                 return false;
             }
-            if (maidenOrSuitor.Spouse is null && !maidenOrSuitor.ExSpouses.Any(exSpouse => exSpouse.IsAlive) || isPolygamous || isCheating)
+            if ((maidenOrSuitor.Spouse is null && !maidenOrSuitor.ExSpouses.Any(exSpouse => exSpouse.IsAlive)) || isPolygamous || isCheating)
             {
                 if (maidenOrSuitor.IsFemale)
                 {
