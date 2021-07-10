@@ -16,6 +16,16 @@ namespace MarryAnyone.Behaviors
     {
         protected void AddDialogs(CampaignGameStarter starter)
         {
+            foreach (Hero hero in Hero.AllAliveHeroes.ToList())
+            {
+                if (Hero.MainHero.Children.Contains(hero))
+                {
+                    MAHelper.OccupationToLord(hero.CharacterObject);
+                    hero.Clan = null;
+                    hero.Clan = Clan.PlayerClan;
+                }
+            }
+            
             // Children
             starter.AddPlayerLine("adoption_discussion_MA", "town_or_village_children_player_no_rhyme", "adoption_child_MA", "{=adoption_offer_child}I can tell you have no parents to go back to child. I can be your {?PLAYER.GENDER}mother{?}father{\\?} if that is the case.", new ConversationSentence.OnConditionDelegate(conversation_adopt_child_on_condition), null, 120, null, null);
             starter.AddDialogLine("character_adoption_response_MA", "adoption_child_MA", "close_window", "{=adoption_response_child}You want to be my {?PLAYER.GENDER}Ma{?}Pa{\\?}? Okay then![rf:happy][rb:very_positive]", null, new ConversationSentence.OnConsequenceDelegate(conversation_adopt_child_on_consequence), 100, null);

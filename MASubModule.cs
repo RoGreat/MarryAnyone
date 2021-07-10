@@ -21,6 +21,7 @@ namespace MarryAnyone
         public override void NoHarmonyLoad()
         {
             ReplaceModel<MADefaultMarriageModel, DefaultMarriageModel>();
+            ReplaceModel<MARomanceModel, DefaultRomanceModel>();
         }
 
         protected override void OnSubModuleLoad()
