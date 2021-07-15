@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using MarryAnyone.Models;
 using MarryAnyone.Settings;
 using System;
 using System.Linq;
@@ -88,9 +89,19 @@ namespace MarryAnyone.Behaviors
         // return false = carry out entire romance
         private bool conversation_finalize_courtship_for_hero_on_condition()
         {
-            return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) 
+            bool ret = false;
+
+            if (Campaign.Current.Models.MarriageModel is MADefaultMarriageModel)
+                ((MADefaultMarriageModel)Campaign.Current.Models.MarriageModel).accepteSansClan = true;
+
+            ret = Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) 
                 && (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero)
                 && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+
+            if (Campaign.Current.Models.MarriageModel is MADefaultMarriageModel)
+                ((MADefaultMarriageModel)Campaign.Current.Models.MarriageModel).accepteSansClan = false;
+
+            return ret;
         }
 
         private bool conversation_finalize_courtship_for_other_on_condition()
