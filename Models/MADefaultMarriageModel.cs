@@ -8,6 +8,9 @@ namespace MarryAnyone.Models
 {
     internal class MADefaultMarriageModel : DefaultMarriageModel
     {
+
+        public bool accepteSansClan = false;
+
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
             ISettingsProvider settings = new MASettings();
@@ -16,6 +19,9 @@ namespace MarryAnyone.Models
             bool isBisexual = settings.SexualOrientation == "Bisexual" && isMainHero;
             bool isIncestuous = settings.Incest && isMainHero;
             bool discoverAncestors = DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
+
+            if (!accepteSansClan && (firstHero.Clan == null || secondHero.Clan == null))
+                return false;
 
             Clan clan = firstHero.Clan;
             if (clan?.Leader == firstHero && !isMainHero)
