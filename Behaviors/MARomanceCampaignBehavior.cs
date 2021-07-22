@@ -4,7 +4,6 @@ using System;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
-using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 using TaleWorlds.Localization;
 
 namespace MarryAnyone.Behaviors
@@ -88,9 +87,46 @@ namespace MarryAnyone.Behaviors
         // return false = carry out entire romance
         private bool conversation_finalize_courtship_for_hero_on_condition()
         {
-            return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) 
-                && (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero)
-                && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+            ISettingsProvider settings = new MASettings();
+            Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
+            bool clanLeader = Hero.MainHero.Clan.Leader == Hero.MainHero && Hero.MainHero.Clan.Lords.Contains(Hero.OneToOneConversationHero);
+
+            if (settings.Difficulty == "Realistic")
+            {
+                // Skip issues with bartering marriage within clans
+                // If you are the leader of the clan then it is a problem
+                if (clanLeader)
+                {
+                    MAHelper.Print("Realistic: Clan Leader");
+                    return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+                }
+                if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
+                {
+                    MAHelper.Print("Realistic: Noble");
+                    return false;
+                }
+                return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+            }
+            else
+            {
+                if (clanLeader)
+                {
+                    if (settings.Difficulty == "Easy")
+                    {
+                        MAHelper.Print("Easy: Clan Leader");
+                        return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+                    }
+                    MAHelper.Print("Very Easy: Clan Leader");
+                    return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
+                }
+                if (settings.Difficulty == "Easy" && (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero))
+                {
+                    MAHelper.Print("Easy: Noble");
+                    return false;
+                }
+                MAHelper.Print("Very Easy");
+                return Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) && (romanticLevel == Romance.RomanceLevelEnum.CourtshipStarted || romanticLevel == Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
+            }
         }
 
         private bool conversation_finalize_courtship_for_other_on_condition()
@@ -260,7 +296,7 @@ namespace MarryAnyone.Behaviors
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
-            foreach (Hero hero in Hero.All.ToList())
+            foreach (Hero hero in Hero.AllAliveHeroes.ToList())
             {
                 // The old fix for occupations not sticking
                 if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
