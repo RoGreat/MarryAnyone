@@ -213,14 +213,13 @@ namespace MarryAnyone.Patches.Behaviors
                         $"\n Hero DailyChance: {heroChance}" +
                         $"\n Spouse DailyChance: {heroSpouseChance}" +
                         $"\n Hero ShouldBePregnant: {rndChance <= heroChance}" +
-                        $"\n Spouse ShouldBePregnant: {rndChance <= heroSpouseChance}" +
-                        $"\n  Settings"
+                        $"\n Spouse ShouldBePregnant: {rndChance <= heroSpouseChance}"
                         );
                 }
 
                 if (settings.PregnancyMode == "Default")
                 {
-                    MAHelper.Print("   Default");
+                    MAHelper.Print("  Default");
                     if (rndChance <= heroChance)
                     {
                         MakePregnantAction.Apply(hero);
@@ -238,7 +237,7 @@ namespace MarryAnyone.Patches.Behaviors
                 {
                     if (hero2 == null)
                     {
-                        MAHelper.Print("   Conditions for Mother Not Met");
+                        MAHelper.Print("   Mother Not Determined");
                         return false;
                     }
                     MakePregnantAction.Apply(hero2);
@@ -279,19 +278,19 @@ namespace MarryAnyone.Patches.Behaviors
             {
                 case "Player":
                     result = (spouse1.IsHumanPlayerCharacter ? spouse1 : spouse2);
-                    MAHelper.Print("   Player: " + result.Name.ToString());
+                    MAHelper.Print("  Player: " + result.Name.ToString());
                     break;
                 case "Partner":
                     result = (spouse1.IsHumanPlayerCharacter ? spouse2 : spouse1);
-                    MAHelper.Print("   Partner: " + result.Name.ToString());
+                    MAHelper.Print("  Partner: " + result.Name.ToString());
                     break;
                 case "Random":
                     result = ((MBRandom.RandomInt(0, 1) == 0) ? spouse1 : spouse2);
-                    MAHelper.Print("   Random: " + result.Name.ToString());
+                    MAHelper.Print("  Random: " + result.Name.ToString());
                     break;
                 default:
                     result = null;
-                    MAHelper.Print("   Disabled");
+                    MAHelper.Print("  Disabled");
                     break;
             }
             return result;
