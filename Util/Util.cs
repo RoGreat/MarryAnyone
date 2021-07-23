@@ -22,17 +22,17 @@ namespace MarryAnyone.Util
 
             if (hero.Spouse != null && hero.Spouse == otherHero)
             {
-                MAHelper.Print(String.Format("AreMarried SUCCESS because {0} marry {1}", hero.Name, otherHero.Name));
+                MAHelper.Print(String.Format("AreMarried SUCCEEDED because {0} married {1}", hero.Name, otherHero.Name));
                 return true;
             }
 
             if (hero.ExSpouses != null && hero.ExSpouses.FirstOrDefault<Hero>(x => x == otherHero) != null)
             {
-                MAHelper.Print(String.Format("AreMarried SUCCESS because {0} hax {1} in his ex-spouses", hero.Name, otherHero.Name));
+                MAHelper.Print(String.Format("AreMarried SUCCEEDED because {0} has {1} in his ex-spouses", hero.Name, otherHero.Name));
                 return true;
             }
 
-            MAHelper.Print(String.Format("AreMarried FAIL for {0} and {1}", hero.Name, otherHero.Name));
+            MAHelper.Print(String.Format("AreMarried FAILED for {0} and {1}", hero.Name, otherHero.Name));
             return false;
         }
 
@@ -50,10 +50,7 @@ namespace MarryAnyone.Util
                 else
                     break;
             }
-
-            MAHelper.Print(String.Format("Nettoyage romances entre {0} et {1} => {2} suppressions", hero.Name, otherHero.Name, n));
+            MAHelper.Print(String.Format("Removing romances for {0} and {1} => {2} removed", hero.Name, otherHero.Name, n));
         }
-
-
     }
 }

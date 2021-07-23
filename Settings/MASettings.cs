@@ -26,7 +26,8 @@ namespace MarryAnyone.Settings
         public float AdoptionChance { get => _provider.AdoptionChance; set => _provider.AdoptionChance = value; }
         public bool AdoptionTitles { get => _provider.AdoptionTitles; set => _provider.AdoptionTitles = value; }
         public bool RetryCourtship { get => _provider.RetryCourtship; set => _provider.RetryCourtship = value; }
-        public string pregnancyMode { get => _provider.pregnancyMode; set => _provider.pregnancyMode = value; }
+        public string PregnancyMode { get => _provider.PregnancyMode; set => _provider.PregnancyMode = value; }
+        public float FertilityBonus { get => _provider.FertilityBonus; set => _provider.FertilityBonus = value; }
 
         public MASettings()
         {
@@ -56,6 +57,8 @@ namespace MarryAnyone.Settings
                     MAConfig.Instance.AdoptionChance = config.AdoptionChance;
                     MAConfig.Instance.AdoptionTitles = config.AdoptionTitles;
                     MAConfig.Instance.RetryCourtship = config.RetryCourtship;
+                    MAConfig.Instance.PregnancyMode = config.PregnancyMode;
+                    MAConfig.Instance.FertilityBonus = config.FertilityBonus;
                     NoMCMWarning = true;
                     NoConfigWarning = false;
                 }
