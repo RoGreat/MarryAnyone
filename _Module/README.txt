@@ -5,6 +5,12 @@ Adoption Chance goes from 0.00 (0%) to 1.00 (100%).
 
 Below is a list of values for the following settings for reference.
 
+PregnancyMode:
+Disabled
+Player
+Partner
+Random
+
 Difficulty:
 Very Easy
 Easy

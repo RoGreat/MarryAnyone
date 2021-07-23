@@ -15,6 +15,7 @@
         public float AdoptionChance { get; set; } = 0.05f;
         public bool AdoptionTitles { get; set; } = false;
         public bool RetryCourtship { get; set; } = false;
-        public string pregnancyMode { get; set; } = "Disabled";
+        public string PregnancyMode { get; set; } = "Default";
+        public float FertilityBonus { get; set; } = 1f;
     }
 }

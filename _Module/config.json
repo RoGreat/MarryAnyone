@@ -1,6 +1,8 @@
 {
 	"Difficulty": "Easy",
 	"SexualOrientation": "Heterosexual",
+	"PregnancyMode": "Disabled",
+	"FertilityBonus": 1.0,
 	"Polygamy": false,
 	"Polyamory": false,
 	"Incest": false,

@@ -122,21 +122,21 @@ namespace MarryAnyone.Patches.Behaviors
                     }
                 }
             }
-
-
-
             // Outside of female pregnancy behavior
             // Prevents RefreshSpouseVisit from being called on female - female marriage
-            /*if (hero.Spouse is not null)
+            if (settings.PregnancyMode == "Default")
             {
-                if (hero.IsFemale == hero.Spouse.IsFemale)
+                if (hero.Spouse is not null)
                 {
-                    // Decided to do this at the end so that you are not always going out with the opposite gender
-                    MAHelper.Print("   Spouse Unassigned: " + hero.Spouse);
-                    hero.Spouse.Spouse = null;
-                    hero.Spouse = null;
+                    if (hero.IsFemale == hero.Spouse.IsFemale)
+                    {
+                        // Decided to do this at the end so that you are not always going out with the opposite gender
+                        MAHelper.Print("   Spouse Unassigned: " + hero.Spouse);
+                        hero.Spouse.Spouse = null;
+                        hero.Spouse = null;
+                    }
                 }
-            }*/
+            }
         }
 
         private static void Postfix(Hero hero)
@@ -173,11 +173,10 @@ namespace MarryAnyone.Patches.Behaviors
     }
 
 
-    // Token: 0x02000008 RID: 8
+    // Credit to Lazeras
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "RefreshSpouseVisit")]
     public static class CheckForPregnancies
     {
-        // Token: 0x06000014 RID: 20 RVA: 0x00002360 File Offset: 0x00000560
         private static bool CheckAreNearbyBase(PregnancyCampaignBehavior instance, Hero hero, Hero spouse)
         {
             return (bool)CheckForPregnancies.checkAreNearbyBase.Invoke(instance, new object[]
@@ -187,7 +186,6 @@ namespace MarryAnyone.Patches.Behaviors
             });
         }
 
-        // Token: 0x06000015 RID: 21 RVA: 0x00002380 File Offset: 0x00000580
         private static void ChildConceivedBase(PregnancyCampaignBehavior instance, Hero mother)
         {
             CheckForPregnancies.childConceivedBase.Invoke(instance, new object[]
@@ -196,47 +194,62 @@ namespace MarryAnyone.Patches.Behaviors
             });
         }
 
-        // Token: 0x06000016 RID: 22 RVA: 0x00002398 File Offset: 0x00000598
         public static bool Prefix(PregnancyCampaignBehavior __instance, Hero hero)
         {
             ISettingsProvider settings = new MASettings();
             bool isNearbyBase = CheckForPregnancies.CheckAreNearbyBase(__instance, hero, hero.Spouse);
-            if (isNearbyBase)
+            if ((hero == Hero.MainHero || hero.Spouse == Hero.MainHero) && isNearbyBase)
             {
                 float rndChance = MBRandom.RandomFloat;
-                float heroChance = Campaign.Current.Models.PregnancyModel.GetDailyChanceOfPregnancyForHero(hero);
-                float heroSpouceChance = Campaign.Current.Models.PregnancyModel.GetDailyChanceOfPregnancyForHero(hero.Spouse);
+                float heroChance = Campaign.Current.Models.PregnancyModel.GetDailyChanceOfPregnancyForHero(hero) * settings.FertilityBonus;
+                float heroSpouseChance = Campaign.Current.Models.PregnancyModel.GetDailyChanceOfPregnancyForHero(hero.Spouse) * settings.FertilityBonus;
 
-                if (hero == Hero.MainHero || hero.Spouse == Hero.MainHero && settings.Debug)
+                if (settings.Debug)
                 {
                     MAHelper.Print($"RefreshSpouseVisit " +
                         $"\n Hero: {hero.Name.ToString()}" +
                         $"\n Spouse: {hero.Spouse.Name.ToString()}" +
                         $"\n rndChance: {rndChance}   " +
-                        $"\n DailyChance: {heroChance}" +
-                        $"\n Spouce DailyChance: {heroSpouceChance}" +
-                        $"\n ShouldBePregnent: {rndChance <= heroChance}" +
-                        $"\n Spouce ShouldBePregnent: {rndChance <= heroSpouceChance}"
+                        $"\n Hero DailyChance: {heroChance}" +
+                        $"\n Spouse DailyChance: {heroSpouseChance}" +
+                        $"\n Hero ShouldBePregnant: {rndChance <= heroChance}" +
+                        $"\n Spouse ShouldBePregnant: {rndChance <= heroSpouseChance}" +
+                        $"\n  Settings"
                         );
                 }
 
-                if (rndChance <= heroChance || rndChance <= heroSpouceChance)
+                if (settings.PregnancyMode == "Default")
                 {
-                    Hero hero2 = DetermineMother(hero, hero.Spouse);
+                    MAHelper.Print("   Default");
+                    if (rndChance <= heroChance)
+                    {
+                        MakePregnantAction.Apply(hero);
+                        CheckForPregnancies.ChildConceivedBase(__instance, hero);
+                    }
+                    return false;
+                }
+
+                Hero hero2 = DetermineMother(hero, hero.Spouse)!;
+                if (hero2 == hero.Spouse)
+                {
+                    heroChance = heroSpouseChance;
+                }
+                if (rndChance <= heroChance)
+                {
                     if (hero2 == null)
                     {
-                        MAHelper.Print("   RefreshSpouseVisit if (hero2 == null)");
+                        MAHelper.Print("   Conditions for Mother Not Met");
                         return false;
                     }
                     MakePregnantAction.Apply(hero2);
                     CheckForPregnancies.ChildConceivedBase(__instance, hero2);
                 }
+                return false;
             }
-            return false;
+            return true;
         }
 
-        // Token: 0x06000017 RID: 23 RVA: 0x000023F0 File Offset: 0x000005F0
-        private static Hero DetermineMother(Hero spouse1, Hero spouse2)
+        private static Hero? DetermineMother(Hero spouse1, Hero spouse2)
         {
             ISettingsProvider settings = new MASettings();
             if (spouse1.IsPregnant || spouse2.IsPregnant)
@@ -261,29 +274,31 @@ namespace MarryAnyone.Patches.Behaviors
                 }
                 return null;
             }
-            Hero result;
-            switch (settings.pregnancyMode)
+            Hero? result;
+            switch (settings.PregnancyMode)
             {
                 case "Player":
                     result = (spouse1.IsHumanPlayerCharacter ? spouse1 : spouse2);
+                    MAHelper.Print("   Player: " + result.Name.ToString());
                     break;
                 case "Partner":
                     result = (spouse1.IsHumanPlayerCharacter ? spouse2 : spouse1);
+                    MAHelper.Print("   Partner: " + result.Name.ToString());
                     break;
                 case "Random":
                     result = ((MBRandom.RandomInt(0, 1) == 0) ? spouse1 : spouse2);
+                    MAHelper.Print("   Random: " + result.Name.ToString());
                     break;
                 default:
                     result = null;
+                    MAHelper.Print("   Disabled");
                     break;
             }
             return result;
         }
 
-        // Token: 0x0400000A RID: 10
         private static readonly MethodInfo checkAreNearbyBase = AccessTools.Method(typeof(PregnancyCampaignBehavior), "CheckAreNearby", null, null);
 
-        // Token: 0x0400000B RID: 11
         private static readonly MethodInfo childConceivedBase = AccessTools.Method(typeof(PregnancyCampaignBehavior), "ChildConceived", null, null);
     }
 }

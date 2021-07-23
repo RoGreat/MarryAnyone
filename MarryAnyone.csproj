@@ -3,8 +3,8 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.3.4</Version>
-		<Authors>RoGreat, GrandesMarees</Authors>
+		<Version>2.4.0</Version>
+		<Authors>RoGreat, GrandesMarees, Lazeras</Authors>
 	</PropertyGroup>
 	
 	<!-- Setup -->
@@ -46,21 +46,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.39">
+    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.41">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Bannerlord.MCM" Version="$(MCMVersion)" />
     <PackageReference Include="Bannerlord_NoHarmonyLoader" Version="1.0.0" />
-    <PackageReference Include="Lib.Harmony" Version="2.0.4" />
-    <PackageReference Include="IsExternalInit" Version="1.0.0">
+    <PackageReference Include="IsExternalInit" Version="1.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Nullable" Version="1.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Lib.Harmony" Version="2.1.0" />
   </ItemGroup>
 
 	<!-- Bannerlord Assemblies -->
