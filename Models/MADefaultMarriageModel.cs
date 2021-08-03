@@ -15,30 +15,48 @@ namespace MarryAnyone.Models
             bool isHomosexual = settings.SexualOrientation == "Homosexual" && isMainHero;
             bool isBisexual = settings.SexualOrientation == "Bisexual" && isMainHero;
             bool isIncestuous = settings.Incest && isMainHero;
-            bool discoverAncestors = !DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
+            bool discoverAncestors = DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
 
             Clan clan = firstHero.Clan;
+            Clan clan2 = secondHero.Clan;
             if (clan?.Leader == firstHero && !isMainHero)
             {
-                Clan clan2 = secondHero.Clan;
                 if (clan2?.Leader == secondHero)
                 {
                     return false;
                 }
             }
-            if (isIncestuous)
+
+            // Patch V1500 We can only married hero in clan :/
+            if (firstHero == Hero.MainHero && clan2 == null)
+                return false;
+            else if (secondHero == Hero.MainHero && clan == null)
+                return false;
+
+            if (!isIncestuous)
             {
-                discoverAncestors = true;
+                if (discoverAncestors)
+                {
+                    List<Hero> ancetresEnCommun = DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).ToList<Hero>();
+                    MAHelper.Print(string.Format("SuitableForMarriage:: Ancetres en commun {0}", string.Join(", ", ancetresEnCommun.Select<Hero, string>(x => x.Name.ToString()))));
+                    return false;
+                }
             }
             if (isHomosexual)
             {
-                return firstHero.IsFemale == secondHero.IsFemale && discoverAncestors && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+                MAHelper.Print(string.Format("SuitableForMarriage::Homo entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
+                        , (firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero))));
+                return firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
             }
             if (isBisexual)
             {
-                return discoverAncestors && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+                MAHelper.Print(string.Format("SuitableForMarriage::Bi entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
+                        , (IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero))));
+                return IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
             }
-            return firstHero.IsFemale != secondHero.IsFemale && discoverAncestors && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+            MAHelper.Print(string.Format("SuitableForMarriage::Hétéro entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
+                    , (firstHero.IsFemale != secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero))));
+            return firstHero.IsFemale != secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
         }
 
         public static IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)

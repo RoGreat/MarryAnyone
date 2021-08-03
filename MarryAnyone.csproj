@@ -33,7 +33,8 @@
 	
   <PropertyGroup>
 	  <!--Windows-->
-    <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 261550@InstallLocation)</GameFolder>
+	<GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
+	<GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 261550@InstallLocation)</GameFolder>
     <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
     <!--Unix-->
     <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Unix'">~/.steam/root/steamapps/common/Mount &amp; Blade II Bannerlord</GameFolder>
