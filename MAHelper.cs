@@ -2,30 +2,61 @@
 using MarryAnyone.Settings;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Library;
+using TaleWorlds.ModuleManager;
 
 namespace MarryAnyone
 {
     internal static class MAHelper
     {
-        public static void Print(string message)
+
+        public static string? LogPath { get; set; }
+
+        public static void Print(string message, bool bForce = false)
         {
             ISettingsProvider settings = new MASettings();
-            if (settings.Debug)
+            if (settings.Debug || bForce)
             {
                 // Custom purple!
                 Color color = new(0.6f, 0.2f, 1f);
                 InformationManager.DisplayMessage(new InformationMessage(message, color));
             }
         }
+        public static void PrintWithColor(string message, Color color)
+        {
+            InformationManager.DisplayMessage(new InformationMessage(message, color));
+        }
+
+        public static void Log(string text, string? prefix = null)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(LogPath))
+                {
+                    using (var sw = new StreamWriter(LogPath, true))
+                    {
+                        //string version = ModuleInfo.GetModules().Where(x => x.Name == "Tournaments XPanded").FirstOrDefault().Version.ToString();
+                        string version = "MarryAnyOne v160";
+                        sw.WriteLine(string.Concat("(", version, ") ", prefix != null ? prefix + ":: " : "", DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss"), "\n", text));
+                    }
+                }
+            }
+            catch
+            {
+                //Something has gone horribly wrong.
+            }
+        }
 
         public static void Error(Exception exception)
         {
-            InformationManager.DisplayMessage(new InformationMessage("Marry Anyone: " + exception.Message, Colors.Red));
+            String message = "Marry Anyone: " + exception.Message;
+            InformationManager.DisplayMessage(new InformationMessage(message, Colors.Red));
+            Log(message, "ERROR");
         }
 
         public static void RemoveExSpouses(Hero hero, bool completelyRemove = false)

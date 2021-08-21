@@ -167,7 +167,7 @@ namespace MarryAnyone.Behaviors
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
-            foreach (Hero hero in Hero.All.ToList())
+            foreach (Hero hero in Hero.AllAliveHeroes.ToList())
             {
                 if (Hero.MainHero.Children.Contains(hero))
                 {

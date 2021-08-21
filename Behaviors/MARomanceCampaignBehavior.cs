@@ -271,7 +271,7 @@ namespace MarryAnyone.Behaviors
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
-            foreach (Hero hero in Hero.All.ToList())
+            foreach (Hero hero in Hero.AllAliveHeroes.ToList())
             {
                 // The old fix for occupations not sticking
                 if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))

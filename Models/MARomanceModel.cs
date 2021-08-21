@@ -8,7 +8,7 @@ using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 
 namespace MarryAnyone.Models
 {
-    internal class MARomanceModel : DefaultRomanceModel
+    public class MARomanceModel : DefaultRomanceModel
     {
         public override bool CourtshipPossibleBetweenNPCs(Hero person1, Hero person2)
         {

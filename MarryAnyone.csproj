@@ -42,18 +42,17 @@
 
   <!-- NuGet References -->
   <ItemGroup>
-    <PackageReference Include="Bannerlord.BuildResources" Version="1.0.0.33">
+    <PackageReference Include="Bannerlord.BuildResources" Version="1.0.0.36">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.39">
+    <PackageReference Include="Bannerlord.BUTR.Shared" Version="1.6.1.54">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Bannerlord.MCM" Version="$(MCMVersion)" />
-    <PackageReference Include="Bannerlord_NoHarmonyLoader" Version="1.0.0" />
-    <PackageReference Include="Lib.Harmony" Version="2.0.4" />
-    <PackageReference Include="IsExternalInit" Version="1.0.0">
+    <PackageReference Include="Lib.Harmony" Version="2.1.1" />
+    <PackageReference Include="IsExternalInit" Version="1.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

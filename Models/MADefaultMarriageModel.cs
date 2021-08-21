@@ -6,7 +6,7 @@ using TaleWorlds.CampaignSystem.SandBox.GameComponents;
 
 namespace MarryAnyone.Models
 {
-    internal class MADefaultMarriageModel : DefaultMarriageModel
+    public class MADefaultMarriageModel : DefaultMarriageModel
     {
 
         public bool accepteSansClan = false;
