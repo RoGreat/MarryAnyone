@@ -39,6 +39,10 @@
     <!--Unix-->
     <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Unix'">~/.steam/root/steamapps/common/Mount &amp; Blade II Bannerlord</GameFolder>
   </PropertyGroup>
+	
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>TRACE;DEBUG;V2</DefineConstants>
+  </PropertyGroup>
 
   <!-- NuGet References -->
   <ItemGroup>

@@ -45,11 +45,11 @@ namespace MarryAnyone
                 {
                     Directory.CreateDirectory(dirpath);
                 }
-                MAHelper.Print("Output directory : " + dirpath, true);
+                MAHelper.Print("Output directory : " + dirpath, MAHelper.PrintHow.PrintForceDisplay);
             }
             catch
             {
-                MAHelper.Print("Failed to create config directory.  Please manually create this directory: " + dirpath, true);
+                MAHelper.Print("Failed to create config directory.  Please manually create this directory: " + dirpath, MAHelper.PrintHow.PrintForceDisplay);
             }
 
             MAHelper.LogPath = dirpath;
@@ -60,12 +60,10 @@ namespace MarryAnyone
         {
             base.OnGameStart(game, gameStarter);
 
-            MAHelper.Print(String.Format("Chemin output : '{0}'", MAHelper.LogPath), true);
-
             if (game.GameType is Campaign)
             {
 
-                MAHelper.Print("Campaign", true);
+                MAHelper.Print("Campaign", MAHelper.PrintHow.PrintForceDisplay);
 
                 CampaignGameStarter campaignGameStarter = (CampaignGameStarter)gameStarter;
                 campaignGameStarter.LoadGameTexts(BasePath.Name + "Modules/MarryAnyone/ModuleData/ma_module_strings.xml");
@@ -87,34 +85,52 @@ namespace MarryAnyone
                 //    campaignGameStarter.Models.AddItem(new MARomanceModel());
 
 
-                bool hadSpouse = Hero.MainHero.Spouse != null;
-                bool mainHeroIsFemale = Hero.MainHero.IsFemale;
+            }
+        }
 
-                foreach (Hero hero in Hero.MainHero.Children)
+        public override void OnGameLoaded(Game game, object initializerObject)
+        {
+            base.OnGameLoaded(game, initializerObject);
+
+            MAHelper.Print(String.Format("Chemin output : '{0}'", MAHelper.LogPath), MAHelper.PrintHow.PrintForceDisplay);
+
+            // Parent patch
+            bool hadSpouse = Hero.MainHero.Spouse != null;
+            bool mainHeroIsFemale = Hero.MainHero.IsFemale;
+
+            foreach (Hero hero in Hero.MainHero.Children)
+            {
+                if (hadSpouse && hero.Father == Hero.MainHero && hero.Mother == Hero.MainHero)
                 {
-                    if (hadSpouse && hero.Father == Hero.MainHero && hero.Mother == Hero.MainHero)
-                    {
-                        if (mainHeroIsFemale)
-                            hero.Father = Hero.MainHero.Spouse;
-                        else
-                            hero.Mother = Hero.MainHero.Father;
-                        MAHelper.Print(string.Format("Patch Parent of {0}", hero.Name), true);
-                    }
-                    if (hero.Father == null)
-                    {
-                        hero.Father = mainHeroIsFemale && hadSpouse ? Hero.MainHero.Spouse : Hero.MainHero;
-                        MAHelper.Print(string.Format("Patch Father of {0}", hero.Name), true);
-                    }
-                    if (hero.Mother == null)
-                    {
-                        hero.Mother = !mainHeroIsFemale && hadSpouse ? Hero.MainHero.Spouse : Hero.MainHero;
-                        MAHelper.Print(string.Format("Patch Mother of {0}", hero.Name), true);
-                    }
+                    if (mainHeroIsFemale)
+                        hero.Father = Hero.MainHero.Spouse;
+                    else
+                        hero.Mother = Hero.MainHero.Father;
+                    MAHelper.Print(string.Format("Patch Parent of {0}", hero.Name), MAHelper.PRINT_PATCH);
+                }
+                if (hero.Father == null)
+                {
+                    hero.Father = mainHeroIsFemale && hadSpouse ? Hero.MainHero.Spouse : Hero.MainHero;
+                    MAHelper.Print(string.Format("Patch Father of {0}", hero.Name), MAHelper.PRINT_PATCH);
+                }
+                if (hero.Mother == null)
+                {
+                    hero.Mother = !mainHeroIsFemale && hadSpouse ? Hero.MainHero.Spouse : Hero.MainHero;
+                    MAHelper.Print(string.Format("Patch Mother of {0}", hero.Name), MAHelper.PRINT_PATCH);
                 }
             }
         }
 
+        public override void OnGameEnd(Game game)
+        {
+            base.OnGameEnd(game);
+            MAHelper.LogClose();
+        }
+
+#if NOTUSED
+
         #region HarmoryPatches
+
 
         protected void ApplyPatches(Game game, Type moduletype, bool debugmode = false)
         {
@@ -221,6 +237,7 @@ namespace MarryAnyone
         }
 
         #endregion HarmoryPatches
+#endif
 
 
         public override void OnGameInitializationFinished(Game game)

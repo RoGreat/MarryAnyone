@@ -44,10 +44,10 @@ namespace MarryAnyone.Patches.Behaviors
                 return false;
             }
             bool flag = Hero.MainHero.IsFemale && settings.SexualOrientation == "Heterosexual" || !Hero.MainHero.IsFemale && settings.SexualOrientation == "Homosexual" || !Hero.OneToOneConversationHero.IsFemale && settings.SexualOrientation == "Bisexual";
-            MAHelper.Print(string.Format("Output {0}" + MAHelper.LogPath));
-            MAHelper.Print("Courtship Possible: " + Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
-            MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
-            MAHelper.Print("Retry Courtship: " + settings.RetryCourtship.ToString());
+            MAHelper.Print(string.Format("Output {0}", MAHelper.LogPath), MAHelper.PRINT_TEST_ROMANCE);
+            MAHelper.Print("Courtship Possible: " + Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero).ToString(), MAHelper.PRINT_TEST_ROMANCE);
+            MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString(), MAHelper.PRINT_TEST_ROMANCE);
+            MAHelper.Print("Retry Courtship: " + settings.RetryCourtship.ToString(),MAHelper.PRINT_TEST_ROMANCE);
           
             if (Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero)){ 
 

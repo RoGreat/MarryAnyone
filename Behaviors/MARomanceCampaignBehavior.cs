@@ -70,11 +70,17 @@ namespace MarryAnyone.Behaviors
                     if (areMarried)
                     {
                         ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Ended);
-                        MAHelper.Print("PATCH Married New Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
+                        MAHelper.Print("PATCH Married New Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString(), MAHelper.PRINT_PATCH);
                     }
                 }
             }
+#if V2
+            MAHelper.Print(String.Format("conversation_begin_courtship_for_hero_on_condition(V2) with {0} va répondre {1}", Hero.OneToOneConversationHero.Name, (Hero.OneToOneConversationHero.IsWanderer || Hero.OneToOneConversationHero.IsPlayerCompanion).ToString()), MAHelper.PRINT_TEST_ROMANCE);
+            return Hero.OneToOneConversationHero.IsWanderer || Hero.OneToOneConversationHero.IsPlayerCompanion;
+#else
+            MAHelper.Print(String.Format("conversation_begin_courtship_for_hero_on_condition with {0} va répondre {1}", Hero.OneToOneConversationHero.Name,  (Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion).ToString()), MAHelper.PRINT_TEST_ROMANCE);
             return Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
+#endif
         }
 
         private bool conversation_character_agrees_to_discussion_on_condition()
@@ -211,6 +217,12 @@ namespace MarryAnyone.Behaviors
                     }
                 }
             }
+#if V2
+            if (spouse.Clan == null)
+            {
+                spouse.Clan = hero.Clan;
+            }
+#endif
             // New nobility
             MAHelper.OccupationToLord(spouse.CharacterObject);
             if (!spouse.IsNoble)

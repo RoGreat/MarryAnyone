@@ -40,14 +40,16 @@ namespace MarryAnyone.Patches
                 if (discoverAncestors)
                 {
                     List<Hero> ancetresEnCommun = DefaultMarriageModelHelp.DiscoverAncestors(firstHero, 3).Intersect(DefaultMarriageModelHelp.DiscoverAncestors(secondHero, 3)).ToList<Hero>();
-                    MAHelper.Print(string.Format("SuitableForMarriage:: Ancetres en commun {0}", string.Join(", ", ancetresEnCommun.Select<Hero, string>(x => x.Name.ToString()))));
+                    MAHelper.Print(string.Format("SuitableForMarriage:: Ancetres en commun {0}", string.Join(", ", ancetresEnCommun.Select<Hero, string>(x => x.Name.ToString())))
+                        , MAHelper.PRINT_TEST_ROMANCE);
                     goto returnFalse;
                 }
             }
             if (isHomosexual)
             {
                 MAHelper.Print(string.Format("SuitableForMarriage::Homo entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
-                        , (firstHero.IsFemale == secondHero.IsFemale && __instance.IsSuitableForMarriage(firstHero) && __instance.IsSuitableForMarriage(secondHero))));
+                        , (firstHero.IsFemale == secondHero.IsFemale && __instance.IsSuitableForMarriage(firstHero) && __instance.IsSuitableForMarriage(secondHero)))
+                        , MAHelper.PRINT_TEST_ROMANCE);
                 if (firstHero.IsFemale == secondHero.IsFemale && __instance.IsSuitableForMarriage(firstHero) && __instance.IsSuitableForMarriage(secondHero))
                     goto returnTrue;
                 goto returnFalse;
@@ -55,13 +57,15 @@ namespace MarryAnyone.Patches
             if (isBisexual)
             {
                 MAHelper.Print(string.Format("SuitableForMarriage::Bi entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
-                        , (__instance.IsSuitableForMarriage(firstHero) && __instance.IsSuitableForMarriage(secondHero))));
+                        , (__instance.IsSuitableForMarriage(firstHero) && __instance.IsSuitableForMarriage(secondHero)))
+                        , MAHelper.PRINT_TEST_ROMANCE);
                 if (__instance.IsSuitableForMarriage(firstHero) && __instance.IsSuitableForMarriage(secondHero))
                     goto returnTrue;
                 goto returnFalse;
             }
             MAHelper.Print(string.Format("SuitableForMarriage::Hétéro entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
-                    , (firstHero.IsFemale != secondHero.IsFemale && __instance.IsSuitableForMarriage(firstHero) && __instance.IsSuitableForMarriage(secondHero))));
+                    , (firstHero.IsFemale != secondHero.IsFemale && __instance.IsSuitableForMarriage(firstHero) && __instance.IsSuitableForMarriage(secondHero)))
+                    , MAHelper.PRINT_TEST_ROMANCE);
             if (firstHero.IsFemale != secondHero.IsFemale && __instance.IsSuitableForMarriage(firstHero) && __instance.IsSuitableForMarriage(secondHero))
                 goto returnTrue;
             goto returnFalse;
