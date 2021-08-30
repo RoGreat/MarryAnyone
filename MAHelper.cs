@@ -23,14 +23,16 @@ namespace MarryAnyone
             PrintRAS = 0,
             PrintDisplay = 1,
             PrintForceDisplay = 2,
-            PrintToLog = 4
+            PrintToLog = 4,
+            UpdateLog = 8,
+            PrintToLogAndWrite = 12
         }
 
 #if TESTROMANCE
         public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintToLog;
         public const PrintHow PRINT_PATCH = PrintHow.PrintToLog | PrintHow.PrintForceDisplay;
 #else
-        public const PrintComment PRINT_TEST_ROMANCE = PrintHow.PrintRAS;
+        public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintRAS;
         public const PrintHow PRINT_PATCH = PrintHow.PrintRAS;
 #endif
         public static string? LogPath { get; set; }
@@ -48,6 +50,8 @@ namespace MarryAnyone
             {
                 Log(message);
             }
+            if ((printHow & PrintHow.UpdateLog) != 0 && LogPath != null)
+                LogClose();
         }
         public static void PrintWithColor(string message, Color color)
         {

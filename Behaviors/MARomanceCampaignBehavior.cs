@@ -27,6 +27,7 @@ namespace MarryAnyone.Behaviors
             
             // To begin the dialog for companions
             starter.AddPlayerLine("main_option_discussions_MA", "hero_main_options", "lord_talk_speak_diplomacy_MA", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_begin_courtship_for_hero_on_condition), null, 120, null, null);
+            //starter.AddPlayerLine("main_option_discussions_MA", "hero_main_options", "lord_start_courtship_response", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_begin_courtship_for_hero_on_conditionFromMain), new ConversationSentence.OnConsequenceDelegate(this.conversation_start_courtship_persuasion_pt1_on_consequence), 120, null, null);
             starter.AddDialogLine("character_agrees_to_discussion_MA", "lord_talk_speak_diplomacy_MA", "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_character_agrees_to_discussion_on_condition), null, 100, null);
 
             // From previous iteration
@@ -45,43 +46,96 @@ namespace MarryAnyone.Behaviors
 
         private bool conversation_begin_courtship_for_hero_on_condition()
         {
-            ISettingsProvider settings = new MASettings();
-            if (Hero.OneToOneConversationHero.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge)
-            {
-                if (settings.Debug)
-                {
-                    MAHelper.Print("MCM: " + MASettings.UsingMCM);
-                    MAHelper.Print("Difficulty: " + settings.Difficulty);
-                    MAHelper.Print("Orientation: " + settings.SexualOrientation);
-                    MAHelper.Print("Cheating: " + settings.Cheating);
-                    MAHelper.Print("Polygamy: " + settings.Polygamy);
-                    MAHelper.Print("Incest: " + settings.Incest);
-                    MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
+            if (Hero.OneToOneConversationHero != null) {
+
+                bool ret = MarryAnyone.Patches.Behaviors.RomanceCampaignBehaviorPatch.conversation_player_can_open_courtship_on_condition();
+                if (ret) { 
+#if V2
+                    ret = Hero.OneToOneConversationHero.IsWanderer || Hero.OneToOneConversationHero.IsPlayerCompanion;
+#else
+                    ret = Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
+#endif
                 }
 
-                // OnNeNousDitPasTout/GrandesMaree Patch
-                // In Fact we can't go through Romance.RomanceLevelEnum.Untested
-                // because for the next modification, there will be another romance status
-                // And we must have only have one romance status for each relation
-                if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested)
+                if (Hero.OneToOneConversationHero.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge)
                 {
-                    Util.Util.CleanRomance(Hero.MainHero, Hero.OneToOneConversationHero);
-                    bool areMarried = Util.Util.AreMarried(Hero.MainHero, Hero.OneToOneConversationHero);
-                    if (areMarried)
+                    ISettingsProvider settings = new MASettings();
+                    if (settings.Debug)
                     {
-                        ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Ended);
-                        MAHelper.Print("PATCH Married New Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString(), MAHelper.PRINT_PATCH);
+                        MAHelper.Print("MCM: " + MASettings.UsingMCM);
+                        MAHelper.Print("Difficulty: " + settings.Difficulty);
+                        MAHelper.Print("Orientation: " + settings.SexualOrientation);
+                        MAHelper.Print("Cheating: " + settings.Cheating);
+                        MAHelper.Print("Polygamy: " + settings.Polygamy);
+                        MAHelper.Print("Incest: " + settings.Incest);
+                        MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
+                    }
+
+                    // OnNeNousDitPasTout/GrandesMaree Patch
+                    // In Fact we can't go through Romance.RomanceLevelEnum.Untested
+                    // because for the next modification, there will be another romance status
+                    // And we must have only have one romance status for each relation
+                    if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested)
+                    {
+                        Util.Util.CleanRomance(Hero.MainHero, Hero.OneToOneConversationHero);
+                        bool areMarried = Util.Util.AreMarried(Hero.MainHero, Hero.OneToOneConversationHero);
+                        if (areMarried)
+                        {
+                            ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Ended);
+                            MAHelper.Print("PATCH Married New Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString(), MAHelper.PRINT_PATCH);
+                        }
                     }
                 }
+                MAHelper.Print(String.Format("conversation_begin_courtship_for_hero_on_condition(V2) with {0} va répondre {1}", Hero.OneToOneConversationHero.Name, ret.ToString()), MAHelper.PRINT_TEST_ROMANCE);
+                return ret;
             }
-#if V2
-            MAHelper.Print(String.Format("conversation_begin_courtship_for_hero_on_condition(V2) with {0} va répondre {1}", Hero.OneToOneConversationHero.Name, (Hero.OneToOneConversationHero.IsWanderer || Hero.OneToOneConversationHero.IsPlayerCompanion).ToString()), MAHelper.PRINT_TEST_ROMANCE);
-            return Hero.OneToOneConversationHero.IsWanderer || Hero.OneToOneConversationHero.IsPlayerCompanion;
-#else
-            MAHelper.Print(String.Format("conversation_begin_courtship_for_hero_on_condition with {0} va répondre {1}", Hero.OneToOneConversationHero.Name,  (Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion).ToString()), MAHelper.PRINT_TEST_ROMANCE);
-            return Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
-#endif
+            return false;
         }
+
+//#if V2
+//        private bool conversation_begin_courtship_for_hero_on_conditionFromMain()
+//        {
+//            if (Hero.OneToOneConversationHero != null) { 
+//                if (Hero.OneToOneConversationHero.IsWanderer ^ Hero.OneToOneConversationHero.IsPlayerCompanion)
+//                {
+//                    bool ret = MarryAnyone.Patches.Behaviors.RomanceCampaignBehaviorPatch.conversation_player_can_open_courtship_on_condition();
+
+//     //               ISettingsProvider settings = new MASettings();
+//					//if (Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) 
+//     //                   && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested)
+//					//{
+//					//	if (Hero.MainHero.IsFemale)
+//					//	{
+//					//		MBTextManager.SetTextVariable("STR_INTRIGUE_AGREEMENT", "{=bjJs0eeB}My lord, I note that you have not yet taken a wife.", false);
+//					//	}
+//					//	else
+//					//	{
+//					//		MBTextManager.SetTextVariable("STR_INTRIGUE_AGREEMENT", "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer", false);
+//					//	}
+//     //                   ret = true;
+//					//}
+//     //               else
+//     //               if (settings.RetryCourtship && Campaign.Current.Models.MarriageModel.IsCoupleSuitableForMarriage(Hero.MainHero, Hero.OneToOneConversationHero))
+//					//{
+//					//	if (Hero.MainHero.IsFemale)
+//					//	{
+//					//		MBTextManager.SetTextVariable("STR_INTRIGUE_AGREEMENT", "{=2WnhUBMM}My lord, may you give me another chance to prove myself?", false);
+//					//	}
+//					//	else
+//					//	{
+//					//		MBTextManager.SetTextVariable("STR_INTRIGUE_AGREEMENT", "{=4iTaEZKg}My lady, may you give me another chance to prove myself?", false);
+//					//	}
+//     //                   ret = true;
+//					//}
+
+//                    MAHelper.Print(String.Format("conversation_begin_courtship_for_hero_on_conditionFromMain(V2) with {0} va répondre {1}", Hero.OneToOneConversationHero.Name, ret.ToString()), MAHelper.PRINT_TEST_ROMANCE);
+//                    return true;
+//                }
+//            }
+//            return false;
+
+//        }
+//#endif
 
         private bool conversation_character_agrees_to_discussion_on_condition()
         {
@@ -95,17 +149,9 @@ namespace MarryAnyone.Behaviors
         // return false = carry out entire romance
         private bool conversation_finalize_courtship_for_hero_on_condition()
         {
-            bool ret = false;
-
-            if (Campaign.Current.Models.MarriageModel is MADefaultMarriageModel)
-                ((MADefaultMarriageModel)Campaign.Current.Models.MarriageModel).accepteSansClan = true;
-
-            ret = Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) 
-                && (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero)
-                && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
-
-            if (Campaign.Current.Models.MarriageModel is MADefaultMarriageModel)
-                ((MADefaultMarriageModel)Campaign.Current.Models.MarriageModel).accepteSansClan = false;
+            bool ret = Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero) 
+                        && (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero)
+                        && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
 
             return ret;
         }

@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using MarryAnyone.Models;
 using MarryAnyone.Settings;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -156,12 +157,16 @@ namespace MarryAnyone.Patches.Behaviors
         [HarmonyPatch("conversation_finalize_courtship_for_hero_on_condition")]
         private static bool Prefix4(ref bool __result)
         {
-            if (CharacterObject.OneToOneConversationCharacter.Occupation == Occupation.Wanderer && !Hero.OneToOneConversationHero.IsPlayerCompanion)
-            {
-                __result = false;
-                return false;
-            }
-            return true;
+            //if (CharacterObject.OneToOneConversationCharacter.Occupation == Occupation.Wanderer && !Hero.OneToOneConversationHero.IsPlayerCompanion)
+            //{
+            //    __result = false;
+            //    return false;
+            //}
+            __result = MADefaultMarriageModel.IsCoupleSuitableForMarriageStatic(Hero.MainHero, Hero.OneToOneConversationHero) 
+                    && (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero) 
+                    && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+
+            return false;
         }
     }
 }

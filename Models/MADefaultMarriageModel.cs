@@ -9,9 +9,9 @@ namespace MarryAnyone.Models
     public class MADefaultMarriageModel : DefaultMarriageModel
     {
 
-        public bool accepteSansClan = false;
+        //public bool accepteSansClan = false;
 
-        public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
+        public static bool IsCoupleSuitableForMarriageStatic(Hero firstHero, Hero secondHero)
         {
             ISettingsProvider settings = new MASettings();
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
@@ -20,8 +20,16 @@ namespace MarryAnyone.Models
             bool isIncestuous = settings.Incest && isMainHero;
             bool discoverAncestors = DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).Any();
 
-            if (!accepteSansClan && (firstHero.Clan == null || secondHero.Clan == null))
-                return false;
+            if (!isMainHero)
+            {
+                if (firstHero.Clan == null || secondHero.Clan == null)
+                {
+                    MAHelper.Print(string.Format("SuitableForMarriage:: entre {0} et {1} Echoue car il manque au moins un clan"
+                                    , firstHero.Name.ToString(), secondHero.Name.ToString())
+                                    , MAHelper.PRINT_TEST_ROMANCE);
+                    return false;
+                }
+            }
 
             Clan clan = firstHero.Clan;
             if (clan?.Leader == firstHero && !isMainHero)
@@ -37,25 +45,36 @@ namespace MarryAnyone.Models
                 if (discoverAncestors)
                 {
                     List<Hero> ancetresEnCommun = DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).ToList<Hero>();
-                    MAHelper.Print(string.Format("SuitableForMarriage:: Ancetres en commun {0}", string.Join(", ", ancetresEnCommun.Select<Hero, string>(x => x.Name.ToString()))));
+                    MAHelper.Print(string.Format("SuitableForMarriage:: entre {0} et {1} Ancetres en commun {2}"
+                                    , firstHero.Name.ToString(), secondHero.Name.ToString()
+                                    , string.Join(", ", ancetresEnCommun.Select<Hero, string>(x => x.Name.ToString())))
+                                    , MAHelper.PRINT_TEST_ROMANCE);
                     return false;
                 }
             }
             if (isHomosexual)
             {
                 MAHelper.Print(string.Format("SuitableForMarriage::Homo entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
-                        , (firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero))));
-                return firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+                        , (firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriageStatic(firstHero) && IsSuitableForMarriageStatic(secondHero)))
+                        , MAHelper.PRINT_TEST_ROMANCE);
+                return firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriageStatic(firstHero) && IsSuitableForMarriageStatic(secondHero);
             }
             if (isBisexual)
             {
                 MAHelper.Print(string.Format("SuitableForMarriage::Bi entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
-                        , (IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero))));
-                return IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+                        , (IsSuitableForMarriageStatic(firstHero) && IsSuitableForMarriageStatic(secondHero)))
+                        , MAHelper.PRINT_TEST_ROMANCE);
+                return IsSuitableForMarriageStatic(firstHero) && IsSuitableForMarriageStatic(secondHero);
             }
             MAHelper.Print(string.Format("SuitableForMarriage::Hétéro entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
-                    , (firstHero.IsFemale != secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero))));
-            return firstHero.IsFemale != secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+                    , (firstHero.IsFemale != secondHero.IsFemale && IsSuitableForMarriageStatic(firstHero) && IsSuitableForMarriageStatic(secondHero)))
+                    , MAHelper.PRINT_TEST_ROMANCE);
+            return firstHero.IsFemale != secondHero.IsFemale && IsSuitableForMarriageStatic(firstHero) && IsSuitableForMarriageStatic(secondHero);
+        }
+
+        public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
+        {
+            return IsCoupleSuitableForMarriageStatic(firstHero, secondHero);
         }
 
         public static IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)
@@ -78,7 +97,7 @@ namespace MarryAnyone.Models
             yield break;
         }
 
-        public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
+        public static bool IsSuitableForMarriageStatic(Hero maidenOrSuitor)
         {
             ISettingsProvider settings = new MASettings();
             bool inConversation, isCheating, isPolygamous;
@@ -102,6 +121,11 @@ namespace MarryAnyone.Models
                 return maidenOrSuitor.CharacterObject.Age >= Campaign.Current.Models.MarriageModel.MinimumMarriageAgeMale;
             }
             return false;
+        }
+
+        public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
+        {
+            return IsSuitableForMarriageStatic(maidenOrSuitor);
         }
     }
 }

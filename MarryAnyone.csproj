@@ -41,7 +41,7 @@
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DefineConstants>TRACE;DEBUG;V2</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;V2,TRACELOCATION,TESTROMANCE</DefineConstants>
   </PropertyGroup>
 
   <!-- NuGet References -->
