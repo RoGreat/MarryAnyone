@@ -17,6 +17,7 @@ namespace MarryAnyone
 
         private static FileStream? _fichier = null;
         private static StreamWriter? _sw = null;
+        private static bool _needToSupprimeFichier = false;
 
         public enum PrintHow // Bitwise enumération
         {
@@ -35,7 +36,16 @@ namespace MarryAnyone
         public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintRAS;
         public const PrintHow PRINT_PATCH = PrintHow.PrintRAS;
 #endif
-        public static string? LogPath { get; set; }
+        public static string? LogPath 
+        {
+            get => _logPath;
+            set
+            {
+                _logPath = value;
+                _needToSupprimeFichier = true;
+            }
+        }
+        private static string? _logPath;
 
         public static void Print(string message, PrintHow printHow = PrintHow.PrintRAS)
         {
@@ -64,7 +74,14 @@ namespace MarryAnyone
             {
                 try
                 {
-                    _fichier = new FileStream(LogPath + "\\MarryAnyOne.log", FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+                    if (_needToSupprimeFichier)
+                    {
+                        _fichier = new FileStream(LogPath + "\\MarryAnyOne.log", FileMode.Create, FileAccess.Write, FileShare.Read);
+                        _needToSupprimeFichier = false;
+                    }
+                    else
+                        _fichier = new FileStream(LogPath + "\\MarryAnyOne.log", FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+
                     if (_fichier != null)
                     {
                         _fichier.Seek(0, SeekOrigin.End);

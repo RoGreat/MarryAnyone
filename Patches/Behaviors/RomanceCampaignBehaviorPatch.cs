@@ -50,11 +50,11 @@ namespace MarryAnyone.Patches.Behaviors
             MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString(), MAHelper.PRINT_TEST_ROMANCE);
             MAHelper.Print("Retry Courtship: " + settings.RetryCourtship.ToString(),MAHelper.PRINT_TEST_ROMANCE);
           
-            if (Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero)){ 
+            bool areMarried = Util.Util.AreMarried(Hero.MainHero, Hero.OneToOneConversationHero);
+            Romance.RomanceLevelEnum romanceLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
 
-                bool areMarried = Util.Util.AreMarried(Hero.MainHero, Hero.OneToOneConversationHero);
+            if (Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero)){
 
-                Romance.RomanceLevelEnum romanceLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
                 if (romanceLevel == Romance.RomanceLevelEnum.Untested)
                 {
                     if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
@@ -83,29 +83,30 @@ namespace MarryAnyone.Patches.Behaviors
                     }
                     return true;
                 }
-
-                if (romanceLevel == Romance.RomanceLevelEnum.FailedInCompatibility 
-                    || romanceLevel == Romance.RomanceLevelEnum.FailedInPracticalities
-                    || (romanceLevel == Romance.RomanceLevelEnum.Ended && settings.RetryCourtship && !areMarried)
-                    )
+            }
+            else
+            {
+                if (settings.RetryCourtship)
                 {
-                    if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
+                    if (romanceLevel == Romance.RomanceLevelEnum.FailedInCompatibility
+                        || romanceLevel == Romance.RomanceLevelEnum.FailedInPracticalities
+                        || (romanceLevel == Romance.RomanceLevelEnum.Ended && !areMarried)
+                        )
                     {
-                        MBTextManager.SetTextVariable("FLIRTATION_LINE",
-                            flag
-                                ? "{=2WnhUBMM}My lord, may you give me another chance to prove myself?"
-                                : "{=4iTaEZKg}My lady, may you give me another chance to prove myself?", false);
-                    }
-                    else
-                    {
-                        MBTextManager.SetTextVariable("FLIRTATION_LINE",
-                            flag
-                                ? "{=goodman_chance}Goodman, may you give me another chance to prove myself?"
-                                : "{=goodwife_chance}Goodwife, may you give me another chance to prove myself?", false);
-                    }
-                    // Retry Courtship feature!
-                    if (settings.RetryCourtship)
-                    {
+                        if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
+                        {
+                            MBTextManager.SetTextVariable("FLIRTATION_LINE",
+                                flag
+                                    ? "{=2WnhUBMM}My lord, may you give me another chance to prove myself?"
+                                    : "{=4iTaEZKg}My lady, may you give me another chance to prove myself?", false);
+                        }
+                        else
+                        {
+                            MBTextManager.SetTextVariable("FLIRTATION_LINE",
+                                flag
+                                    ? "{=goodman_chance}Goodman, may you give me another chance to prove myself?"
+                                    : "{=goodwife_chance}Goodwife, may you give me another chance to prove myself?", false);
+                        }
                         if (romanceLevel == Romance.RomanceLevelEnum.Ended)
                             // OnNeNousDitPasTout/GrandesMaree Patch
                             // Patch we must have only have one romance status for each relation
@@ -119,8 +120,8 @@ namespace MarryAnyone.Patches.Behaviors
                         {
                             ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
                         }
+                        return true;
                     }
-                    return true;
                 }
             }
             return false;

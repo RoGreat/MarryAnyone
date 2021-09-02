@@ -9,7 +9,6 @@ using TaleWorlds.MountAndBlade;
 using System.IO;
 using System;
 using System.Collections.Generic;
-using TournamentsXPanded.Common.Patches;
 using System.Reflection;
 using System.Linq;
 
@@ -20,7 +19,6 @@ namespace MarryAnyone
 
         public static string ModuleFolderName { get; } = "MarryAnyone";
 
-        public static IDictionary<Type, IPatch> ActivePatches = new Dictionary<Type, IPatch>();
         public static readonly Harmony Harmony = new Harmony(ModuleFolderName);
 
         //public override void NoHarmonyInit()
@@ -126,118 +124,6 @@ namespace MarryAnyone
             base.OnGameEnd(game);
             MAHelper.LogClose();
         }
-
-#if NOTUSED
-
-        #region HarmoryPatches
-
-
-        protected void ApplyPatches(Game game, Type moduletype, bool debugmode = false)
-        {
-            //ActivePatches.Clear();
-
-            foreach (var patch in GetPatches(moduletype))
-            {
-                try
-                {
-                    patch.Reset();
-                }
-                catch (Exception ex)
-                {
-                    //Error(ex, $"Error while resetting patch: {patch.GetType().Name}");
-                    //MessageBox.Show("TournamentXP Patch Error", $"Error while applying patch: {patch.GetType().Name}\n" + ex.ToStringFull());
-                    MAHelper.Log($"Error while resetting patch: {patch.GetType().Name}", "ERROR");
-                    MAHelper.Log(ex.ToString(), "ERROR");
-                }
-
-                try
-                {
-                    if (patch.IsApplicable(game))
-                    {
-                        try
-                        {
-                            patch.Apply(game);
-                        }
-                        catch (Exception ex)
-                        {
-                            //  Error(ex, $"Error while applying patch: {patch.GetType().Name}");
-                            MAHelper.Log($"Error while applying patch: {patch.GetType().Name}", "ERROR");
-                            MAHelper.Log(ex.ToString(), "ERROR");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MAHelper.Log($"Error while checking if patch is applicable: {patch.GetType().Name}", "ERROR");
-                    MAHelper.Log(ex.ToString(), "ERROR");
-                }
-
-                var patchApplied = patch.Applied;
-                if (patchApplied)
-                {
-                    ActivePatches[patch.GetType()] = patch;
-                }
-
-                if (debugmode)
-                {
-                    MAHelper.PrintWithColor($"{(patchApplied ? "Applied" : "Skipped")} Patch: {patch.GetType().Name}", (patchApplied ? Colors.Cyan : Colors.Red));
-                }
-            }
-        }
-
-        private LinkedList<IPatch>? _patches;
-
-        public LinkedList<IPatch> GetPatches(Type moduletype)
-        {
-
-
-            if (_patches != null)
-            {
-                return _patches;
-            }
-
-            var patchInterfaceType = typeof(IPatch);
-            _patches = new LinkedList<IPatch>();
-
-
-            foreach (var type in moduletype.Assembly.GetTypes())
-            {
-                if (type.IsInterface || type.IsAbstract)
-                {
-                    continue;
-                }
-
-                if (!patchInterfaceType.IsAssignableFrom(type))
-                {
-                    continue;
-                }
-
-                try
-                {
-                    var patch = (IPatch)Activator.CreateInstance(type, true);
-                    //var patch = (IPatch) FormatterServices.GetUninitializedObject(type);
-                    _patches.AddLast(patch);
-                }
-                catch (TargetInvocationException tie)
-                {
-                    //     Error(tie.InnerException, $"Failed to create instance of patch: {type.FullName}");
-                    MAHelper.Log($"Failed to create instance of patch: {type.FullName}", "INFO");
-                    MAHelper.Log(tie.ToString(), "INFO");
-                }
-                catch (Exception ex)
-                {
-                    // Error(ex, $"Failed to create instance of patch: {type.FullName}");
-                    MAHelper.Log($"Failed to create instance of patch: {type.FullName}", "INFO");
-                    MAHelper.Log(ex.ToString(), "INFO");
-                }
-
-            }
-            return _patches;
-
-        }
-
-        #endregion HarmoryPatches
-#endif
 
 
         public override void OnGameInitializationFinished(Game game)
