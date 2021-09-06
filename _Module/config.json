@@ -1,7 +1,7 @@
 {
 	"Difficulty": "Easy",
 	"SexualOrientation": "Heterosexual",
-	"PregnancyMode": "Disabled",
+	"PregnancyMode": "Default",
 	"FertilityBonus": 1.0,
 	"Polygamy": false,
 	"Polyamory": false,
