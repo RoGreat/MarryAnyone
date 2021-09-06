@@ -20,7 +20,7 @@ namespace MarryAnyone.Settings
             { "VERSION", TextObjectHelper.Create(typeof(MCMSettings).Assembly.GetName().Version?.ToString(3) ?? "ERROR") }
         })?.ToString() ?? "ERROR";
 
-        [SettingPropertyDropdown("{=difficulty}Difficulty", Order = 0, RequireRestart = false, HintText = "{=difficulty_desc}Very Easy - skip the romance mini-game. Easy - skip the romance mini-game for lowborn. Realistic - always play the romance mini-game.")]
+        [SettingPropertyDropdown("{=difficulty}Difficulty", Order = 0, RequireRestart = false, HintText = "{=difficulty_desc}Very Easy to skip romance. Easy to romance nobles. Realistic to romance everyone.")]
         [SettingPropertyGroup("{=general}General")]
         public DropdownDefault<string> DifficultyDropdown { get; set; } = new DropdownDefault<string>(new string[]
         {
@@ -38,7 +38,7 @@ namespace MarryAnyone.Settings
             "Bisexual"
         }, 0);
 
-        [SettingPropertyBool("{=cheating}Cheating", Order = 2, RequireRestart = false, HintText = "{=cheating_desc}Player character can marry characters that are already married.")]
+        [SettingPropertyBool("{=cheating}Cheating", RequireRestart = false, HintText = "{=cheating_desc}Player character can marry characters that are already married.")]
         [SettingPropertyGroup("{=relationship}Relationship Options", GroupOrder = 2)]
         public bool Cheating { get; set; } = false;
 
@@ -50,7 +50,7 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=relationship}Relationship Options", GroupOrder = 2)]
         public bool Polyamory { get; set; } = false;
 
-        [SettingPropertyBool("{=incest}Incest", Order = 3, RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships.")]
+        [SettingPropertyBool("{=incest}Incest", RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships.")]
         [SettingPropertyGroup("{=relationship}Relationship Options", GroupOrder = 2)]
         public bool Incest { get; set; } = false;
 
@@ -61,26 +61,26 @@ namespace MarryAnyone.Settings
         public string SexualOrientation { get => SexualOrientationDropdown.SelectedValue; set => SexualOrientationDropdown.SelectedValue = value; }
 
         [SettingPropertyBool("{=adoption}Adoption", RequireRestart = false, HintText = "{=adoption_desc}Player can adopt children in towns and villages by talking to them.", IsToggle = true)]
-        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 5)]
+        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 4)]
         public bool Adoption { get; set; } = false;
 
-        [SettingPropertyFloatingInteger("{=adoption_chance}Adoption Chance", 0f, 1f, "#0%", RequireRestart = false, Order = 1, HintText = "{=adoption_chance_desc}Chance that a child is up for adoption.")]
-        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 5)]
+        [SettingPropertyFloatingInteger("{=adoption_chance}Adoption Chance", 0f, 1f, "#0%", RequireRestart = false, HintText = "{=adoption_chance_desc}Chance that a child is up for adoption.")]
+        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 4)]
         public float AdoptionChance { get; set; } = 0.05f;
 
-        [SettingPropertyBool("{=adoption_titles}Adoption Titles", RequireRestart = false, Order = 2, HintText = "{=adoption_titles_desc}Encyclopedia displays children without a parent as adopted.")]
-        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 5)]
+        [SettingPropertyBool("{=adoption_titles}Adoption Titles", RequireRestart = false, HintText = "{=adoption_titles_desc}Encyclopedia displays children without a parent as adopted.")]
+        [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 4)]
         public bool AdoptionTitles { get; set; } = false;
 
         [SettingPropertyBool("{=retry_courtship}Retry Courtship", RequireRestart = false, HintText = "{=retry_courtship_desc}Player can retry courtship after failure.")]
-        [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 3)]
+        [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 1)]
         public bool RetryCourtship { get; set; } = false;
 
 
         // Credit to Lazeras
-        [SettingPropertyDropdown("{=pregnancies}Pregnancies", RequireRestart = false, Order = 0, 
+        [SettingPropertyDropdown("{=pregnancies}Pregnancies", Order = 0, RequireRestart = false, 
             HintText = "{=pregnancies_desc}Controls or disables which partner can become pregnant.")]
-        [SettingPropertyGroup("{=pregnancy}Pregnancy", GroupOrder = 4)]
+        [SettingPropertyGroup("{=pregnancy}Pregnancy", GroupOrder = 3)]
         public DropdownDefault<string> PregnancyModeSetting { get; set; } = new DropdownDefault<string>(new string[]
         {
             "Default",
@@ -94,7 +94,7 @@ namespace MarryAnyone.Settings
 
         [SettingPropertyFloatingInteger("{=fertility_bonus}Fertility Bonus", 1f, 10f, "0%", Order = 1, RequireRestart = false,
             HintText = "{=fertility_bonus_desc}Adds modifier to chance of pregnancy. 100% = No Bonus, 200% = 2x chance. Note: May not do much after ~6-8 kids due to the base pregnancy calculations."),
-            SettingPropertyGroup("{=pregnancy}Pregnancy", GroupOrder = 4)]
+            SettingPropertyGroup("{=pregnancy}Pregnancy", GroupOrder = 3)]
         public float FertilityBonus { get; set; } = 1.0f;
     }
 }

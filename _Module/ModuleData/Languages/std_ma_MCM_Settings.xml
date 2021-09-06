@@ -6,7 +6,7 @@
   <strings>
 		<string id="marryanyone" text="Marry Anyone" />
 		<string id="difficulty" text="Difficulty" />
-		<string id="difficulty_desc" text="Very Easy - skip the romance mini-game. Easy - skip the romance mini-game for lowborn. Realistic - always play the romance mini-game." />
+		<string id="difficulty_desc" text="Very Easy - no mini-game | Easy - mini-game nobles only | Realistic - mini-game all" />
 		<string id="general" text="General" />
 		<string id="orientation" text="Sexual Orientation" />
 		<string id="orientation_desc" text="Player character can choose what gender the player can marry." />
