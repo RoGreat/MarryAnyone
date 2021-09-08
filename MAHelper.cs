@@ -28,14 +28,29 @@ namespace MarryAnyone
             UpdateLog = 8,
             PrintToLogAndWrite = 12
         }
-
+#if TRACELOAD
+        public const PrintHow PRINT_TRACE_LOAD = PrintHow.PrintToLog;
+#else
+        public const PrintHow PRINT_TRACE_LOAD = PrintHow.PrintRAS;
+#endif
+#if TESTPREGNANCY
+        public const PrintHow PRINT_TEST_PREGNANCY = PrintHow.PrintToLog | PrintHow.PrintDisplay;
+#else
+        public const PrintHow PRINT_TEST_PREGNANCY = PrintHow.PrintDisplay;
+#endif
 #if TESTROMANCE
         public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintToLog;
-        public const PrintHow PRINT_PATCH = PrintHow.PrintToLog | PrintHow.PrintForceDisplay;
 #else
         public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintRAS;
+#endif
+#if TRACELOAD
+        public const PrintHow PRINT_PATCH = PrintHow.PrintToLog | PrintHow.UpdateLog;
+#elif TESTROMANCE
+        public const PrintHow PRINT_PATCH = PrintHow.PrintToLog | PrintHow.PrintForceDisplay;
+#else
         public const PrintHow PRINT_PATCH = PrintHow.PrintRAS;
 #endif
+
         public static string? LogPath 
         {
             get => _logPath;
