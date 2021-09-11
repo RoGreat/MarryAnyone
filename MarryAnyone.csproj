@@ -45,7 +45,7 @@
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DefineConstants>TRACE;RELEASE,TESTPREGNANCY,TRACELOAD</DefineConstants>
+    <DefineConstants>TRACE;RELEASE,TESTPREGNANCY,TRACELOAD,TRACEWEDDING</DefineConstants>
   </PropertyGroup>
 
   <!-- NuGet References -->
@@ -84,8 +84,20 @@
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
     </Reference>
-		<Reference Include="$(GameFolder)\Modules\StoryMode\bin\Win64_Shipping_Client\*.dll">
-      <HintPath>%(Identity)</HintPath>
+    <Reference Include="E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode.GauntletUI.dll">
+      <HintPath>E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode.GauntletUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode.View.dll">
+      <HintPath>E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode.View.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode.ViewModelCollection.dll">
+      <HintPath>E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode.ViewModelCollection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryModeSauve.dll">
+      <HintPath>E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryModeSauve.dll</HintPath>
       <Private>False</Private>
     </Reference>
 		<Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\Newtonsoft.Json.dll">

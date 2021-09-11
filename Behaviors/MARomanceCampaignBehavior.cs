@@ -217,6 +217,8 @@ namespace MarryAnyone.Behaviors
             Hero oldSpouse = hero.Spouse;
             Hero cheatedSpouse = spouse.Spouse;
 
+            MAHelper.Print("conversation_courtship_success_on_consequence::", MAHelper.PRINT_TRACE_WEDDING);
+
             // If you are marrying a kingdom ruler as a kingdom ruler yourself,
             // the kingdom ruler will have to give up being clan head.
             // Apparently causes issues if this is not done.
@@ -232,9 +234,9 @@ namespace MarryAnyone.Behaviors
                             ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(hero.Clan);
                             if (hero.Clan.Leader == Hero.MainHero)
                             {
-                                MAHelper.Print("No Heirs");
+                                MAHelper.Print("No Heirs", MAHelper.PRINT_TRACE_WEDDING);
                                 DestroyClanAction.Apply(hero.Clan);
-                                MAHelper.Print("Eliminated Player Clan");
+                                MAHelper.Print("Eliminated Player Clan", MAHelper.PRINT_TRACE_WEDDING);
                             }
                         }
                         foreach (Hero companion in hero.Clan.Companions.ToList())
@@ -254,21 +256,26 @@ namespace MarryAnyone.Behaviors
                         hero.Clan = spouse.Clan;
                         var current = Traverse.Create<Campaign>().Property("Current").GetValue<Campaign>();
                         Traverse.Create(current).Property("PlayerDefaultFaction").SetValue(spouse.Clan);
-                        MAHelper.Print("Lowborn Player Married to Kingdom Ruler");
+                        MAHelper.Print("Lowborn Player Married to Kingdom Ruler", MAHelper.PRINT_TRACE_WEDDING);
                     }
                     else
                     {
                         ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(spouse.Clan);
-                        MAHelper.Print("Kingdom Ruler Stepped Down and Married to Player");
+                        MAHelper.Print("Kingdom Ruler Stepped Down and Married to Player", MAHelper.PRINT_TRACE_WEDDING);
                     }
                 }
             }
-#if V2
-            if (spouse.Clan == null)
+            else if (spouse.IsFactionLeader && spouse.IsMinorFactionHero)
+            {
+                ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(spouse.Clan);
+                MAHelper.Print("MinorFaction Ruler Stepped Down and Married to Player", MAHelper.PRINT_TRACE_WEDDING);
+            }
+
+            if (spouse.Clan == null) // Patch V2
             {
                 spouse.Clan = hero.Clan;
             }
-#endif
+
             // New nobility
             MAHelper.OccupationToLord(spouse.CharacterObject);
             if (!spouse.IsNoble)

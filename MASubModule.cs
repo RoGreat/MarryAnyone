@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using TaleWorlds.CampaignSystem.Actions;
 
 namespace MarryAnyone
 {
@@ -20,6 +21,7 @@ namespace MarryAnyone
         public static string ModuleFolderName { get; } = "MarryAnyone";
 
         public static readonly Harmony Harmony = new Harmony(ModuleFolderName);
+        //private bool bPatchOnTick = false;
 
         //public override void NoHarmonyInit()
         //{
@@ -124,6 +126,7 @@ namespace MarryAnyone
 
         }
 #endif
+
         public override void OnGameLoaded(Game game, object initializerObject)
         {
             base.OnGameLoaded(game, initializerObject);
@@ -145,7 +148,7 @@ namespace MarryAnyone
                 foreach (Hero hero in Hero.MainHero.Clan.Heroes)
                     traceHero(hero, "Companion in clan");
 
-            MAHelper.Print("List spouse &amp; Companions END", MAHelper.PrintHow.PrintToLogAndWrite);
+            MAHelper.Print("List spouse and Companions END", MAHelper.PrintHow.PrintToLogAndWrite);
 #endif
 
             if (Hero.MainHero.Spouse != null && Hero.MainHero.Spouse.HeroState == Hero.CharacterStates.Disabled)
@@ -163,8 +166,8 @@ namespace MarryAnyone
                 }
             }
 
-                // Parent patch
-                bool hadSpouse = Hero.MainHero.Spouse != null;
+            // Parent patch
+            bool hadSpouse = Hero.MainHero.Spouse != null;
             bool mainHeroIsFemale = Hero.MainHero.IsFemale;
 
             foreach (Hero hero in Hero.MainHero.Children)
@@ -209,6 +212,7 @@ namespace MarryAnyone
 
         private void AddBehaviors(CampaignGameStarter campaignGameStarter)
         {
+            campaignGameStarter.AddBehavior(new MAPatchBehavior());
             campaignGameStarter.AddBehavior(new MAPerSaveCampaignBehavior());
             campaignGameStarter.AddBehavior(new MARomanceCampaignBehavior());
             campaignGameStarter.AddBehavior(new MAAdoptionCampaignBehavior());

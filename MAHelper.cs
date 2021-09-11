@@ -28,6 +28,11 @@ namespace MarryAnyone
             UpdateLog = 8,
             PrintToLogAndWrite = 12
         }
+#if TRACEWEDDING
+    public const PrintHow PRINT_TRACE_WEDDING = PrintHow.PrintToLog | PrintHow.PrintDisplay;
+#else
+        public const PrintHow PRINT_TRACE_WEDDING = PrintHow.PrintDisplay;
+#endif
 #if TRACELOAD
         public const PrintHow PRINT_TRACE_LOAD = PrintHow.PrintToLog;
 #else
