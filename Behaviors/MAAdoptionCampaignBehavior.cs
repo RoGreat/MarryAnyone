@@ -21,8 +21,6 @@ namespace MarryAnyone.Behaviors
                 if (Hero.MainHero.Children.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
-                    hero.Clan = null;
-                    hero.Clan = Clan.PlayerClan;
                 }
             }
             
@@ -172,8 +170,6 @@ namespace MarryAnyone.Behaviors
                 if (Hero.MainHero.Children.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
-                    hero.Clan = null;
-                    hero.Clan = Clan.PlayerClan;
                 }
             }
 
