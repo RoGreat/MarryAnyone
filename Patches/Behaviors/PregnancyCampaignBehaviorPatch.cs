@@ -27,7 +27,7 @@ namespace MarryAnyone.Patches.Behaviors
                     }
                     _spouses = new List<Hero>();
                     MAHelper.Print(string.Format("DailyTickHero::{0} Pregnant {2}\r\nPolyamory ?= {1}", hero.Name, settings.Polyamory, hero.IsPregnant), MAHelper.PRINT_TEST_PREGNANCY);
-                    if (hero.Spouse is not null && hero == Hero.MainHero)
+                    if (hero.Spouse is not null && hero == Hero.MainHero && hero.CurrentSettlement == hero.Spouse.CurrentSettlement)
                     {
                         _spouses.Add(hero.Spouse);
                         MAHelper.Print("DailyTickHero::Spouse to Collection: " + hero.Spouse, MAHelper.PRINT_TEST_PREGNANCY);
@@ -35,17 +35,17 @@ namespace MarryAnyone.Patches.Behaviors
                     if (settings.Polyamory && hero != Hero.MainHero)
                     {
                         MAHelper.Print("Polyamory");
-                        if (hero.Spouse != Hero.MainHero)
+                        if (hero.Spouse != Hero.MainHero && hero.CurrentSettlement == Hero.MainHero.CurrentSettlement)
                         {
                             _spouses.Add(Hero.MainHero);
                         }
-                        if (Hero.MainHero.Spouse is not null && Hero.MainHero.Spouse != hero)
+                        if (Hero.MainHero.Spouse is not null && Hero.MainHero.Spouse != hero && hero.CurrentSettlement == Hero.MainHero.Spouse.CurrentSettlement)
                         {
                             _spouses.Add(Hero.MainHero.Spouse);
                         }
                         foreach (Hero exSpouse in Hero.MainHero.ExSpouses.Distinct().ToList())
                         {
-                            if (exSpouse != hero && exSpouse.IsAlive)
+                            if (exSpouse != hero && exSpouse.IsAlive && hero.CurrentSettlement == exSpouse.CurrentSettlement)
                             {
                                 _spouses.Add(exSpouse);
                             }
@@ -54,7 +54,7 @@ namespace MarryAnyone.Patches.Behaviors
                     else
                     {
                         // Taken out of polyamory mode
-                        if (hero.Spouse != Hero.MainHero && hero != Hero.MainHero)
+                        if (hero.Spouse != Hero.MainHero && hero != Hero.MainHero && hero.CurrentSettlement == Hero.MainHero.CurrentSettlement)
                         {
                             _spouses.Add(Hero.MainHero);
                         }
@@ -62,7 +62,7 @@ namespace MarryAnyone.Patches.Behaviors
                         {
                             foreach (Hero exSpouse in hero.ExSpouses.Distinct().ToList())
                             {
-                                if (exSpouse.IsAlive)
+                                if (exSpouse.IsAlive && exSpouse.CurrentSettlement == hero.CurrentSettlement)
                                 {
                                     _spouses.Add(exSpouse);
                                 }
