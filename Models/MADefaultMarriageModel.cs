@@ -95,11 +95,7 @@ namespace MarryAnyone.Models
             }
             if ((maidenOrSuitor.Spouse is null && !maidenOrSuitor.ExSpouses.Any(exSpouse => exSpouse.IsAlive)) || isPolygamous || isCheating)
             {
-                if (maidenOrSuitor.IsFemale)
-                {
-                    return maidenOrSuitor.CharacterObject.Age >= Campaign.Current.Models.MarriageModel.MinimumMarriageAgeFemale;
-                }
-                return maidenOrSuitor.CharacterObject.Age >= Campaign.Current.Models.MarriageModel.MinimumMarriageAgeMale;
+                return maidenOrSuitor.CharacterObject.Age >= settings.MinMarriageAge;
             }
             return false;
         }

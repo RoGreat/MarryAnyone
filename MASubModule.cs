@@ -22,6 +22,7 @@ namespace MarryAnyone
         {
             ReplaceModel<MADefaultMarriageModel, DefaultMarriageModel>();
             ReplaceModel<MARomanceModel, DefaultRomanceModel>();
+            ReplaceModel<MAPregnancyModel, DefaultPregnancyModel>();
         }
 
         protected override void OnSubModuleLoad()

@@ -3,6 +3,7 @@ using MarryAnyone.Settings;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
@@ -17,7 +18,7 @@ namespace MarryAnyone.Patches.Behaviors
         private static void Prefix(Hero hero)
         {
             ISettingsProvider settings = new MASettings();
-            if (hero.IsFemale && hero.IsAlive && hero.Age > Campaign.Current.Models.AgeModel.HeroComesOfAge )
+            if (hero.IsFemale && hero.IsAlive && hero.Age > settings.MinPregnancyAge )
             {
                 // If you are the MainHero go through advanced process
                 if (hero == Hero.MainHero || hero == Hero.MainHero.Spouse || Hero.MainHero.ExSpouses.Contains(hero))
@@ -138,6 +139,21 @@ namespace MarryAnyone.Patches.Behaviors
                 }
             }
         }
+        
+        //Sets the games age check to 0 for pregnancy
+        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+            MAHelper.Print("doing transpiler");
+            for (var i = 0; i < codes.Count; i++)
+            {
+                if(codes[i].opcode == OpCodes.Ldc_R4 && (float)codes[i].operand == 18f){
+                    MAHelper.Print("transpiler replaced value");
+                    codes[i].operand = 0f;
+                }
+            }
+            return codes.AsEnumerable();
+        }
 
         private static void Postfix(Hero hero)
         {
@@ -172,6 +188,17 @@ namespace MarryAnyone.Patches.Behaviors
         private static List<Hero>? _spouses;
     }
 
+    //Makes the pregnancy check use the age from this mod instead of default
+    [HarmonyPatch(typeof(PregnancyCampaignBehavior),"HeroPregnancyCheckCondition")]
+    public static class PregnancyCheckPatch
+    {
+        static bool Prefix(ref bool __result,Hero hero){
+            ISettingsProvider settings = new MASettings();
+            __result = hero.IsFemale && hero.IsAlive && hero.Age > settings.MinPregnancyAge &&(hero.Clan == null || !hero.Clan.IsRebelClan) && !CampaignOptions.IsLifeDeathCycleDisabled;
+            return false;
+        }
+    }
+
 
     // Credit to Lazeras
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "RefreshSpouseVisit")]
@@ -204,8 +231,6 @@ namespace MarryAnyone.Patches.Behaviors
                 float heroChance = Campaign.Current.Models.PregnancyModel.GetDailyChanceOfPregnancyForHero(hero) * settings.FertilityBonus;
                 float heroSpouseChance = Campaign.Current.Models.PregnancyModel.GetDailyChanceOfPregnancyForHero(hero.Spouse) * settings.FertilityBonus;
 
-                if (settings.Debug)
-                {
                     MAHelper.Print($"RefreshSpouseVisit " +
                         $"\n Hero: {hero.Name.ToString()}" +
                         $"\n Spouse: {hero.Spouse.Name.ToString()}" +
@@ -215,7 +240,6 @@ namespace MarryAnyone.Patches.Behaviors
                         $"\n Hero ShouldBePregnant: {rndChance <= heroChance}" +
                         $"\n Spouse ShouldBePregnant: {rndChance <= heroSpouseChance}"
                         );
-                }
 
                 if (settings.PregnancyMode == "Default")
                 {

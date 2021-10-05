@@ -24,5 +24,7 @@
         bool RetryCourtship { get; set; }
         string PregnancyMode { get; set; }
         float FertilityBonus { get; set; }
+        float MinMarriageAge { get; set; }
+        float MinPregnancyAge { get; set; }
     }
 }

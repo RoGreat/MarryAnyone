@@ -54,6 +54,10 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=relationship}Relationship Options", GroupOrder = 2)]
         public bool Incest { get; set; } = false;
 
+        [SettingPropertyFloatingInteger("{=min_marriage_age} Min Marriage Age", 0f, 100f, "0.00", RequireRestart = false, Order = 1, HintText = "{=min_marriage_age_desc} Minimum age for marriage to be allowed.")]
+        [SettingPropertyGroup("{=relationship}Relationship Options", GroupOrder = 2)]
+        public float MinMarriageAge { get; set; } = 16.00f;
+
         [SettingPropertyBool("{=debug}Debug", RequireRestart = false, HintText = "{=debug_desc}Displays mod developer debug information in the game's message log.")]
         public bool Debug { get; set; } = false;
 
@@ -96,5 +100,10 @@ namespace MarryAnyone.Settings
             HintText = "{=fertility_bonus_desc}Adds modifier to chance of pregnancy. 100% = No Bonus, 200% = 2x chance. Note: May not do much after ~6-8 kids due to the base pregnancy calculations."),
             SettingPropertyGroup("{=pregnancy}Pregnancy", GroupOrder = 4)]
         public float FertilityBonus { get; set; } = 1.0f;
+
+        [SettingPropertyFloatingInteger("{=min_pregnancy_age} Min Pregnancy Age", 0f, 100f, "0.00", RequireRestart = false, Order = 1, HintText = "{=min_pregnancy_age_desc} Minimum age for pregnancy to be allowed.")]
+        [SettingPropertyGroup("{=pregnancy}Pregnancy", GroupOrder = 4)]
+        public float MinPregnancyAge { get; set; } = 16.00f;
+
     }
 }
