@@ -65,7 +65,15 @@ namespace MarryAnyone
         {
             if (character.Occupation != Occupation.Lord)
             {
-                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(character, Occupation.Lord);
+                if (character.IsHero)
+                {
+                    AccessTools.Property(typeof(Hero), "Occupation").SetValue(character.HeroObject, Occupation.Lord);
+                }
+                else
+                {
+                    AccessTools.Field(typeof(CharacterObject), "_occupation").SetValue(character, Occupation.Lord);
+                }
+                
                 Print("Occupation To Lord");
                 AccessTools.Field(typeof(CharacterObject), "_originCharacter").SetValue(character, CharacterObject.PlayerCharacter);
                 AccessTools.Field(typeof(CharacterObject), "_originCharacterStringId").SetValue(character, CharacterObject.PlayerCharacter.StringId);

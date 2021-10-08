@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.4.4</Version>
+		<Version>2.5.2</Version>
 		<Authors>RoGreat, GrandesMarees, Lazeras</Authors>
 	</PropertyGroup>
 	
@@ -18,7 +18,7 @@
 	
 	<!-- Versions -->
 	<PropertyGroup>
-		<GameVersion>1.6.1</GameVersion>
+		<GameVersion>1.6.3</GameVersion>
 		<MCMVersion>4.3.10</MCMVersion>
 	</PropertyGroup>
 	
