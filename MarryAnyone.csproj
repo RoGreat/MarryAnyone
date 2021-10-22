@@ -106,6 +106,7 @@
     </Reference>
     <Reference Include="StoryMode">
       <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode.dll</HintPath>
+      <Private>false</Private>
     </Reference>
   </ItemGroup>
 

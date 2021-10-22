@@ -345,8 +345,11 @@ namespace MarryAnyone.Behaviors
                 if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
-                    hero.Clan = null;
-                    hero.Clan = Clan.PlayerClan;
+                    if (hero.Clan != Clan.PlayerClan) // Else lost the town govenor post on hero.Clan = null !!
+                    { 
+                        hero.Clan = null;
+                        hero.Clan = Clan.PlayerClan;
+                    }
                 }
             }
 
