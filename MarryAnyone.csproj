@@ -18,7 +18,7 @@
 	
 	<!-- Versions -->
 	<PropertyGroup>
-		<GameVersion>1.6.0</GameVersion>
+		<GameVersion>1.6.1</GameVersion>
 		<MCMVersion>4.3.10</MCMVersion>
 	</PropertyGroup>
 	
@@ -96,10 +96,6 @@
       <HintPath>E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode.ViewModelCollection.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryModeSauve.dll">
-      <HintPath>E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryModeSauve.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
 		<Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\Newtonsoft.Json.dll">
 			<HintPath>%(Identity)</HintPath>
       <Private>False</Private>
@@ -107,6 +103,9 @@
     <Reference Include="$(GameFolder)\Modules\SandBox\bin\Win64_Shipping_Client\SandBox.dll">
       <HintPath>%(Identity)</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="StoryMode">
+      <HintPath>..\..\..\..\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord\Modules\StoryMode\bin\Win64_Shipping_Client\StoryMode.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -12,10 +12,12 @@ namespace MarryAnyone.Patches.Behaviors
     internal class RomanceCampaignBehaviorPatch
     {
         [HarmonyPostfix]
-        [HarmonyPatch("conversation_player_eligible_for_marriage_on_condition")]
+        [HarmonyPatch("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition")]
         private static void Postfix1(ref bool __result)
         {
-            __result = Hero.OneToOneConversationHero is not null && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) is null && Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero);
+            __result = Hero.OneToOneConversationHero != null 
+                && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) == null 
+                && Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero);
         }
 
         [HarmonyPostfix]
