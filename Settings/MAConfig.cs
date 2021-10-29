@@ -15,5 +15,7 @@
         public float AdoptionChance { get; set; } = 0.05f;
         public bool AdoptionTitles { get; set; } = false;
         public bool RetryCourtship { get; set; } = false;
+        public bool SpouseJoinArena { get; set; } = true;
+
     }
 }

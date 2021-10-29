@@ -4,6 +4,7 @@ using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Dropdown;
 using MCM.Abstractions.Settings.Base.PerSave;
 using System.Collections.Generic;
+using System.ComponentModel;
 using TaleWorlds.Localization;
 
 namespace MarryAnyone.Settings
@@ -13,6 +14,7 @@ namespace MarryAnyone.Settings
     // Have to reload save in order for it to work.
     internal class MCMSettings : AttributePerSaveSettings<MCMSettings>, ISettingsProvider
     {
+
         public override string Id { get; } = "MarryAnyone_v2";
 
         public override string DisplayName => TextObjectHelper.Create("{=marryanyone}Marry Anyone {VERSION}", new Dictionary<string, TextObject?>
@@ -54,8 +56,12 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool Incest { get; set; } = false;
 
-        [SettingPropertyBool("{=debug}Debug", RequireRestart = false, HintText = "{=debug_desc}Displays mod developer debug information in the game's message log")]
-        public bool Debug { get; set; } = false;
+        [SettingPropertyBool("{=retry_courtship}Retry Courtship", RequireRestart = false, HintText = "{=retry_courtship_desc}Player can retry courtship after failure")]
+        [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 1)]
+        public bool RetryCourtship { get; set; } = false;
+
+        [SettingPropertyBool("{=spousejoinarena}Spouse(s) join arena", RequireRestart = false, HintText = "{=spousejoinarena_desc}Spouse join arena with you")]
+        public bool SpouseJoinArena { get; set; } = false;
 
         public string Difficulty { get => DifficultyDropdown.SelectedValue; set => DifficultyDropdown.SelectedValue = value; }
         public string SexualOrientation { get => SexualOrientationDropdown.SelectedValue; set => SexualOrientationDropdown.SelectedValue = value; }
@@ -72,8 +78,9 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 2)]
         public bool AdoptionTitles { get; set; } = false;
 
-        [SettingPropertyBool("{=retry_courtship}Retry Courtship", RequireRestart = false, HintText = "{=retry_courtship_desc}Player can retry courtship after failure")]
-        [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 1)]
-        public bool RetryCourtship { get; set; } = false;
+        [SettingPropertyBool("{=debug}Debug", RequireRestart = false, HintText = "{=debug_desc}Displays mod developer debug information in the game's message log")]
+        public bool Debug { get; set; } = false;
+
+
     }
 }

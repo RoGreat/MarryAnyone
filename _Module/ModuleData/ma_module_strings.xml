@@ -22,13 +22,13 @@
 		<string id="str_hero_adopted_hero" text="{=adopted}{ADOPTER.LINK} adopted {ADOPTED_HERO.LINK}."/>
 		<!-- Uppercase In-Laws -->
 		<string id="str_ma_husband_fatherinlaw" text="{=mahusbandfatherinlaw}Father-in-law"/>
-    <string id="str_ma_husband_motherinlaw" text="{=mahusbandmotherinlaw}Mother-in-law"/>
-    <string id="str_ma_husband_sisterinlaw" text="{=mahusbandsisterinlaw}Sister-in-law"/>
-    <string id="str_ma_husband_brotherinlaw" text="{=mahusbandbrotherinlaw}Brother-in-law"/>
-    <string id="str_ma_wife_fatherinlaw" text="{=mawifefatherinlaw}Father-in-law"/>
-    <string id="str_ma_wife_motherinlaw" text="{=mawifemotherinlaw}Mother-in-law"/>
-    <string id="str_ma_wife_sisterinlaw" text="{=mawifesisterinlaw}Sister-in-law"/>
-    <string id="str_ma_wife_brotherinlaw" text="{=mawifebrotherinlaw}Brother-in-law"/>
+		<string id="str_ma_husband_motherinlaw" text="{=mahusbandmotherinlaw}Mother-in-law"/>
+		<string id="str_ma_husband_sisterinlaw" text="{=mahusbandsisterinlaw}Sister-in-law"/>
+		<string id="str_ma_husband_brotherinlaw" text="{=mahusbandbrotherinlaw}Brother-in-law"/>
+		<string id="str_ma_wife_fatherinlaw" text="{=mawifefatherinlaw}Father-in-law"/>
+		<string id="str_ma_wife_motherinlaw" text="{=mawifemotherinlaw}Mother-in-law"/>
+		<string id="str_ma_wife_sisterinlaw" text="{=mawifesisterinlaw}Sister-in-law"/>
+		<string id="str_ma_wife_brotherinlaw" text="{=mawifebrotherinlaw}Brother-in-law"/>
 		<!-- Warning -->
 		<string id="str_warning" text="{=warning}Marry Anyone: Warning"/>
 		<string id="str_dontshowagain" text="{=dontshowagain}Don't Show Again"/>

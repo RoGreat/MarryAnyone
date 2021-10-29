@@ -7,6 +7,8 @@ namespace MarryAnyone.Settings
 {
     internal class MASettings : ISettingsProvider
     {
+
+
         public static bool UsingMCM;
 
         public static bool NoMCMWarning;
@@ -26,6 +28,7 @@ namespace MarryAnyone.Settings
         public float AdoptionChance { get => _provider.AdoptionChance; set => _provider.AdoptionChance = value; }
         public bool AdoptionTitles { get => _provider.AdoptionTitles; set => _provider.AdoptionTitles = value; }
         public bool RetryCourtship { get => _provider.RetryCourtship; set => _provider.RetryCourtship = value; }
+        public bool SpouseJoinArena { get => _provider.SpouseJoinArena; set => _provider.SpouseJoinArena = value; }
 
         public MASettings()
         {
@@ -48,6 +51,7 @@ namespace MarryAnyone.Settings
                     MAConfig.Instance.Incest = config.Incest;
                     MAConfig.Instance.Cheating = config.Cheating;
                     MAConfig.Instance.Debug = config.Debug;
+                    MAConfig.Instance.SpouseJoinArena = config.SpouseJoinArena;
                     MAConfig.Instance.Warning = config.Warning;
                     MAConfig.Instance.Difficulty = config.Difficulty;
                     MAConfig.Instance.SexualOrientation = config.SexualOrientation;

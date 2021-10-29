@@ -21,11 +21,7 @@ namespace MarryAnyone.Behaviors
                 if (Hero.MainHero.Children.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
-                    if (hero.Clan != Clan.PlayerClan) // Else lost the town govenor post on hero.Clan = null !!
-                    {
-                        hero.Clan = null;
-                        hero.Clan = Clan.PlayerClan;
-                    }
+                    MAHelper.PatchHeroPlayerClan(hero);
                 }
             }
             
@@ -175,11 +171,7 @@ namespace MarryAnyone.Behaviors
                 if (Hero.MainHero.Children.Contains(hero))
                 {
                     MAHelper.OccupationToLord(hero.CharacterObject);
-                    if (hero.Clan != Clan.PlayerClan) // Else lost the town govenor post on hero.Clan = null !!
-                    {
-                        hero.Clan = null;
-                        hero.Clan = Clan.PlayerClan;
-                    }
+                    MAHelper.PatchHeroPlayerClan(hero);
                 }
             }
 

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using TaleWorlds.CampaignSystem.Actions;
+using static MarryAnyone.MAHelper;
 
 namespace MarryAnyone
 {
@@ -88,50 +89,12 @@ namespace MarryAnyone
             }
         }
 
-#if TRACELOAD
-        private void traceHero(Hero hero, String prefix)
-        {
-            String aff = (String.IsNullOrWhiteSpace(prefix) ? "" : (prefix + "::")) + hero.Name;
-
-            if (!hero.IsAlive)
-                aff += ", DEAD";
-
-            if (hero.IsDead)
-                aff += ", REALY DEAD";
-
-            if (!hero.IsActive)
-                aff += ", INACTIF";
-
-            aff += ", State " + hero.HeroState;
-
-            if (hero.IsPlayerCompanion)
-                aff += ", PLAYER Companion";
-
-            if (hero.IsPrisoner)
-                aff += ", PRISONER";
-
-            if (hero.Clan != null)
-                aff += ", Clan " + hero.Clan.Name;
-
-            if (hero.MapFaction != null)
-                aff += ", MAP Faction " + hero.MapFaction.Name;
-
-            if (hero.Spouse != null)
-                aff += ", Spouse" + hero.Spouse.Name;
-
-            if (hero.CurrentSettlement != null)
-                aff += ", Settlement " + hero.CurrentSettlement.Name;
-
-            MAHelper.Print(aff, MAHelper.PRINT_TRACE_LOAD);
-
-        }
-#endif
 
         public override void OnGameLoaded(Game game, object initializerObject)
         {
             base.OnGameLoaded(game, initializerObject);
 
-
+            MAHelper.MAEtape = Etape.EtapeLoad;
 #if TRACELOAD
             MAHelper.Print(String.Format("Chemin output : '{0}'", MAHelper.LogPath), MAHelper.PrintHow.PrintForceDisplay);
 

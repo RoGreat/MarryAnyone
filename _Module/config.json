@@ -5,6 +5,7 @@
 	"Polyamory": false,
 	"Incest": false,
 	"Cheating": false,
+	"SpouseJoinArena": false,
 	"Adoption": false,
 	"AdoptionChance": 0.05,
 	"AdoptionTitles": false,

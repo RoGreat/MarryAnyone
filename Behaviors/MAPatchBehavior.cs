@@ -18,10 +18,20 @@ namespace MarryAnyone.Behaviors
 
             List<Hero> spouses = new List<Hero>();
             if (Hero.MainHero.Spouse != null)
+            {
                 spouses.Add(Hero.MainHero.Spouse);
+#if TRACELOAD
+                MAHelper.traceHero(Hero.MainHero.Spouse, "MainSpouse"); 
+#endif
 
-            foreach (Hero hero in Hero.MainHero.ExSpouses)
+            }
+
+            foreach (Hero hero in Hero.MainHero.ExSpouses) {
                 spouses.Add(hero);
+#if TRACELOAD
+                MAHelper.traceHero(hero, "OtherSpouse");
+#endif
+            }
 
             foreach (Clan clan in Clan.FindAll(c => c.IsClan))
             {
@@ -75,11 +85,39 @@ namespace MarryAnyone.Behaviors
                         MAHelper.Print(String.Format("PATCH Leader for the clan {0} SUCCESS swap the leader from {1} to {2}", clan.Name, ancLeader.Name, clan.Leader == null ? "NULL" : clan.Leader.Name), MAHelper.PRINT_PATCH);
                 }
             }
+
+            foreach (Hero hero in spouses)
+            {
+                MAHelper.PatchHeroPlayerClan(hero);
+            }
+
+#if TRACELOAD
+            // Voir HeroAgentSpawnCampaignBehavior.AddPartyHero
+
+            foreach (Hero hero in Clan.PlayerClan.Lords)
+            {
+                MAHelper.traceHero(hero, "PlayerClan Lords");
+            }
+            using (IEnumerator<Hero> enumerator2 = Hero.MainHero.CompanionsInParty.GetEnumerator())
+            {
+                while (enumerator2.MoveNext())
+                {
+                    Hero companion = enumerator2.Current;
+                    MAHelper.traceHero(companion, "Companion");
+                }
+            }
+
+#endif
             MAHelper.Print(String.Format("patchClanLeader {0}", (bPatchExecute ? "OK SUCCESS" : "RAS")) , MAHelper.PRINT_PATCH | (bPatchExecute ? MAHelper.PrintHow.PrintForceDisplay : 0));
         }
 
         private void OnSessionLaunched(CampaignGameStarter cgs)
         {
+
+            MAHelper.MASettingsClean();
+
+            MAHelper.MAEtape = MAHelper.Etape.EtapeLoadPas2;
+
             // Kingdom patch
             foreach (Kingdom kingdom in Kingdom.All)
             {
@@ -98,7 +136,6 @@ namespace MarryAnyone.Behaviors
             }
 
             patchClanLeader();
-
         }
 
 

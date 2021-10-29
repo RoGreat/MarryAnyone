@@ -19,6 +19,24 @@ namespace MarryAnyone
         private static StreamWriter? _sw = null;
         private static bool _needToSupprimeFichier = false;
 
+        public static MASettings MASettings
+        {
+            get
+            {
+                if (_MASettings == null)
+                    _MASettings = new MASettings();
+                return _MASettings;
+            }
+        }
+
+        private static MASettings? _MASettings = null;
+
+        public static void MASettingsClean()
+        {
+            _MASettings = null;
+        }
+
+
         public enum PrintHow // Bitwise enumération
         {
             PrintRAS = 0,
@@ -28,15 +46,25 @@ namespace MarryAnyone
             UpdateLog = 8,
             PrintToLogAndWrite = 12
         }
+
+        public enum Etape
+        {
+            EtapeInitialize = 1,
+            EtapeLoad = 2,
+            EtapeLoadPas2 = 4,
+        }
+
+        public static Etape MAEtape;
+
 #if TRACEWEDDING
-    public const PrintHow PRINT_TRACE_WEDDING = PrintHow.PrintToLog | PrintHow.PrintDisplay;
+        public const PrintHow PRINT_TRACE_WEDDING = PrintHow.PrintToLog | PrintHow.PrintDisplay;
 #else
         public const PrintHow PRINT_TRACE_WEDDING = PrintHow.PrintDisplay;
 #endif
 #if TRACELOAD
         public const PrintHow PRINT_TRACE_LOAD = PrintHow.PrintToLog;
 #else
-        public const PrintHow PRINT_TRACE_LOAD = PrintHow.PrintRAS;
+        public const PrintHow PRINT_TRACE_LOAD = PrintHow.PrintDisplay;
 #endif
 #if TESTPREGNANCY
         public const PrintHow PRINT_TEST_PREGNANCY = PrintHow.PrintToLog | PrintHow.PrintDisplay;
@@ -67,10 +95,10 @@ namespace MarryAnyone
         }
         private static string? _logPath;
 
+
         public static void Print(string message, PrintHow printHow = PrintHow.PrintRAS)
         {
-            ISettingsProvider settings = new MASettings();
-            if (settings.Debug || (printHow & PrintHow.PrintForceDisplay) !=0)
+            if ((MASettings.Debug  && (printHow & PrintHow.PrintDisplay) != 0)  || (printHow & PrintHow.PrintForceDisplay) !=0)
             {
                 // Custom purple!
                 Color color = new(0.6f, 0.2f, 1f);
@@ -202,5 +230,73 @@ namespace MarryAnyone
                 AccessTools.Field(typeof(CharacterObject), "_originCharacterStringId").SetValue(character, CharacterObject.PlayerCharacter.StringId);
             }
         }
+
+        public static bool PatchHeroPlayerClan(Hero hero)
+        {
+            if (hero.Clan != Clan.PlayerClan
+                || (Clan.PlayerClan != null && Clan.PlayerClan.Lords.IndexOf(hero) < 0)) // Else lost the town govenor post on hero.Clan = null !!
+            {
+                hero.Clan = null;
+                hero.Clan = Clan.PlayerClan;
+                Print("Patch Hero with PlayerClan " + hero.Name.ToString());
+                return true;
+            }
+            return false;
+        }
+
+#if TRACELOAD
+        public static void traceHero(Hero hero, String prefix)
+        {
+            String aff = (String.IsNullOrWhiteSpace(prefix) ? "" : (prefix + "::")) + hero.Name;
+
+            if (!hero.IsAlive)
+                aff += ", DEAD";
+
+            if (hero.IsDead)
+                aff += ", REALY DEAD";
+
+            if (!hero.IsActive)
+                aff += ", INACTIF";
+
+            aff += ", State " + hero.HeroState;
+
+            if (hero.IsPlayerCompanion)
+                aff += ", PLAYER Companion";
+
+            if (hero.IsPrisoner)
+                aff += ", PRISONER";
+
+            if (hero.Clan != null)
+                aff += ", Clan " + hero.Clan.Name;
+
+            if (hero.MapFaction != null)
+                aff += ", MAP Faction " + hero.MapFaction.Name;
+
+            if (hero.Spouse != null)
+                aff += ", Spouse" + hero.Spouse.Name;
+
+            if (hero.CurrentSettlement != null)
+                aff += ", Settlement " + hero.CurrentSettlement.Name;
+
+            if (MAEtape >= Etape.EtapeLoadPas2)
+            {
+                if (hero.PartyBelongedTo != null)
+                    aff += ", In Party " + hero.PartyBelongedTo.Name;
+
+                if (hero.IsSpecial)
+                    aff += ", IS Special";
+
+                if (hero.IsTemplate)
+                    aff += ", IS Tempalte";
+
+                if (hero.IsPreacher)
+                    aff += ", IS Preacher";
+            }
+
+            MAHelper.Print(aff, MAHelper.PRINT_TRACE_LOAD);
+
+        }
+#endif
+
     }
 }

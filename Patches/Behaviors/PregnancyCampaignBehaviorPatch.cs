@@ -11,7 +11,7 @@ namespace MarryAnyone.Patches.Behaviors
     // Add in a setting for enabling polyamory so it does not have to be a harem
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "DailyTickHero")]
     internal class PregnancyCampaignBehaviorPatch
-    {
+    { 
         private static void Prefix(Hero hero)
         {
             if (hero.IsFemale && hero.IsAlive && hero.Age > Campaign.Current.Models.AgeModel.HeroComesOfAge)

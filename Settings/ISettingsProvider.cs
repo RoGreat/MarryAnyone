@@ -13,5 +13,6 @@
         float AdoptionChance { get; set; }
         bool AdoptionTitles { get; set; }
         bool RetryCourtship { get; set; }
+        bool SpouseJoinArena { get; set; }
     }
 }
