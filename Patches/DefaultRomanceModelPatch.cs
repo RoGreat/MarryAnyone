@@ -26,7 +26,11 @@ namespace MarryAnyone.Patches
                 && (person1.Clan == null || Romance.GetCourtedHeroInOtherClan(person2, person1) == null)
                 && Campaign.Current.Models.MarriageModel.IsCoupleSuitableForMarriage(person1, person2);
 
-            return false; // On retourne fals pour inhiber l'appel classique
+#if TESTROMANCE
+            MAHelper.Print(String.Format("CourtshipPossibleBetweenNPCs entre {0} et {1} répond {2}", person1.Name.ToString(), person2.Name.ToString(), __result.ToString()), MAHelper.PRINT_TEST_ROMANCE) ;
+#endif
+
+            return false; // On retourne false pour inhiber l'appel classique
         }
 
     }

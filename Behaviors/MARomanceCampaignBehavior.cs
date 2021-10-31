@@ -58,15 +58,14 @@ namespace MarryAnyone.Behaviors
 
                 if (Hero.OneToOneConversationHero.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge)
                 {
-                    ISettingsProvider settings = new MASettings();
-                    if (settings.Debug)
+                    if (MAHelper.MASettings.Debug)
                     {
-                        MAHelper.Print("MCM: " + MASettings.UsingMCM);
-                        MAHelper.Print("Difficulty: " + settings.Difficulty);
-                        MAHelper.Print("Orientation: " + settings.SexualOrientation);
-                        MAHelper.Print("Cheating: " + settings.Cheating);
-                        MAHelper.Print("Polygamy: " + settings.Polygamy);
-                        MAHelper.Print("Incest: " + settings.Incest);
+                        MAHelper.Print("MCM: " + MASettings.UsingMCM, MAHelper.PrintHow.PrintDisplay);
+                        MAHelper.Print("Difficulty: " + MAHelper.MASettings.Difficulty, MAHelper.PrintHow.PrintDisplay);
+                        MAHelper.Print("Orientation: " + MAHelper.MASettings.SexualOrientation, MAHelper.PrintHow.PrintDisplay);
+                        MAHelper.Print("Cheating: " + MAHelper.MASettings.Cheating, MAHelper.PrintHow.PrintDisplay);
+                        MAHelper.Print("Polygamy: " + MAHelper.MASettings.Polygamy, MAHelper.PrintHow.PrintDisplay);
+                        MAHelper.Print("Incest: " + MAHelper.MASettings.Incest, MAHelper.PrintHow.PrintDisplay);
                         MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
                     }
 
@@ -85,7 +84,9 @@ namespace MarryAnyone.Behaviors
                         }
                     }
                 }
-                MAHelper.Print(String.Format("conversation_begin_courtship_for_hero_on_condition(V2) with {0} va répondre {1}", Hero.OneToOneConversationHero.Name, ret.ToString()), MAHelper.PRINT_TEST_ROMANCE);
+#if TESTROMANCE
+                MAHelper.Print(String.Format("conversation_begin_courtship_for_hero_on_condition(V2) with {0} va répondre {1}", Hero.OneToOneConversationHero.Name, ret.ToString()), MAHelper.PRINT_TEST_ROMANCE | MAHelper.PrintHow.PrintToLogAndWrite);
+#endif
                 return ret;
             }
             return false;
@@ -216,8 +217,9 @@ namespace MarryAnyone.Behaviors
             Hero oldSpouse = hero.Spouse;
             Hero cheatedSpouse = spouse.Spouse;
 
+#if TRACEWEDDING
             MAHelper.Print("conversation_courtship_success_on_consequence::", MAHelper.PRINT_TRACE_WEDDING);
-
+#endif
             // If you are marrying a kingdom ruler as a kingdom ruler yourself,
             // the kingdom ruler will have to give up being clan head.
             // Apparently causes issues if this is not done.
@@ -287,12 +289,12 @@ namespace MarryAnyone.Behaviors
             if (spouse.PartyBelongedTo == MobileParty.MainParty)
             {
                 AccessTools.Property(typeof(Hero), "PartyBelongedTo").SetValue(spouse, null, null);
-                MAHelper.Print("Spouse Already in Player's Party");
+                MAHelper.Print("Spouse Already in Player's Party", MAHelper.PRINT_TRACE_WEDDING);
                 dodge = true;
             }
             // Apply marriage
             ChangeRomanticStateAction.Apply(hero, spouse, Romance.RomanceLevelEnum.Marriage);
-            MAHelper.Print("Marriage Action Applied");
+            MAHelper.Print("Marriage Action Applied", MAHelper.PRINT_TRACE_WEDDING);
             if (oldSpouse is not null)
             {
                 MAHelper.RemoveExSpouses(oldSpouse);
@@ -310,18 +312,18 @@ namespace MarryAnyone.Behaviors
             if (!spouse.IsActive)
             {
                 spouse.ChangeState(Hero.CharacterStates.Active);
-                MAHelper.Print("Activated Spouse");
+                MAHelper.Print("Activated Spouse", MAHelper.PRINT_TRACE_WEDDING);
             }
             if (spouse.IsPlayerCompanion)
             {
                 spouse.CompanionOf = null;
-                MAHelper.Print("Spouse No Longer Companion");
+                MAHelper.Print("Spouse No Longer Companion", MAHelper.PRINT_TRACE_WEDDING);
             }
             if (settings.Cheating && cheatedSpouse is not null)
             {
                 MAHelper.RemoveExSpouses(cheatedSpouse, true);
                 MAHelper.RemoveExSpouses(spouse, true);
-                MAHelper.Print("Spouse Broke Off Past Marriage");
+                MAHelper.Print("Spouse Broke Off Past Marriage", MAHelper.PRINT_TRACE_WEDDING);
             }
             MAHelper.RemoveExSpouses(hero);
             MAHelper.RemoveExSpouses(spouse);

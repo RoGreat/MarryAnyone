@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.3.5</Version>
+		<Version>2.3.6</Version>
 		<Authors>RoGreat, GrandesMarees</Authors>
 	</PropertyGroup>
 	
@@ -33,7 +33,8 @@
 	
   <PropertyGroup>
     <!--Windows-->
-    <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
+	<GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">E:\Mount &amp; Blade II 161 Steam</GameFolder>
+	<GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
     <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 261550@InstallLocation)</GameFolder>
     <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
     <!--Unix-->
@@ -45,7 +46,7 @@
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DefineConstants>TRACE;RELEASE</DefineConstants>
+    <DefineConstants>RELEASE,V1620,V2</DefineConstants>
   </PropertyGroup>
 
   <!-- NuGet References -->

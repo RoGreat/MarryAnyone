@@ -56,12 +56,13 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool Incest { get; set; } = false;
 
+        [SettingPropertyBool("{=spousejoinarena}Spouse(s) join arena", RequireRestart = false, HintText = "{=spousejoinarena_desc}Spouse join arena with you")]
+        [SettingPropertyGroup("{=relationship}Relationship Options")]
+        public bool SpouseJoinArena { get; set; } = false;
+
         [SettingPropertyBool("{=retry_courtship}Retry Courtship", RequireRestart = false, HintText = "{=retry_courtship_desc}Player can retry courtship after failure")]
         [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 1)]
         public bool RetryCourtship { get; set; } = false;
-
-        [SettingPropertyBool("{=spousejoinarena}Spouse(s) join arena", RequireRestart = false, HintText = "{=spousejoinarena_desc}Spouse join arena with you")]
-        public bool SpouseJoinArena { get; set; } = false;
 
         public string Difficulty { get => DifficultyDropdown.SelectedValue; set => DifficultyDropdown.SelectedValue = value; }
         public string SexualOrientation { get => SexualOrientationDropdown.SelectedValue; set => SexualOrientationDropdown.SelectedValue = value; }

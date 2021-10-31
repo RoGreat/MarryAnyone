@@ -24,9 +24,11 @@ namespace MarryAnyone.Models
             {
                 if (firstHero.Clan == null || secondHero.Clan == null)
                 {
+#if TESTROMANCE
                     MAHelper.Print(string.Format("SuitableForMarriage:: entre {0} et {1} Echoue car il manque au moins un clan"
                                     , firstHero.Name.ToString(), secondHero.Name.ToString())
                                     , MAHelper.PRINT_TEST_ROMANCE);
+#endif
                     return false;
                 }
             }
@@ -45,25 +47,31 @@ namespace MarryAnyone.Models
                 if (discoverAncestors)
                 {
                     List<Hero> ancetresEnCommun = DiscoverAncestors(firstHero, 3).Intersect(DiscoverAncestors(secondHero, 3)).ToList<Hero>();
+#if TESTROMANCE
                     MAHelper.Print(string.Format("SuitableForMarriage:: entre {0} et {1} Ancetres en commun {2}"
                                     , firstHero.Name.ToString(), secondHero.Name.ToString()
                                     , string.Join(", ", ancetresEnCommun.Select<Hero, string>(x => x.Name.ToString())))
                                     , MAHelper.PRINT_TEST_ROMANCE);
+#endif
                     return false;
                 }
             }
             if (isHomosexual)
             {
+#if TESTROMANCE
                 MAHelper.Print(string.Format("SuitableForMarriage::Homo entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
                         , (firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriageStatic(firstHero) && IsSuitableForMarriageStatic(secondHero)))
                         , MAHelper.PRINT_TEST_ROMANCE);
+#endif
                 return firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriageStatic(firstHero) && IsSuitableForMarriageStatic(secondHero);
             }
             if (isBisexual)
             {
+#if TESTROMANCE
                 MAHelper.Print(string.Format("SuitableForMarriage::Bi entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()
                         , (IsSuitableForMarriageStatic(firstHero) && IsSuitableForMarriageStatic(secondHero)))
                         , MAHelper.PRINT_TEST_ROMANCE);
+#endif
                 return IsSuitableForMarriageStatic(firstHero) && IsSuitableForMarriageStatic(secondHero);
             }
             MAHelper.Print(string.Format("SuitableForMarriage::Hétéro entre {0} et {1} répond {2}", firstHero.Name.ToString(), secondHero.Name.ToString()

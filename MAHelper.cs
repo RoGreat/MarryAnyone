@@ -91,10 +91,41 @@ namespace MarryAnyone
             {
                 _logPath = value;
                 _needToSupprimeFichier = true;
+
             }
         }
         private static string? _logPath;
 
+        public static string VersionGet
+        {
+            get { 
+                if (_version == null) {
+                    //_version = Assembly.GetEntryAssembly().GetCustomAttributes<Version>().ToString();
+                    _version = typeof(MASubModule).Assembly.GetName().Version.ToString();
+                    //_version = Version.
+                    if (_version == null)
+                        _version = "Retrieve Version FAIL";
+                }
+                return _version;
+            }
+
+        }
+        private static string? _version = null;
+
+        public static string ModuleNameGet
+        {
+            get
+            {
+                if (_moduleName == null)
+                {
+                    _moduleName = typeof(MASubModule).Assembly.GetName().Name.ToString();
+                    if (_moduleName == null)
+                        _moduleName = "Retrieve module name FAIL";
+                }
+                return _moduleName;
+            }
+        }
+        private static string? _moduleName = null;
 
         public static void Print(string message, PrintHow printHow = PrintHow.PrintRAS)
         {
@@ -147,8 +178,7 @@ namespace MarryAnyone
             if (_sw != null)
             {
                 //string version = ModuleInfo.GetModules().Where(x => x.Name == "Tournaments XPanded").FirstOrDefault().Version.ToString();
-                string version = "MarryAnyOne v160";
-                _sw.WriteLine(string.Concat("(", version, ") ", prefix != null ? prefix + "" : "", "[", DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss"), "]::", text));
+                _sw.WriteLine(string.Concat(ModuleNameGet, "(", VersionGet, ") ", prefix != null ? prefix + "" : "", "[", DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss"), "]::", text));
             }
         }
 
@@ -182,7 +212,7 @@ namespace MarryAnyone
 
         public static void Error(Exception exception)
         {
-            String message = "Marry Anyone: " + exception.Message;
+            String message = ModuleNameGet + ": " + exception.Message;
             InformationManager.DisplayMessage(new InformationMessage(message, Colors.Red));
             Log(message, "ERROR");
         }
