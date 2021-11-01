@@ -44,7 +44,9 @@ namespace MarryAnyone
             PrintForceDisplay = 2,
             PrintToLog = 4,
             UpdateLog = 8,
-            PrintToLogAndWrite = 12
+            PrintToLogAndWrite = 12,
+            PrintToLogAndWriteAndDisplay = 13,
+            PrintToLogAndWriteAndForceDisplay = 14
         }
 
         public enum Etape
@@ -72,16 +74,15 @@ namespace MarryAnyone
         public const PrintHow PRINT_TEST_PREGNANCY = PrintHow.PrintDisplay;
 #endif
 #if TESTROMANCE
-        public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintToLog;
+        public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintToLog | PrintHow.UpdateLog;
 #else
         public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintRAS;
 #endif
 #if TRACELOAD
         public const PrintHow PRINT_PATCH = PrintHow.PrintToLog | PrintHow.UpdateLog;
-#elif TESTROMANCE
         public const PrintHow PRINT_PATCH = PrintHow.PrintToLog | PrintHow.PrintForceDisplay;
 #else
-        public const PrintHow PRINT_PATCH = PrintHow.PrintRAS;
+        public const PrintHow PRINT_PATCH = PrintHow.PrintToLogAndWrite;
 #endif
 
         public static string? LogPath 
@@ -255,7 +256,9 @@ namespace MarryAnyone
             if (character.Occupation != Occupation.Lord)
             {
                 AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(character, Occupation.Lord);
-                Print("Occupation To Lord");
+
+                Print(String.Format("Swap Occupation To Lord for {0}", character.Name.ToString()), PrintHow.PrintToLogAndWriteAndDisplay);
+
                 AccessTools.Field(typeof(CharacterObject), "_originCharacter").SetValue(character, CharacterObject.PlayerCharacter);
                 AccessTools.Field(typeof(CharacterObject), "_originCharacterStringId").SetValue(character, CharacterObject.PlayerCharacter.StringId);
             }
@@ -268,14 +271,29 @@ namespace MarryAnyone
             {
                 hero.Clan = null;
                 hero.Clan = Clan.PlayerClan;
-                Print("Patch Hero with PlayerClan " + hero.Name.ToString());
+                Print("Patch Hero with PlayerClan " + hero.Name.ToString(), PrintHow.PrintToLogAndWriteAndDisplay);
                 return true;
             }
             return false;
         }
 
-#if TRACELOAD
-        public static void traceHero(Hero hero, String prefix)
+        public static List<Hero> ListClanLord(Hero hero)
+        {
+            List<Hero> ret = new List<Hero>();
+            ret.Add(hero);
+            if (hero.Clan != null)
+            {
+                foreach(Hero h in hero.Clan.Lords) 
+                {
+                    if (h != hero)
+                        ret.Add(h);
+                }
+            }
+            return ret;
+        }
+
+#if TRACELOAD || TESTROMANCE
+        public static String TraceHero(Hero hero, String prefix = null)
         {
             String aff = (String.IsNullOrWhiteSpace(prefix) ? "" : (prefix + "::")) + hero.Name;
 
@@ -289,6 +307,9 @@ namespace MarryAnyone
                 aff += ", INACTIF";
 
             aff += ", State " + hero.HeroState;
+
+            if (hero.IsWanderer)
+                aff += ", Wanderer";
 
             if (hero.IsPlayerCompanion)
                 aff += ", PLAYER Companion";
@@ -323,7 +344,7 @@ namespace MarryAnyone
                     aff += ", IS Preacher";
             }
 
-            MAHelper.Print(aff, MAHelper.PRINT_TRACE_LOAD);
+            return aff;
 
         }
 #endif

@@ -22,17 +22,17 @@ namespace MarryAnyone.Util
 
             if (hero.Spouse != null && hero.Spouse == otherHero)
             {
-                MAHelper.Print(String.Format("AreMarried SUCCESS because {0} marry {1}", hero.Name, otherHero.Name));
+                MAHelper.Print(String.Format("AreMarried SUCCESS because {0} marry {1}", hero.Name, otherHero.Name), MAHelper.PRINT_TRACE_WEDDING);
                 return true;
             }
 
             if (hero.ExSpouses != null && hero.ExSpouses.FirstOrDefault<Hero>(x => x == otherHero) != null)
             {
-                MAHelper.Print(String.Format("AreMarried SUCCESS because {0} hax {1} in his ex-spouses", hero.Name, otherHero.Name));
+                MAHelper.Print(String.Format("AreMarried SUCCESS because {0} hax {1} in his ex-spouses", hero.Name, otherHero.Name), MAHelper.PRINT_TRACE_WEDDING);
                 return true;
             }
 
-            MAHelper.Print(String.Format("AreMarried FAIL for {0} and {1}", hero.Name, otherHero.Name));
+            MAHelper.Print(String.Format("AreMarried FAIL for {0} and {1}", hero.Name, otherHero.Name), MAHelper.PRINT_TRACE_WEDDING);
             return false;
         }
 

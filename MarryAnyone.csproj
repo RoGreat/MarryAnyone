@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.3.6</Version>
+		<Version>2.3.7</Version>
 		<Authors>RoGreat, GrandesMarees</Authors>
 	</PropertyGroup>
 	
@@ -46,7 +46,8 @@
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DefineConstants>RELEASE,V1620,V2</DefineConstants>
+    <!-- <DefineConstants>RELEASE,V1610,V2,TESTROMANCE,TRACEWEDDING</DefineConstants> -->
+	  <DefineConstants>RELEASE,V1610,V2</DefineConstants>
   </PropertyGroup>
 
   <!-- NuGet References -->

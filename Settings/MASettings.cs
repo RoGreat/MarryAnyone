@@ -9,6 +9,9 @@ namespace MarryAnyone.Settings
     {
 
 
+        public const String DIFFICULTY_VERY_EASY = "Very Easy";
+        public const String DIFFICULTY_EASY = "Easy";
+
         public static bool UsingMCM;
 
         public static bool NoMCMWarning;
