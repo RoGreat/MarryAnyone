@@ -59,7 +59,7 @@ namespace MarryAnyone
         public static Etape MAEtape;
 
 #if TRACEWEDDING
-        public const PrintHow PRINT_TRACE_WEDDING = PrintHow.PrintToLog | PrintHow.PrintDisplay;
+        public const PrintHow PRINT_TRACE_WEDDING = PrintHow.PrintToLogAndWriteAndDisplay;
 #else
         public const PrintHow PRINT_TRACE_WEDDING = PrintHow.PrintDisplay;
 #endif
@@ -255,7 +255,14 @@ namespace MarryAnyone
         {
             if (character.Occupation != Occupation.Lord)
             {
-                AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(character, Occupation.Lord);
+#if V1640
+                //Hero hero = character.HeroObject;
+                //if (hero != null)
+                //    AccessTools.Property(typeof(Hero), "Occupation").SetValue(hero, Occupation.Lord);
+                AccessTools.Field(typeof(CharacterObject), "_occupation").SetValue(character, Occupation.Lord);
+#else
+                    AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(character, Occupation.Lord);
+#endif
 
                 Print(String.Format("Swap Occupation To Lord for {0}", character.Name.ToString()), PrintHow.PrintToLogAndWriteAndDisplay);
 
@@ -292,7 +299,7 @@ namespace MarryAnyone
             return ret;
         }
 
-#if TRACELOAD || TESTROMANCE
+#if TRACELOAD || TESTROMANCE || TRACEWEDDING
         public static String TraceHero(Hero hero, String prefix = null)
         {
             String aff = (String.IsNullOrWhiteSpace(prefix) ? "" : (prefix + "::")) + hero.Name;

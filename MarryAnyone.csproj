@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.3.7</Version>
+		<Version>2.3.9</Version>
 		<Authors>RoGreat, GrandesMarees</Authors>
 	</PropertyGroup>
 	
@@ -18,7 +18,7 @@
 	
 	<!-- Versions -->
 	<PropertyGroup>
-		<GameVersion>1.6.1</GameVersion>
+		<GameVersion>1.6.4</GameVersion>
 		<MCMVersion>4.3.10</MCMVersion>
 	</PropertyGroup>
 	
@@ -33,7 +33,8 @@
 	
   <PropertyGroup>
     <!--Windows-->
-	<GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">E:\Mount &amp; Blade II 161 Steam</GameFolder>
+	  <!-- <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">E:\Mount &amp; Blade II 161 Steam</GameFolder>
+	<GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">E:\Mount &amp; Blade II 162 Steam</GameFolder> -->
 	<GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">E:\SteamLibrary\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
     <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Steam App 261550@InstallLocation)</GameFolder>
     <GameFolder Condition="$(GameFolder) == '' AND $(OS) == 'Windows_NT'">C:\Program Files (x86)\Steam\steamapps\common\Mount &amp; Blade II Bannerlord</GameFolder>
@@ -42,12 +43,15 @@
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DefineConstants>TRACE;DEBUG;V2,TRACELOCATION,TESTROMANCE</DefineConstants>
+    <DefineConstants>TRACE,DEBUG,V2,V1640TRACELOCATION,TESTROMANCE</DefineConstants>
   </PropertyGroup>
 	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <!-- <DefineConstants>RELEASE,V1610,V2,TESTROMANCE,TRACEWEDDING</DefineConstants> -->
+	  <!-- <DefineConstants>RELEASE,V1610,V2,TESTROMANCE,TRACEWEDDING</DefineConstants>
 	  <DefineConstants>RELEASE,V1610,V2</DefineConstants>
+	  <DefineConstants>RELEASE,V1620,V2</DefineConstants>-->
+	  <DefineConstants>RELEASE,V2,V1640,TESTROMANCE,TRACEWEDDING</DefineConstants>
+	  <!--  -->
   </PropertyGroup>
 
   <!-- NuGet References -->

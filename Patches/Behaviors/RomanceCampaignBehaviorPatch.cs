@@ -4,6 +4,7 @@ using MarryAnyone.Settings;
 using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
+using TaleWorlds.CampaignSystem.Barterables;
 using TaleWorlds.CampaignSystem.SandBox.CampaignBehaviors;
 using TaleWorlds.Localization;
 
@@ -216,9 +217,11 @@ namespace MarryAnyone.Patches.Behaviors
                 && (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero) 
                 && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
 
-            if (__result && Hero.OneToOneConversationHero.Clan == null)
+            if (__result && (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan == Hero.MainHero.Clan))
             {
+#if TESTROMANCE
                 MAHelper.Print("RomanceCampaignBehaviorPatch:: conversation_finalize_courtship_for_hero_on_conditionPatch::FAIL car pas de clan (MARomanceCampaignBehavior work)", MAHelper.PRINT_TEST_ROMANCE);
+#endif
                 __result = false;
             }
 
@@ -268,12 +271,23 @@ namespace MarryAnyone.Patches.Behaviors
             PartyBase mainParty = PartyBase.MainParty;
             MobileParty partyBelongedTo = Hero.OneToOneConversationHero.PartyBelongedTo;
 
-            if (oneToOneConversationHero.Clan != null && oneToOneConversationHero.Clan.Leader != oneToOneConversationHero && oneToOneConversationHero.Spouse != mainHero)
+            if (heroBeingProposedTo.Clan != null && heroBeingProposedTo.Clan.Leader != heroBeingProposedTo && heroBeingProposedTo.Spouse != mainHero)
             {
+#if TESTROMANCE
+                MAHelper.Print("StartBarterOffer", MAHelper.PRINT_TEST_ROMANCE);
+#endif
+#if V1640
+                MarriageBarterable marriageBarterable = new MarriageBarterable(Hero.MainHero, PartyBase.MainParty, heroBeingProposedTo, Hero.MainHero);
                 bmInstance.StartBarterOffer(mainHero, oneToOneConversationHero, mainParty, (partyBelongedTo != null) ? partyBelongedTo.Party : null, null, (Barterable barterable, BarterData _args, object obj)
                             => BarterManager.Instance.InitializeMarriageBarterContext(barterable, _args
                                                     , new Tuple<Hero, Hero>(heroBeingProposedTo, Hero.MainHero))
-                                                    , (int)Romance.GetRomanticState(Hero.MainHero, heroBeingProposedTo).ScoreFromPersuasion, false, null);
+                                                    , score, false, new Barterable[] { marriageBarterable  });
+#else
+                bmInstance.StartBarterOffer(mainHero, oneToOneConversationHero, mainParty, (partyBelongedTo != null) ? partyBelongedTo.Party : null, null, (Barterable barterable, BarterData _args, object obj)
+                            => BarterManager.Instance.InitializeMarriageBarterContext(barterable, _args
+                                                    , new Tuple<Hero, Hero>(heroBeingProposedTo, Hero.MainHero))
+                                                    , score, false, null);
+#endif
             }
             if (PlayerEncounter.Current != null)
             {

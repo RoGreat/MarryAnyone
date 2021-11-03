@@ -13,7 +13,7 @@ namespace MarryAnyone.Models
 
         public static bool IsCoupleSuitableForMarriageStatic(Hero firstHero, Hero secondHero)
         {
-            ISettingsProvider settings = new MASettings();
+            ISettingsProvider settings = new MASettings(); 
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
             bool isHomosexual = settings.SexualOrientation == "Homosexual" && isMainHero;
             bool isBisexual = settings.SexualOrientation == "Bisexual" && isMainHero;
