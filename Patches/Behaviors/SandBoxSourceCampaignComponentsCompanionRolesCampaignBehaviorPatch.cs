@@ -34,7 +34,11 @@ namespace MarryAnyone.Patches.Behaviors
         [HarmonyPrefix]
         public static bool turn_companion_to_lord_on_conditionPatch(ref bool __result)
         {
-            if (Hero.OneToOneConversationHero != null && Hero.MainHero.MapFaction.IsKingdomFaction && Hero.MainHero.IsFactionLeader && Hero.OneToOneConversationHero.Clan == Hero.MainHero.Clan)
+            if (Hero.OneToOneConversationHero != null 
+                && Hero.MainHero.MapFaction.IsKingdomFaction 
+                && Hero.MainHero.IsFactionLeader 
+                && Hero.OneToOneConversationHero.Clan == Hero.MainHero.Clan
+                && Hero.OneToOneConversationHero.Occupation == Occupation.Lord)
             {
                 __result = false;
                 if (IsChild(Hero.OneToOneConversationHero, Hero.MainHero))
