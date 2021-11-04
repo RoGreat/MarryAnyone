@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Conversation.Tags;
 
@@ -7,7 +8,9 @@ namespace MarryAnyone.Patches
     [HarmonyPatch(typeof(PlayerIsSpouseTag), "IsApplicableTo")]
     internal class PlayerIsSpouseTagPatch
     {
-        private static void Postfix(ref bool __result, CharacterObject character)
+        [HarmonyPatch(typeof(PlayerIsSpouseTag), "IsApplicableTo", new Type[] { typeof(CharacterObject) } )]
+        [HarmonyPostfix]
+        private static void PlayerIsSpouseTagIsApplicableTo(ref bool __result, CharacterObject character)
         {
             if (__result)
             {

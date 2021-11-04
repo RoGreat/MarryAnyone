@@ -31,6 +31,17 @@ namespace MarryAnyone.Models
 #endif
                     return false;
                 }
+                if ((firstHero.Spouse != null && !firstHero.Spouse.IsDead)
+                    || (secondHero.Spouse != null && !secondHero.Spouse.IsDead))
+                {
+#if TESTROMANCE
+                    MAHelper.Print(string.Format("SuitableForMarriage:: entre {0} et {1} Echoue car un des héros est déjà marié"
+                                    , firstHero.Name.ToString(), secondHero.Name.ToString())
+                                    , MAHelper.PRINT_TEST_ROMANCE);
+#endif
+
+                    return false;
+                }
             }
 
             Clan clan = firstHero.Clan;
@@ -107,7 +118,7 @@ namespace MarryAnyone.Models
 
         public static bool IsSuitableForMarriageStatic(Hero maidenOrSuitor)
         {
-            ISettingsProvider settings = new MASettings();
+            ISettingsProvider settings = MAHelper.MASettings; // new MASettings();
             bool inConversation, isCheating, isPolygamous;
             inConversation = isCheating = isPolygamous = false;
             if (Hero.OneToOneConversationHero is not null)

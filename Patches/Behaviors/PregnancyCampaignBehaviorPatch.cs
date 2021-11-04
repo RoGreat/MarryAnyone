@@ -26,11 +26,15 @@ namespace MarryAnyone.Patches.Behaviors
                         return;
                     }
                     _spouses = new List<Hero>();
+#if TESTPREGNANCY
                     MAHelper.Print(string.Format("DailyTickHero::{0} Pregnant {2}\r\nPolyamory ?= {1}", hero.Name, settings.Polyamory, hero.IsPregnant), MAHelper.PRINT_TEST_PREGNANCY);
+#endif
                     if (hero.Spouse is not null && hero == Hero.MainHero && hero.CurrentSettlement == hero.Spouse.CurrentSettlement)
                     {
                         _spouses.Add(hero.Spouse);
+#if TESTPREGNANCY
                         MAHelper.Print("DailyTickHero::Spouse to Collection: " + hero.Spouse, MAHelper.PRINT_TEST_PREGNANCY);
+#endif
                     }
                     if (settings.Polyamory && hero != Hero.MainHero)
                     {
@@ -80,7 +84,9 @@ namespace MarryAnyone.Patches.Behaviors
                             addAttraction = Campaign.Current.Models.RomanceModel.GetAttractionValuePercentage(hero, spouse);
                             attraction += addAttraction * (spouse.IsFemale ? 1 : 3); // To up the pregnancy chance
                             attractionGoal.Add(attraction);
+#if TESTPREGNANCY
                             MAHelper.Print(string.Format("Spouse {0} attraction {1}", spouse.Name, attraction), MAHelper.PRINT_TEST_PREGNANCY);
+#endif
                         }
                         int attractionRandom = MBRandom.RandomInt(attraction);
                         MAHelper.Print("Random: " + attractionRandom, MAHelper.PRINT_TEST_PREGNANCY);
@@ -89,7 +95,9 @@ namespace MarryAnyone.Patches.Behaviors
                         {
                             if (attractionRandom <= attractionGoal[i])
                             {
+#if TESTPREGNANCY
                                 MAHelper.Print(string.Format("Résoud Index{0} => Spouse {1}", i, _spouses[i].Name), MAHelper.PRINT_TEST_PREGNANCY);
+#endif
                                 break;
                             }
                             i++;
@@ -106,6 +114,7 @@ namespace MarryAnyone.Patches.Behaviors
                             spouse.Spouse = hero;
                         }
                     }
+#if TESTPREGNANCY
                     if (hero.Spouse is null)
                     {
                         MAHelper.Print("DailyTickHero:: No Spouse");
@@ -114,6 +123,7 @@ namespace MarryAnyone.Patches.Behaviors
                     {
                         MAHelper.Print("DailyTickHero:: Spouse Assigned" + hero.Spouse);
                     }
+#endif
                 }
             }
             // Outside of female pregnancy behavior
@@ -122,7 +132,9 @@ namespace MarryAnyone.Patches.Behaviors
                 if (hero.IsFemale == hero.Spouse.IsFemale)
                 {
                     // Decided to do this at the end so that you are not always going out with the opposite gender
+#if TESTPREGNANCY
                     MAHelper.Print("DailyTickHero:: Spouse Unassigned because (same sex): " + hero.Spouse, MAHelper.PRINT_TEST_PREGNANCY);
+#endif
                     hero.Spouse.Spouse = null;
                     hero.Spouse = null;
                 }
@@ -135,18 +147,23 @@ namespace MarryAnyone.Patches.Behaviors
 
             if (hero == Hero.MainHero)
             {
+#if TESTPREGNANCY
                 MAHelper.Print(string.Format("Post Pregnancy main hero {0} IsPregnant {1} Check unassigne spouse", hero.Name, hero.IsPregnant), MAHelper.PRINT_TEST_PREGNANCY);
+#endif
                 hero.Spouse = null;
             }
             if (Hero.MainHero.ExSpouses.Contains(hero) || hero.Spouse == Hero.MainHero)
             {
+#if TESTPREGNANCY
                 MAHelper.Print(string.Format("Post Pregnancy {0} IsPregnant {1} ", hero.Name, hero.IsPregnant), MAHelper.PRINT_TEST_PREGNANCY | MAHelper.PrintHow.UpdateLog);
-
+#endif
                 if (hero.Spouse is null || hero.Spouse != Hero.MainHero)
                 {
                     ISettingsProvider settings = new MASettings();
 
+#if TESTPREGNANCY
                     MAHelper.Print("   Spouse is Main Hero", MAHelper.PRINT_TEST_PREGNANCY);
+#endif
                     if (!settings.Polyamory)
                     {
                         // Remove any extra duplicate exspouses

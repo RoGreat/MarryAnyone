@@ -95,24 +95,24 @@ namespace MarryAnyone
             base.OnGameLoaded(game, initializerObject);
 
             MAHelper.MAEtape = Etape.EtapeLoad;
-#if TRACELOAD
-            MAHelper.Print(String.Format("Chemin output : '{0}'", MAHelper.LogPath), MAHelper.PrintHow.PrintForceDisplay);
+//#if TRACELOAD
+//            MAHelper.Print(String.Format("Chemin output : '{0}'", MAHelper.LogPath), MAHelper.PrintHow.PrintForceDisplay);
 
-            if (Hero.MainHero.Spouse != null)
-                traceHero(Hero.MainHero.Spouse, "Main spouse");
+//            if (Hero.MainHero.Spouse != null)
+//                traceHero(Hero.MainHero.Spouse, "Main spouse");
 
-            foreach (Hero hero in Hero.MainHero.ExSpouses)
-                traceHero(hero, "Other spouse");
+//            foreach (Hero hero in Hero.MainHero.ExSpouses)
+//                traceHero(hero, "Other spouse");
 
-            foreach (Hero hero in Hero.MainHero.CompanionsInParty)
-                traceHero(hero, "Companion in party");
+//            foreach (Hero hero in Hero.MainHero.CompanionsInParty)
+//                traceHero(hero, "Companion in party");
 
-            if (Hero.MainHero.Clan != null)
-                foreach (Hero hero in Hero.MainHero.Clan.Heroes)
-                    traceHero(hero, "Companion in clan");
+//            if (Hero.MainHero.Clan != null)
+//                foreach (Hero hero in Hero.MainHero.Clan.Heroes)
+//                    traceHero(hero, "Companion in clan");
 
-            MAHelper.Print("List spouse and Companions END", MAHelper.PrintHow.PrintToLogAndWrite);
-#endif
+//            MAHelper.Print("List spouse and Companions END", MAHelper.PrintHow.PrintToLogAndWrite);
+//#endif
 
             if (Hero.MainHero.Spouse != null && Hero.MainHero.Spouse.HeroState == Hero.CharacterStates.Disabled)
             {

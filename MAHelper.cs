@@ -79,12 +79,16 @@ namespace MarryAnyone
         public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintRAS;
 #endif
 #if TRACELOAD
-        public const PrintHow PRINT_PATCH = PrintHow.PrintToLog | PrintHow.UpdateLog;
-        public const PrintHow PRINT_PATCH = PrintHow.PrintToLog | PrintHow.PrintForceDisplay;
+        public const PrintHow PRINT_PATCH = PrintHow.PrintToLogAndWriteAndDisplay;
 #else
         public const PrintHow PRINT_PATCH = PrintHow.PrintToLogAndWrite;
 #endif
 
+#if TRACECREATECLAN
+        public const PrintHow PRINT_TRACE_CREATE_CLAN = PrintHow.PrintToLog | PrintHow.UpdateLog;
+#else
+        public const PrintHow PRINT_TRACE_CREATE_CLAN = PrintHow.PrintDisplay;
+#endif
         public static string? LogPath 
         {
             get => _logPath;
@@ -256,32 +260,71 @@ namespace MarryAnyone
             if (character.Occupation != Occupation.Lord)
             {
 #if V1640
-                //Hero hero = character.HeroObject;
-                //if (hero != null)
+                Hero hero = character.HeroObject;
+                if (hero != null)
+                {
+                    hero.SetNewOccupation(Occupation.Lord);
+                }
                 //    AccessTools.Property(typeof(Hero), "Occupation").SetValue(hero, Occupation.Lord);
                 AccessTools.Field(typeof(CharacterObject), "_occupation").SetValue(character, Occupation.Lord);
 #else
                     AccessTools.Property(typeof(CharacterObject), "Occupation").SetValue(character, Occupation.Lord);
 #endif
 
-                Print(String.Format("Swap Occupation To Lord for {0}", character.Name.ToString()), PrintHow.PrintToLogAndWriteAndDisplay);
-
                 AccessTools.Field(typeof(CharacterObject), "_originCharacter").SetValue(character, CharacterObject.PlayerCharacter);
                 AccessTools.Field(typeof(CharacterObject), "_originCharacterStringId").SetValue(character, CharacterObject.PlayerCharacter.StringId);
+
+                Print(String.Format("Swap Occupation To Lord for {0} newOccupation ?= {1}", character.Name.ToString(), character.Occupation.ToString()), PrintHow.PrintToLogAndWriteAndDisplay);
+
             }
         }
 
-        public static bool PatchHeroPlayerClan(Hero hero)
+        public static bool PatchHeroPlayerClan(Hero hero, bool etSpouseMainHero = false)
         {
+
+            bool ret = false;
+
             if (hero.Clan != Clan.PlayerClan
                 || (Clan.PlayerClan != null && Clan.PlayerClan.Lords.IndexOf(hero) < 0)) // Else lost the town govenor post on hero.Clan = null !!
             {
                 hero.Clan = null;
+                if (hero.CharacterObject.Occupation != Occupation.Lord)
+                {
+                    OccupationToLord(hero.CharacterObject);
+                }
                 hero.Clan = Clan.PlayerClan;
-                Print("Patch Hero with PlayerClan " + hero.Name.ToString(), PrintHow.PrintToLogAndWriteAndDisplay);
-                return true;
+
+#if V1640
+                if (Hero.MainHero.Clan.Lords.FirstOrDefault(x => x == hero) == null)
+                {
+                    Hero.MainHero.Clan.Lords.AddItem(hero);
+                    MAHelper.Print("Add hero to Noble of the clan", PrintHow.PrintToLogAndWriteAndDisplay);
+                }
+#endif
+                ret = true;
             }
-            return false;
+
+            if (etSpouseMainHero && hero.Spouse == null)
+            {
+                hero.Spouse = Hero.MainHero;
+            }
+
+            if (ret)
+            {
+#if TRACELOAD
+                Print(String.Format("Patch Hero {0} with PlayerClan {1} => {2}\r\n\t{3}", hero.Name.ToString()
+                                , Clan.PlayerClan.Name.ToString()
+                                , hero.Clan.Name.ToString()
+                                , MAHelper.TraceHero(hero)), PrintHow.PrintToLogAndWriteAndDisplay);
+#else
+                Print(String.Format("Patch Hero {0} with PlayerClan {1} => {2}", hero.Name.ToString()
+                                , Clan.PlayerClan.Name.ToString()
+                                , hero.Clan.Name.ToString()), PrintHow.PrintForceDisplay);
+#endif
+            }
+
+
+            return ret;
         }
 
         public static List<Hero> ListClanLord(Hero hero)
@@ -318,6 +361,9 @@ namespace MarryAnyone
             if (hero.IsWanderer)
                 aff += ", Wanderer";
 
+            if (hero.CharacterObject != null)
+                aff += ", Occupation " + hero.CharacterObject.Occupation.ToString();
+
             if (hero.IsPlayerCompanion)
                 aff += ", PLAYER Companion";
 
@@ -331,7 +377,7 @@ namespace MarryAnyone
                 aff += ", MAP Faction " + hero.MapFaction.Name;
 
             if (hero.Spouse != null)
-                aff += ", Spouse" + hero.Spouse.Name;
+                aff += ", Spouse " + hero.Spouse.Name;
 
             if (hero.CurrentSettlement != null)
                 aff += ", Settlement " + hero.CurrentSettlement.Name;

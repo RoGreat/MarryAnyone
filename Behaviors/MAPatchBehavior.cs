@@ -21,7 +21,7 @@ namespace MarryAnyone.Behaviors
             {
                 spouses.Add(Hero.MainHero.Spouse);
 #if TRACELOAD
-                MAHelper.traceHero(Hero.MainHero.Spouse, "MainSpouse"); 
+                MAHelper.Print("Main spouse " + MAHelper.TraceHero(Hero.MainHero.Spouse), MAHelper.PRINT_TRACE_LOAD);
 #endif
 
             }
@@ -29,7 +29,7 @@ namespace MarryAnyone.Behaviors
             foreach (Hero hero in Hero.MainHero.ExSpouses) {
                 spouses.Add(hero);
 #if TRACELOAD
-                MAHelper.traceHero(hero, "OtherSpouse");
+                MAHelper.Print("Other spouse " + MAHelper.TraceHero(hero), MAHelper.PRINT_TRACE_LOAD);
 #endif
             }
 
@@ -88,7 +88,7 @@ namespace MarryAnyone.Behaviors
 
             foreach (Hero hero in spouses)
             {
-                MAHelper.PatchHeroPlayerClan(hero);
+                MAHelper.PatchHeroPlayerClan(hero, true);
             }
 
 #if TRACELOAD
@@ -96,14 +96,14 @@ namespace MarryAnyone.Behaviors
 
             foreach (Hero hero in Clan.PlayerClan.Lords)
             {
-                MAHelper.traceHero(hero, "PlayerClan Lords");
+                MAHelper.Print(String.Format("Hero {0} in Clan.PlayerClan.Lords", hero.Name.ToString()), MAHelper.PRINT_TRACE_LOAD);
             }
             using (IEnumerator<Hero> enumerator2 = Hero.MainHero.CompanionsInParty.GetEnumerator())
             {
                 while (enumerator2.MoveNext())
                 {
                     Hero companion = enumerator2.Current;
-                    MAHelper.traceHero(companion, "Companion");
+                    MAHelper.Print(String.Format("Hero {0} in companion via enumerator", companion.Name.ToString()), MAHelper.PRINT_TRACE_LOAD);
                 }
             }
 

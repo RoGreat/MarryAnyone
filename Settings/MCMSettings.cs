@@ -52,11 +52,11 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool Polyamory { get; set; } = false;
 
-        [SettingPropertyBool("{=incest}Incest", RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships")]
+        [SettingPropertyBool("{=incest}Incest", Order = 3, RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships")]
         [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool Incest { get; set; } = false;
 
-        [SettingPropertyBool("{=spousejoinarena}Spouse(s) join arena", RequireRestart = false, HintText = "{=spousejoinarena_desc}Spouse join arena with you")]
+        [SettingPropertyBool("{=spousejoinarena}Spouse(s) join arena", Order = 4, RequireRestart = false, HintText = "{=spousejoinarena_desc}Spouse join arena with you")]
         [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool SpouseJoinArena { get; set; } = false;
 
