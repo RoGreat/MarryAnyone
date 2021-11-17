@@ -3,6 +3,7 @@ using MarryAnyone;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TaleWorlds.CampaignSystem;
@@ -30,22 +31,22 @@ namespace PatchViaHarmony.Patches
 			}
 		}
 
-		private static void SortTournamentParticipantsPatch(List<CharacterObject> participantCharacters)
-		{
-			for (int i = 0; i < participantCharacters.Count - 1; i++)
-			{
-				for (int j = participantCharacters.Count - 1; j > i; j--)
-				{
-					if (GetTroopPriorityPointForTournamentPatch(participantCharacters[j]) > GetTroopPriorityPointForTournamentPatch(participantCharacters[i]))
-					{
-						CharacterObject value = participantCharacters[j];
-						CharacterObject value2 = participantCharacters[i];
-						participantCharacters[j] = value2;
-						participantCharacters[i] = value;
-					}
-				}
-			}
-		}
+		//private static void SortTournamentParticipantsPatch(List<CharacterObject> participantCharacters)
+		//{
+		//	for (int i = 0; i < participantCharacters.Count - 1; i++)
+		//	{
+		//		for (int j = participantCharacters.Count - 1; j > i; j--)
+		//		{
+		//			if (GetTroopPriorityPointForTournamentPatch(participantCharacters[j]) > GetTroopPriorityPointForTournamentPatch(participantCharacters[i]))
+		//			{
+		//				CharacterObject value = participantCharacters[j];
+		//				CharacterObject value2 = participantCharacters[i];
+		//				participantCharacters[j] = value2;
+		//				participantCharacters[i] = value;
+		//			}
+		//		}
+		//	}
+		//}
 
 		// Token: 0x06001620 RID: 5664 RVA: 0x0005FB8C File Offset: 0x0005DD8C
 		private static int GetTroopPriorityPointForTournamentPatch(CharacterObject troop)
@@ -80,10 +81,21 @@ namespace PatchViaHarmony.Patches
 			return num;
 		}
 
+#if V1650MORE
+
+#endif
+
+#if V1560LESS || V1640 || V1620 || V1610
 
 		[HarmonyPatch(typeof(TournamentGame), "GetParticipantCharacters", new Type[] {typeof(Settlement), typeof(int), typeof(bool), typeof(bool)})]
         [HarmonyPrefix]
         internal static bool GetParticipantCharactersPatch(Settlement settlement, int maxParticipantCount, bool includePlayer, bool includeHeroes, ref List<CharacterObject> __result)
+#endif
+#if V1650MORE
+		[HarmonyPatch(typeof(TournamentGame), "GetParticipantCharacters", new Type[] { typeof(Settlement), typeof(int), typeof(TournamentGame), typeof(bool), typeof(bool) })]
+		[HarmonyPrefix]
+		internal static bool GetParticipantCharactersPatch(Settlement settlement, int maxParticipantCount, TournamentGame tournament, bool includePlayer , bool includeHeroes , ref List<CharacterObject> __result)
+#endif
         {
 
 			if (!MAHelper.MASettings.SpouseJoinArena)
@@ -100,6 +112,9 @@ namespace PatchViaHarmony.Patches
 			Helper.Print(aff, Helper.PrintHow.PrintForceDisplay);
 #endif
 
+			MethodInfo methodInfoCanNpcJoinTournament = typeof(TournamentGame).GetMethod("CanNpcJoinTournament", BindingFlags.Static | BindingFlags.NonPublic);
+			MethodInfo methodInfoSortTournamentParticipants = typeof(TournamentGame).GetMethod("SortTournamentParticipants", BindingFlags.Static | BindingFlags.NonPublic);
+
 			List<CharacterObject> list = new List<CharacterObject>();
 			if (includePlayer)
 			{
@@ -107,14 +122,26 @@ namespace PatchViaHarmony.Patches
 			}
 			int num = 0;
 			int maxParticipantCount12 = (int)(maxParticipantCount / 2.0);
-			while (num < settlement.Parties.Count && list.Count < maxParticipantCount12)
+			if (includeHeroes)
 			{
-				CharacterObject leader = settlement.Parties[num].Leader;
-				if (leader != null && includeHeroes && leader.HeroObject != null && !leader.HeroObject.IsWounded && !leader.HeroObject.Noncombatant && !list.Contains(leader) && leader != CharacterObject.PlayerCharacter)
+				while (num < settlement.Parties.Count && list.Count < maxParticipantCount12)
 				{
-					list.Add(leader);
+#if V1560LESS || V1640 || V1620 || V1610
+					CharacterObject leader = settlement.Parties[num].Leader;
+					if (leader != null && includeHeroes && leader.HeroObject != null && !leader.HeroObject.IsWounded && !leader.HeroObject.Noncombatant && !list.Contains(leader) && leader != CharacterObject.PlayerCharacter)
+					{
+						list.Add(leader);
+					}
+#else
+					Hero leaderHero = settlement.Parties[num].LeaderHero;
+					if ((bool)methodInfoCanNpcJoinTournament.Invoke(null, new Object[] { leaderHero, list, true, tournament }) && leaderHero.IsNoble)
+					{
+						list.Add(leaderHero.CharacterObject);
+					}
+
+#endif
+					num++;
 				}
-				num++;
 			}
 			if (Settlement.CurrentSettlement == settlement && includeHeroes)
 			{
@@ -161,11 +188,11 @@ namespace PatchViaHarmony.Patches
 					}
 				}
 			}
-			if (list.Count < maxParticipantCount)
+			if (list.Count < maxParticipantCount && includeHeroes)
 			{
 				foreach (Hero hero in settlement.HeroesWithoutParty)
 				{
-					if (includeHeroes && !hero.Noncombatant && hero.Age >= (float)Campaign.Current.Models.AgeModel.HeroComesOfAge && (hero.IsWanderer || (hero.IsNoble && hero.PartyBelongedTo == null)))
+					if (!hero.Noncombatant && hero.Age >= (float)Campaign.Current.Models.AgeModel.HeroComesOfAge && (hero.IsWanderer || (hero.IsNoble && hero.PartyBelongedTo == null)))
 					{
 						list.Add(hero.CharacterObject);
 						if (list.Count >= maxParticipantCount)
@@ -285,7 +312,10 @@ namespace PatchViaHarmony.Patches
 					goto IL_292;
 				}
 			}
-			SortTournamentParticipantsPatch(list);
+
+			//SortTournamentParticipantsPatch(list);
+			methodInfoSortTournamentParticipants.Invoke(null, new Object[] { list });
+
 			__result = list;
 
 #if TRACE_ARENA_PARTICIPANT_START
@@ -294,5 +324,5 @@ namespace PatchViaHarmony.Patches
 
 			return false; // Skip default execution
         }
-    }
+	}
 }

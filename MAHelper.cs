@@ -259,7 +259,7 @@ namespace MarryAnyone
         {
             if (character.Occupation != Occupation.Lord)
             {
-#if V1640
+#if V1640MORE 
                 Hero hero = character.HeroObject;
                 if (hero != null)
                 {
@@ -294,7 +294,7 @@ namespace MarryAnyone
                 }
                 hero.Clan = Clan.PlayerClan;
 
-#if V1640
+#if V1640MORE
                 if (Hero.MainHero.Clan.Lords.FirstOrDefault(x => x == hero) == null)
                 {
                     Hero.MainHero.Clan.Lords.AddItem(hero);

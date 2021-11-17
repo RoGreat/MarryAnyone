@@ -276,7 +276,7 @@ namespace MarryAnyone.Patches.Behaviors
 #if TESTROMANCE
                 MAHelper.Print("StartBarterOffer", MAHelper.PRINT_TEST_ROMANCE);
 #endif
-#if V1640
+#if V1640MORE
                 MarriageBarterable marriageBarterable = new MarriageBarterable(Hero.MainHero, PartyBase.MainParty, heroBeingProposedTo, Hero.MainHero);
                 bmInstance.StartBarterOffer(mainHero, oneToOneConversationHero, mainParty, (partyBelongedTo != null) ? partyBelongedTo.Party : null, null, (Barterable barterable, BarterData _args, object obj)
                             => BarterManager.Instance.InitializeMarriageBarterContext(barterable, _args

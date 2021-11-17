@@ -298,7 +298,7 @@ namespace MarryAnyone.Behaviors
                 MAHelper.Print("Spouse to Noble", MAHelper.PRINT_TRACE_WEDDING);
             }
 
-#if V1640
+#if V1640MORE
             if (hero.Clan.Lords.FirstOrDefault(x => x == spouse) == null)
             {
                 hero.Clan.Lords.AddItem(spouse);
