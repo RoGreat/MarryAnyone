@@ -22,6 +22,8 @@ namespace MarryAnyone
         public static string ModuleFolderName { get; } = "MarryAnyone";
 
         public static readonly Harmony Harmony = new Harmony(ModuleFolderName);
+
+        CampaignGameStarter? _campaignGameStarter;
         //private bool bPatchOnTick = false;
 
         //public override void NoHarmonyInit()
@@ -36,6 +38,24 @@ namespace MarryAnyone
         //    ReplaceModel<MADefaultMarriageModel, DefaultMarriageModel>();
         //    ReplaceModel<MARomanceModel, DefaultRomanceModel>();
         //}
+
+
+        internal static MASubModule? Instance;
+
+        public CampaignGameStarter GameStarter()
+        {
+            if (_campaignGameStarter == null)
+                throw new Exception("CampaignGameStarter not referenced");
+
+            return _campaignGameStarter;
+        }
+
+
+        public MASubModule() 
+        {
+            Instance = this;
+        }
+
 
         protected override void OnSubModuleLoad()
         {
@@ -68,6 +88,9 @@ namespace MarryAnyone
 
                 CampaignGameStarter campaignGameStarter = (CampaignGameStarter)gameStarter;
                 campaignGameStarter.LoadGameTexts(BasePath.Name + "Modules/MarryAnyone/ModuleData/ma_module_strings.xml");
+
+                _campaignGameStarter = campaignGameStarter;
+
                 AddBehaviors(campaignGameStarter);
 
                 //gameStarter.AddModel(new MADefaultMarriageModel());
@@ -99,18 +122,18 @@ namespace MarryAnyone
 //            MAHelper.Print(String.Format("Chemin output : '{0}'", MAHelper.LogPath), MAHelper.PrintHow.PrintForceDisplay);
 
 //            if (Hero.MainHero.Spouse != null)
-//                traceHero(Hero.MainHero.Spouse, "Main spouse");
+//                MAHelper.Print(String.Format("Main Spouse {0}", MAHelper.TraceHero(Hero.MainHero.Spouse)), MAHelper.PRINT_TRACE_LOAD);
 
 //            foreach (Hero hero in Hero.MainHero.ExSpouses)
-//                traceHero(hero, "Other spouse");
+//                MAHelper.Print(String.Format("Other spouse {0}", MAHelper.TraceHero(hero)), MAHelper.PRINT_TRACE_LOAD);
 
 //            foreach (Hero hero in Hero.MainHero.CompanionsInParty)
-//                traceHero(hero, "Companion in party");
+//                MAHelper.Print(String.Format("Companion in party {0}", MAHelper.TraceHero(hero)), MAHelper.PRINT_TRACE_LOAD);
 
 //            if (Hero.MainHero.Clan != null)
 //                foreach (Hero hero in Hero.MainHero.Clan.Heroes)
-//                    traceHero(hero, "Companion in clan");
-
+//                    MAHelper.Print(String.Format("Companion in clan {0}", MAHelper.TraceHero(hero)), MAHelper.PRINT_TRACE_LOAD);
+            
 //            MAHelper.Print("List spouse and Companions END", MAHelper.PrintHow.PrintToLogAndWrite);
 //#endif
 
@@ -121,7 +144,7 @@ namespace MarryAnyone
             }
             foreach (Hero hero in Hero.MainHero.ExSpouses)
             {
-                if (hero.HeroState == Hero.CharacterStates.Disabled)
+                if (hero.HeroState == Hero.CharacterStates.Disabled && hero.IsAlive)
                 {
                     hero.ChangeState(Hero.CharacterStates.Active);
                     MAHelper.Print(string.Format("Active {0}", hero.Name), MAHelper.PRINT_PATCH);
@@ -158,6 +181,13 @@ namespace MarryAnyone
 
         public override void OnGameEnd(Game game)
         {
+
+            if (MARomanceCampaignBehavior.Instance != null)
+                MARomanceCampaignBehavior.Instance.Dispose();
+
+            Instance = null;
+            _campaignGameStarter = null;
+
             base.OnGameEnd(game);
             MAHelper.LogClose();
         }

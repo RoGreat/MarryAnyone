@@ -16,6 +16,10 @@
         public bool AdoptionTitles { get; set; } = false;
         public bool RetryCourtship { get; set; } = false;
         public bool SpouseJoinArena { get; set; } = true;
-
+        public int RelationLevelMinForRomance { get; set; } = 5;
+        public int RelationLevelMinForCheating { get; set; } = 10;
+        public int RelationLevelMinForSex { get; set; } = 10;
+        public bool ImproveRelation { get; set; } = false;
+        public bool Notable { get; set; } = false;
     }
 }

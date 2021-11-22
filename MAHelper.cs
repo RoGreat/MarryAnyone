@@ -68,16 +68,22 @@ namespace MarryAnyone
 #else
         public const PrintHow PRINT_TRACE_LOAD = PrintHow.PrintDisplay;
 #endif
-#if TESTPREGNANCY
-        public const PrintHow PRINT_TEST_PREGNANCY = PrintHow.PrintToLog | PrintHow.PrintDisplay;
+#if TRACEPREGNANCY
+        public const PrintHow PRINT_TRACE_PREGNANCY = PrintHow.PrintToLog | PrintHow.PrintDisplay;
 #else
-        public const PrintHow PRINT_TEST_PREGNANCY = PrintHow.PrintDisplay;
+        public const PrintHow PRINT_TRACE_PREGNANCY = PrintHow.PrintDisplay;
 #endif
-#if TESTROMANCE
-        public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintToLog | PrintHow.UpdateLog;
+#if TRACEROMANCE
+        public const PrintHow PRINT_TRACE_ROMANCE = PrintHow.PrintToLog | PrintHow.UpdateLog;
 #else
-        public const PrintHow PRINT_TEST_ROMANCE = PrintHow.PrintRAS;
+        public const PrintHow PRINT_TRACE_ROMANCE = PrintHow.PrintRAS;
 #endif
+#if TRACEROMANCEISSUITABLE
+        public const PrintHow PRINT_TRACE_ROMANCE_IS_SUITABLE = PrintHow.PrintToLog | PrintHow.UpdateLog;
+#else
+        public const PrintHow PRINT_TRACE_ROMANCE_IS_SUITABLE = PrintHow.PrintRAS;
+#endif
+
 #if TRACELOAD
         public const PrintHow PRINT_PATCH = PrintHow.PrintToLogAndWriteAndDisplay;
 #else
@@ -131,6 +137,8 @@ namespace MarryAnyone
             }
         }
         private static string? _moduleName = null;
+
+        public static Color yellowCollor = new Color(0, .8f, .4f);
 
         public static void Print(string message, PrintHow printHow = PrintHow.PrintRAS)
         {
@@ -222,6 +230,7 @@ namespace MarryAnyone
             Log(message, "ERROR");
         }
 
+        // completelyRemove : remove all spouse alive
         public static void RemoveExSpouses(Hero hero, bool completelyRemove = false)
         {
             FieldInfo _exSpouses = AccessTools.Field(typeof(Hero), "_exSpouses");
@@ -232,7 +241,7 @@ namespace MarryAnyone
             if (completelyRemove)
             {
                 // Remove exspouse completely from list
-                _exSpousesList = _exSpousesList.ToList();
+                _exSpousesList = _exSpousesList.Distinct().ToList();
                 List<Hero> exSpouses = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).ToList();
                 foreach(Hero exSpouse in exSpouses)
                 {
@@ -279,13 +288,97 @@ namespace MarryAnyone
             }
         }
 
-        public static bool PatchHeroPlayerClan(Hero hero, bool etSpouseMainHero = false)
+        public static void SwapClan(Hero hero, Clan fromClan, Clan toClan)
+        {
+            hero.Clan = null;
+            if (hero.CharacterObject.Occupation != Occupation.Lord)
+            {
+                OccupationToLord(hero.CharacterObject);
+            }
+            hero.Clan = toClan;
+#if V1640MORE
+            if (toClan.Lords.FirstOrDefault(x => x == hero) == null)
+            {
+                toClan.Lords.AddItem(hero);
+                MAHelper.Print(String.Format("Add {0} to Noble of clan {1}", hero.Name, toClan.Name), MAHelper.PRINT_TRACE_WEDDING);
+            }
+#endif
+        }
+
+        public static void FamilyJoinClan(Hero hero, Clan fromClan, Clan toClan)
+        {
+            if (hero.Clan == fromClan)
+                SwapClan(hero, fromClan, toClan);
+
+            foreach (Hero child in fromClan.Lords)
+            {
+                if (child.Father == hero || child.Mother == hero)
+                {
+                    FamilyJoinClan(child, fromClan, toClan);
+                }
+            }
+            if (hero.Spouse != null && hero.Spouse.Clan == fromClan)
+            {
+                FamilyJoinClan(hero.Spouse, fromClan, toClan);
+            }
+        }
+
+        // Adoption system
+        public static void FamilyAdoptChild(Hero hero, Hero toHero, Clan fromClan)
+        {
+            bool opositeSex = hero.IsFemale != toHero.IsFemale;
+            foreach (Hero child in fromClan.Lords)
+            {
+                if (child.Mother == hero && hero.IsFemale)
+                {
+                    if (child.Father == null 
+                        || (child.Father != null && (child.Father == hero || !child.Father.IsAlive)))
+                    {
+                        MAHelper.Print(String.Format("Hero {0} adopt a child {1} like father", toHero.Name, child.Name), PRINT_TRACE_WEDDING);
+                        child.Father = toHero;
+                    }
+                }
+                else if (child.Father == hero && !hero.IsFemale)
+                {
+                    if (child.Mother == null
+                        || (child.Mother != null && (child.Mother == hero || !child.Mother.IsAlive)))
+                    {
+                        MAHelper.Print(String.Format("Hero {0} adopt a child {1} like mother", toHero.Name, child.Name), PRINT_TRACE_WEDDING);
+                        child.Mother = toHero;
+                    }
+                }
+                else if (child.Mother == hero && (child.Father == null || (child.Father != null && (child.Father == hero || child.Father.IsDead))))
+                {
+                    if (opositeSex)
+                    {
+                        child.Father = hero;
+                        child.Mother = toHero;
+                    }
+                    else
+                        child.Father = toHero;
+                }
+                else if (child.Father == hero && (child.Mother == null || (child.Mother != null && (child.Mother == hero || child.Mother.IsDead))))
+                {
+                    if (opositeSex)
+                    {
+                        child.Mother = hero;
+                        child.Father = toHero;
+                    }
+                    else
+                        child.Mother = toHero;
+                }
+            }
+        }
+
+
+        public static bool PatchHeroPlayerClan(Hero hero, bool canBeOtherClan = false, bool etSpouseMainHero = false)
         {
 
             bool ret = false;
 
-            if (hero.Clan != Clan.PlayerClan
-                || (Clan.PlayerClan != null && Clan.PlayerClan.Lords.IndexOf(hero) < 0)) // Else lost the town govenor post on hero.Clan = null !!
+            if ((!canBeOtherClan && hero.Clan != Clan.PlayerClan)
+                || (canBeOtherClan && hero.Clan == null)
+                || (!canBeOtherClan && Clan.PlayerClan != null && Clan.PlayerClan.Lords.IndexOf(hero) < 0)) // Else lost the town govenor post on hero.Clan = null !!
             {
                 hero.Clan = null;
                 if (hero.CharacterObject.Occupation != Occupation.Lord)
@@ -327,6 +420,85 @@ namespace MarryAnyone
             return ret;
         }
 
+        public static int TraitCompatibility(Hero hero1, Hero hero2, TraitObject trait)
+        {
+            int traitLevel = hero1.GetTraitLevel(trait);
+            int traitLevel2 = hero2.GetTraitLevel(trait);
+            if (traitLevel == 0 || traitLevel2 == 0)
+                return 0;
+            if (traitLevel > 0 && traitLevel2 > 0)
+            {
+                return traitLevel >= traitLevel2 ? traitLevel2 : traitLevel;
+            }
+            if (traitLevel < 0 && traitLevel2 < 0)
+            {
+                return traitLevel >= traitLevel2 ? -traitLevel : -traitLevel2;
+            }
+            if (traitLevel > 0)
+            {
+                return -traitLevel + traitLevel2;
+            }
+            else
+                return traitLevel - traitLevel2;
+        }
+
+        public static bool CheatEnabled(Hero hero, Hero mainHero)
+        {
+            return (MASettings.Cheating
+                    //&& hero.CharacterObject.Occupation == Occupation.Lord
+                    && hero.IsAlive 
+                    && !hero.IsTemplate
+                    && (MASettings.Notable || (!MASettings.Notable && !hero.IsNotable))
+                    && (MASettings.RelationLevelMinForRomance == -1
+                        || hero.GetRelation(mainHero) >= MASettings.RelationLevelMinForCheating));
+        }
+
+        public static bool IsSuitableForMarriagePathMA(Hero maidenOrSuitor)
+        {
+#if V4
+            if (!maidenOrSuitor.IsAlive || maidenOrSuitor.IsTemplate || (!MASettings.Notable && maidenOrSuitor.IsNotable))
+                return false;
+#else
+            if (!maidenOrSuitor.IsAlive || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
+            {
+                return false;
+            }
+#endif
+                return true;
+        }
+
+        public static bool FactionAtWar(Hero hero, Hero otherHero)
+        {
+            IFaction? factionHero = null;
+            IFaction? factionOtherHero = null;
+
+            if (hero.Clan != null)
+                factionHero = hero.Clan.MapFaction;
+
+            if (otherHero.Clan != null)
+                factionOtherHero = otherHero.Clan.MapFaction;
+
+            if (factionHero != null && factionOtherHero != null)
+                return factionHero.IsAtWarWith(factionOtherHero);
+
+            return false;
+        }
+
+        public static bool MarryEnabledPathMA(Hero hero, Hero mainHero)
+        {
+#if V4
+            return (hero.CharacterObject.Occupation != Occupation.Lord
+                    && hero.IsAlive 
+                    && (MASettings.Notable || (!MASettings.Notable && !hero.IsNotable))
+                    && (MASettings.RelationLevelMinForRomance == -1
+                        || hero.GetRelation(mainHero) >= MASettings.RelationLevelMinForRomance));
+#elif V2
+            return Hero.OneToOneConversationHero.IsWanderer || Hero.OneToOneConversationHero.IsPlayerCompanion;
+#else
+            return Hero.OneToOneConversationHero.IsWanderer && Hero.OneToOneConversationHero.IsPlayerCompanion;
+#endif
+        }
+
         public static List<Hero> ListClanLord(Hero hero)
         {
             List<Hero> ret = new List<Hero>();
@@ -342,8 +514,8 @@ namespace MarryAnyone
             return ret;
         }
 
-#if TRACELOAD || TESTROMANCE || TRACEWEDDING
-        public static String TraceHero(Hero hero, String prefix = null)
+#if TRACELOAD || TRACEROMANCE || TRACEWEDDING
+        public static String TraceHero(Hero hero, String? prefix = null)
         {
             String aff = (String.IsNullOrWhiteSpace(prefix) ? "" : (prefix + "::")) + hero.Name;
 

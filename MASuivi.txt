@@ -1,2 +1,29 @@
 You can make married one of your family to a child and he/she disapear
 Una and Tatik
+
+
+line(160) "hero_courtship_task_1_begin_reservations"
+		=> conversation_romance_at_stage_1_discussions_on_condition
+		=> conversation_start_courtship_persuasion_pt1_on_consequence
+			=> ConversationManager.StartPersuasion
+			
+			
+dialogue : 
+	PlayerLine : 																			=> hero_courtship_task_1_begin_reservations
+	
+	
+	DialogLine : hero_courtship_persuasion_start	hero_courtship_task_1_begin_reservations
+	DialogLine : hero_courtship_persuasion_fail		hero_courtship_task_1_begin_reservations
+	
+	
+	conversation_courtship_reaction_stage_2_on_condition
+	
+	
+FixedPregnancyControl :
+	
+	starter.AddDialogLine("hero_sex_nor_reply", "hero_sex_nor_reply", "hero_persuation", "{SEX_NOR_REPLY}"
+		, new ConversationSentence.OnConditionDelegate(this.ReplyCommonOnCondition)
+		, new ConversationSentence.OnConsequenceDelegate(this.StartPersutionThing), 100, null);
+	StartPersutionThing
+	
+	

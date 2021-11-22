@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using MarryAnyone.Behaviors;
 using MarryAnyone.Models;
 using MarryAnyone.Settings;
 using System;
@@ -11,10 +12,12 @@ using TaleWorlds.Localization;
 namespace MarryAnyone.Patches.Behaviors
 {
     [HarmonyPatch(typeof(RomanceCampaignBehavior))]
-    internal class RomanceCampaignBehaviorPatch
+    internal static class RomanceCampaignBehaviorPatch
     {
-        [HarmonyPostfix]
+        static Hero? _heroBeingProposedTo = null;
+
         [HarmonyPatch("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition")]
+        [HarmonyPostfix]
         private static void Postfix1(ref bool __result)
         {
             __result = Hero.OneToOneConversationHero != null 
@@ -37,11 +40,11 @@ namespace MarryAnyone.Patches.Behaviors
         [HarmonyPatch("conversation_player_can_open_courtship_on_condition")]
         private static bool Prefix1(ref bool __result)
         {
-            __result = conversation_player_can_open_courtship_on_condition();
+            __result = conversation_player_can_open_courtship_on_condition(false);
             return false;
         }
 
-        public static bool conversation_player_can_open_courtship_on_condition()
+        public static bool conversation_player_can_open_courtship_on_condition(bool canCheat)
         {
             if (Hero.OneToOneConversationHero is null)
             {
@@ -51,21 +54,22 @@ namespace MarryAnyone.Patches.Behaviors
                     || (!Hero.MainHero.IsFemale && MAHelper.MASettings.SexualOrientation == "Homosexual") 
                     || (!Hero.OneToOneConversationHero.IsFemale && MAHelper.MASettings.SexualOrientation == "Bisexual");
 
-#if TESTROMANCE && TRACELOAD
-            MAHelper.Print(string.Format("Output {0}", MAHelper.LogPath), MAHelper.PRINT_TEST_ROMANCE);
+#if TRACEROMANCE && TRACELOAD
+            MAHelper.Print(string.Format("Output {0}", MAHelper.LogPath), MAHelper.PRINT_TRACE_ROMANCE);
 #endif
             bool areMarried = Util.Util.AreMarried(Hero.MainHero, Hero.OneToOneConversationHero);
             Romance.RomanceLevelEnum romanceLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
 
-#if TESTROMANCE
-            MAHelper.Print("Courtship Possible: " + Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero).ToString(), MAHelper.PRINT_TEST_ROMANCE);
-            MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString(), MAHelper.PRINT_TEST_ROMANCE);
-            MAHelper.Print("Retry Courtship: " + MAHelper.MASettings.RetryCourtship.ToString(), MAHelper.PRINT_TEST_ROMANCE);
-            MAHelper.Print("romanceLevel: " + romanceLevel.ToString(), MAHelper.PRINT_TEST_ROMANCE);
+#if TRACEROMANCE
+            MAHelper.Print("Courtship Possible: " + Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero).ToString(), MAHelper.PRINT_TRACE_ROMANCE);
+            MAHelper.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString(), MAHelper.PRINT_TRACE_ROMANCE);
+            MAHelper.Print("Retry Courtship: " + MAHelper.MASettings.RetryCourtship.ToString(), MAHelper.PRINT_TRACE_ROMANCE);
+            MAHelper.Print("romanceLevel: " + romanceLevel.ToString(), MAHelper.PRINT_TRACE_ROMANCE);
 #endif
 
-            if (Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero)){
-
+            //if (Campaign.Current.Models.RomanceModel.CourtshipPossibleBetweenNPCs(Hero.MainHero, Hero.OneToOneConversationHero))
+            if (MADefaultMarriageModel.IsCoupleSuitableForMarriageStatic(Hero.MainHero, Hero.OneToOneConversationHero, canCheat))
+            {
                 if (romanceLevel == Romance.RomanceLevelEnum.Untested)
                 {
                     if (Hero.OneToOneConversationHero.IsNoble || Hero.OneToOneConversationHero.IsMinorFactionHero)
@@ -135,8 +139,8 @@ namespace MarryAnyone.Patches.Behaviors
                     }
                 }
             }
-#if TESTROMANCE
-            MAHelper.Print("conversation_player_can_open_courtship_on_condition Repond FALSE", MAHelper.PRINT_TEST_ROMANCE);
+#if TRACEROMANCE
+            MAHelper.Print("conversation_player_can_open_courtship_on_condition Repond FALSE", MAHelper.PRINT_TRACE_ROMANCE);
 #endif
             return false;
         }
@@ -152,11 +156,11 @@ namespace MarryAnyone.Patches.Behaviors
             }
 
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-#if TESTROMANCE
+#if TRACEROMANCE
             MAHelper.Print(string.Format("RomanceCampaignBehaviorPatch::conversation_romance_at_stage_1_discussions_on_condition with {0} Difficulty ?= {1} RomanticLevel ?= {2}"
                             , Hero.OneToOneConversationHero.Name.ToString()
                             , MAHelper.MASettings.Difficulty
-                            , romanticLevel.ToString()), MAHelper.PRINT_TEST_ROMANCE);
+                            , romanticLevel.ToString()), MAHelper.PRINT_TRACE_ROMANCE);
 #endif
             if (MAHelper.MASettings.Difficulty == MASettings.DIFFICULTY_VERY_EASY
                || (MAHelper.MASettings.Difficulty == MASettings.DIFFICULTY_EASY && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
@@ -181,11 +185,11 @@ namespace MarryAnyone.Patches.Behaviors
             }
 
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-#if TESTROMANCE
+#if TRACEROMANCE
             MAHelper.Print(string.Format("conversation_romance_at_stage_1_discussions_on_condition with {0} Difficulty ?= {1} Romantilevle ?= {2}"
                     , Hero.OneToOneConversationHero.Name.ToString()
                     , MAHelper.MASettings.Difficulty
-                    , romanticLevel.ToString()), MAHelper.PRINT_TEST_ROMANCE);
+                    , romanticLevel.ToString()), MAHelper.PRINT_TRACE_ROMANCE);
 #endif
             if (MAHelper.MASettings.Difficulty == MASettings.DIFFICULTY_VERY_EASY)
                 //|| (settings.Difficulty == "Easy" && !Hero.OneToOneConversationHero.IsNoble && !Hero.OneToOneConversationHero.IsMinorFactionHero))
@@ -213,24 +217,24 @@ namespace MarryAnyone.Patches.Behaviors
             if (romanticState != null && romanticState.ScoreFromPersuasion == 0)
                 romanticState.ScoreFromPersuasion = 60;
 
-            __result = MADefaultMarriageModel.IsCoupleSuitableForMarriageStatic(Hero.MainHero, Hero.OneToOneConversationHero) 
+            __result = MADefaultMarriageModel.IsCoupleSuitableForMarriageStatic(Hero.MainHero, Hero.OneToOneConversationHero, false)  
                 && (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan.Leader == Hero.OneToOneConversationHero) 
                 && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
 
             if (__result && (Hero.OneToOneConversationHero.Clan == null || Hero.OneToOneConversationHero.Clan == Hero.MainHero.Clan))
             {
-#if TESTROMANCE
-                MAHelper.Print("RomanceCampaignBehaviorPatch:: conversation_finalize_courtship_for_hero_on_conditionPatch::FAIL car pas de clan (MARomanceCampaignBehavior work)", MAHelper.PRINT_TEST_ROMANCE);
+#if TRACEROMANCE
+                MAHelper.Print("RomanceCampaignBehaviorPatch:: conversation_finalize_courtship_for_hero_on_conditionPatch::FAIL car pas de clan (MARomanceCampaignBehavior work)", MAHelper.PRINT_TRACE_ROMANCE);
 #endif
                 __result = false;
             }
 
-#if TESTROMANCE
+#if TRACEROMANCE
             MAHelper.Print(string.Format("RomanceCampaignBehaviorPatch:: conversation_finalize_courtship_for_hero_on_conditionPatch:: with {0} Difficulty ?= {1} répond {2} romanticState Score ?= {3}"
                     , Hero.OneToOneConversationHero.Name.ToString()
                     , MAHelper.MASettings.Difficulty
                     , __result
-                    , (romanticState != null ? romanticState.ScoreFromPersuasion.ToString() : "NULL")), MAHelper.PRINT_TEST_ROMANCE);
+                    , (romanticState != null ? romanticState.ScoreFromPersuasion.ToString() : "NULL")), MAHelper.PRINT_TRACE_ROMANCE);
 #endif
 
             return false;
@@ -240,14 +244,14 @@ namespace MarryAnyone.Patches.Behaviors
         [HarmonyPrefix]
         private static bool conversation_finalize_marriage_barter_consequencePatch(RomanceCampaignBehavior __instance)
         {
-            Hero heroBeingProposedTo = Hero.OneToOneConversationHero;
+            _heroBeingProposedTo = Hero.OneToOneConversationHero;
             if (Hero.OneToOneConversationHero.Clan != null)
             {
                 foreach (Hero hero in Hero.OneToOneConversationHero.Clan.Lords)
                 {
                     if (Romance.GetRomanticLevel(Hero.MainHero, hero) == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage)
                     {
-                        heroBeingProposedTo = hero;
+                        _heroBeingProposedTo = hero;
                         break;
                     }
                 }
@@ -257,30 +261,30 @@ namespace MarryAnyone.Patches.Behaviors
             Hero mainHero = Hero.MainHero;
             Hero oneToOneConversationHero = Hero.OneToOneConversationHero;
             int score = 0;
-            if (Romance.GetRomanticState(Hero.MainHero, heroBeingProposedTo) != null)
+            if (Romance.GetRomanticState(Hero.MainHero, _heroBeingProposedTo) != null)
             {
-                score = (int) Romance.GetRomanticState(Hero.MainHero, heroBeingProposedTo).ScoreFromPersuasion;
+                score = (int) Romance.GetRomanticState(Hero.MainHero, _heroBeingProposedTo).ScoreFromPersuasion;
             }
-#if TESTROMANCE
+#if TRACEROMANCE
             MAHelper.Print(string.Format("RomanceCampaignBehaviorPatch:: conversation_finalize_marriage_barter_consequence between {0}\r\n\t and {1}\r\n\t BarterManager ?= {2}"
                                 , mainHero.Name.ToString()
-                                , MAHelper.TraceHero(heroBeingProposedTo)
+                                , MAHelper.TraceHero(_heroBeingProposedTo)
                                 , (bmInstance != null ? "Existe" : "NULL"))
                         , MAHelper.PrintHow.PrintToLogAndWriteAndForceDisplay);
 #endif
             PartyBase mainParty = PartyBase.MainParty;
             MobileParty partyBelongedTo = Hero.OneToOneConversationHero.PartyBelongedTo;
 
-            if (heroBeingProposedTo.Clan != null && heroBeingProposedTo.Clan.Leader != heroBeingProposedTo && heroBeingProposedTo.Spouse != mainHero)
+            if (_heroBeingProposedTo.Clan != null && _heroBeingProposedTo.Clan.Leader != _heroBeingProposedTo && _heroBeingProposedTo.Spouse != mainHero)
             {
-#if TESTROMANCE
-                MAHelper.Print("StartBarterOffer", MAHelper.PRINT_TEST_ROMANCE);
+#if TRACEROMANCE
+                MAHelper.Print("StartBarterOffer", MAHelper.PRINT_TRACE_ROMANCE);
 #endif
 #if V1640MORE
-                MarriageBarterable marriageBarterable = new MarriageBarterable(Hero.MainHero, PartyBase.MainParty, heroBeingProposedTo, Hero.MainHero);
+                MarriageBarterable marriageBarterable = new MarriageBarterable(Hero.MainHero, PartyBase.MainParty, _heroBeingProposedTo, Hero.MainHero);
                 bmInstance.StartBarterOffer(mainHero, oneToOneConversationHero, mainParty, (partyBelongedTo != null) ? partyBelongedTo.Party : null, null, (Barterable barterable, BarterData _args, object obj)
                             => BarterManager.Instance.InitializeMarriageBarterContext(barterable, _args
-                                                    , new Tuple<Hero, Hero>(heroBeingProposedTo, Hero.MainHero))
+                                                    , new Tuple<Hero, Hero>(_heroBeingProposedTo, Hero.MainHero))
                                                     , score, false, new Barterable[] { marriageBarterable  });
 #else
                 bmInstance.StartBarterOffer(mainHero, oneToOneConversationHero, mainParty, (partyBelongedTo != null) ? partyBelongedTo.Party : null, null, (Barterable barterable, BarterData _args, object obj)
@@ -295,6 +299,16 @@ namespace MarryAnyone.Patches.Behaviors
             }
             return false;
         }
+
+        [HarmonyPatch("conversation_marriage_barter_successful_on_consequence")]
+        [HarmonyPostfix]
+        internal static void conversation_marriage_barter_successful_on_consequencePATCH()
+        {
+            if (_heroBeingProposedTo != null && MARomanceCampaignBehavior.Instance != null)
+                MARomanceCampaignBehavior.Instance.PartnerRemove(_heroBeingProposedTo);
+        }
+
+
 
     }
 }

@@ -55,6 +55,17 @@ namespace MarryAnyone.Patches.Behaviors
             }
             return true;
         }
+
+        [HarmonyPatch(typeof(CompanionRolesCampaignBehavior), "ClanNameSelectionIsDone", new Type[] { typeof(String)})]
+        [HarmonyPostfix]
+        public static void ClanNameSelectionIsDonePatch()
+        {
+            if (Hero.OneToOneConversationHero != null && Hero.OneToOneConversationHero.Clan != Hero.MainHero.Clan)
+            {
+                MAHelper.FamilyJoinClan(Hero.OneToOneConversationHero, Hero.MainHero.Clan, Hero.OneToOneConversationHero.Clan);
+            }
+        }
+
     }
 #endif
-            }
+}

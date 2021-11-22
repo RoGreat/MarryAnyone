@@ -17,7 +17,7 @@ namespace MarryAnyone.Patches
         [HarmonyPrefix]
         public static bool Prefix(DefaultMarriageModel __instance, Hero firstHero, Hero secondHero, ref bool __result)
         {
-            __result = MADefaultMarriageModel.IsCoupleSuitableForMarriageStatic(firstHero, secondHero);
+            __result = MADefaultMarriageModel.IsCoupleSuitableForMarriageStatic(firstHero, secondHero, false);
             return false;
 
         }

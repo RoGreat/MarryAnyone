@@ -56,9 +56,25 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=relationship}Relationship Options")]
         public bool Incest { get; set; } = false;
 
-        [SettingPropertyBool("{=spousejoinarena}Spouse(s) join arena", Order = 4, RequireRestart = false, HintText = "{=spousejoinarena_desc}Spouse join arena with you")]
+        [SettingPropertyBool("{=notable}With notable", Order = 4, RequireRestart = false, HintText = "{=notable_desc}Player character can marry notable")]
         [SettingPropertyGroup("{=relationship}Relationship Options")]
-        public bool SpouseJoinArena { get; set; } = false;
+        public bool Notable { get; set; } = false;
+
+        [SettingPropertyBool("{=ImproveRelation}Improve relation", Order = 5, RequireRestart = false, HintText = "{=ImproveRelation_desc}Improve relation when heroes have sexual relation")]
+        [SettingPropertyGroup("{=relationship}Relationship Options")]
+        public bool ImproveRelation { get; set; } = false;
+
+        [SettingPropertyInteger("{=RelationLevelMinForRomance}Relation needed for romance", -1, 100, Order = 10, RequireRestart = false, HintText = "{=RelationLevelMinForRomance_desc}Relation needed for begin a romance (-1 desabled the control)")]
+        [SettingPropertyGroup("{=relationship}Relationship Options")]
+        public int RelationLevelMinForRomance { get; set; } = 5;
+
+        [SettingPropertyInteger("{=RelationLevelMinForCheating}Relation needed for cheating relation", -1, 100, Order = 11, RequireRestart = false, HintText = "{=RelationLevelMinForRomance_desc}Relation needed for begin a cheating romance (-1 desabled the control)")]
+        [SettingPropertyGroup("{=relationship}Relationship Options")]
+        public int RelationLevelMinForCheating { get; set; } = 10;
+
+        [SettingPropertyInteger("{=RelationLevelMinForSex}Relation needed for sexual relation", -1, 100, Order = 12, RequireRestart = false, HintText = "{=RelationLevelMinForSex_desc}Relation needed for sexual relation (-1 desabled the control)")]
+        [SettingPropertyGroup("{=relationship}Relationship Options")]
+        public int RelationLevelMinForSex { get; set; } = 10;
 
         [SettingPropertyBool("{=retry_courtship}Retry Courtship", RequireRestart = false, HintText = "{=retry_courtship_desc}Player can retry courtship after failure")]
         [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 1)]
@@ -66,6 +82,10 @@ namespace MarryAnyone.Settings
 
         public string Difficulty { get => DifficultyDropdown.SelectedValue; set => DifficultyDropdown.SelectedValue = value; }
         public string SexualOrientation { get => SexualOrientationDropdown.SelectedValue; set => SexualOrientationDropdown.SelectedValue = value; }
+
+        [SettingPropertyBool("{=spousejoinarena}Spouse(s) join arena", Order = 1, RequireRestart = false, HintText = "{=spousejoinarena_desc}Spouse join arena with you")]
+        [SettingPropertyGroup("{=Side}Side Options")]
+        public bool SpouseJoinArena { get; set; } = false;
 
         [SettingPropertyBool("{=adoption}Adoption", RequireRestart = false, HintText = "{=adoption_desc}Player can adopt children in towns and villages", IsToggle = true)]
         [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 2)]

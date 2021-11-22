@@ -26,11 +26,23 @@ namespace MarryAnyone.Behaviors
 
             }
 
-            foreach (Hero hero in Hero.MainHero.ExSpouses) {
-                spouses.Add(hero);
+            if (Hero.MainHero.ExSpouses != null)
+            {
+                int nb = Hero.MainHero.ExSpouses.Count;
+                MAHelper.RemoveExSpouses(Hero.MainHero);
 #if TRACELOAD
-                MAHelper.Print("Other spouse " + MAHelper.TraceHero(hero), MAHelper.PRINT_TRACE_LOAD);
+                if (nb != Hero.MainHero.ExSpouses.Count)
+                    MAHelper.Print(String.Format("Patch duplicate spouse for mainHero from {0} to {1}", nb, Hero.MainHero.ExSpouses.Count), MAHelper.PRINT_TRACE_LOAD);
 #endif
+
+                foreach (Hero hero in Hero.MainHero.ExSpouses) 
+                {
+                    if (hero.IsAlive)
+                        spouses.Add(hero);
+    #if TRACELOAD
+                    MAHelper.Print("Other spouse " + MAHelper.TraceHero(hero), MAHelper.PRINT_TRACE_LOAD);
+    #endif
+                }
             }
 
             foreach (Clan clan in Clan.FindAll(c => c.IsClan))
@@ -88,7 +100,8 @@ namespace MarryAnyone.Behaviors
 
             foreach (Hero hero in spouses)
             {
-                MAHelper.PatchHeroPlayerClan(hero, true);
+                if (hero.IsAlive)
+                    MAHelper.PatchHeroPlayerClan(hero, false, true);
             }
 
 #if TRACELOAD
@@ -124,10 +137,10 @@ namespace MarryAnyone.Behaviors
                 if (!kingdom.IsEliminated && kingdom.Leader != null && kingdom.Leader.Clan.Kingdom != kingdom)
                 {
 
-                    MAHelper.Print(String.Format("PATCH KingDom va supprimer le royaume {0}", kingdom.Name), MAHelper.PRINT_PATCH | MAHelper.PrintHow.PrintForceDisplay);
+                    MAHelper.Print(String.Format("PATCH Kingdom will destroy the kingdom {0}", kingdom.Name), MAHelper.PRINT_PATCH | MAHelper.PrintHow.PrintForceDisplay);
                     foreach(Clan clan in kingdom.Clans)
                     {
-                        MAHelper.Print(String.Format("Avec le clan {0}", clan.Name), MAHelper.PRINT_PATCH);
+                        MAHelper.Print(String.Format("with the clan {0}", clan.Name), MAHelper.PRINT_PATCH);
                     }
                     DestroyKingdomAction.Apply(kingdom);
                     kingdom.MainHeroCrimeRating = 0;
