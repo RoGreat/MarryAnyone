@@ -99,7 +99,12 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=adoption}Adoption", GroupOrder = 2)]
         public bool AdoptionTitles { get; set; } = false;
 
-        [SettingPropertyBool("{=debug}Debug", RequireRestart = false, HintText = "{=debug_desc}Displays mod developer debug information in the game's message log")]
+        [SettingPropertyBool("{=NotifyRelationImprovementWithinFamily}Notify relation improvement in your family", Order = 1, RequireRestart = false, HintText = "{=NotifyRelationImprovementWithinFamily_desc}Display relation improvement in your family in the game's message log")]
+        [SettingPropertyGroup("{=Notification}Notification", GroupOrder = 3)]
+        public bool NotifyRelationImprovementWithinFamily { get; set; } = false;
+
+        [SettingPropertyBool("{=debug}Debug", Order = 2, RequireRestart = false, HintText = "{=debug_desc}Displays mod developer debug information in the game's message log")]
+        [SettingPropertyGroup("{=Notification}Notification", GroupOrder = 3)]
         public bool Debug { get; set; } = false;
 
 

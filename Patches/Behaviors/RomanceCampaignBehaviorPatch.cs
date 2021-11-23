@@ -29,8 +29,7 @@ namespace MarryAnyone.Patches.Behaviors
         [HarmonyPatch("RomanceCourtshipAttemptCooldown", MethodType.Getter)]
         private static void Postfix2(ref CampaignTime __result)
         {
-            ISettingsProvider settings = new MASettings();
-            if (settings.RetryCourtship)
+            if (MAHelper.MASettings.RetryCourtship)
             {
                 __result = CampaignTime.DaysFromNow(1f);
             }

@@ -35,19 +35,24 @@ namespace MarryAnyone.Behaviors
         private float _criticalFailValue = 2f;
 
         // Token: 0x040010C6 RID: 4294
-        private float _failValue;
+        private float _failValue = 1f;
 
         public static MARomanceCampaignBehavior? Instance;
 
         public void PartnerRemove(Hero hero)
         {
 
-            while (true)
+            if (Partners != null)
             {
-                if (!Partners.Remove(hero))
-                    break;
+                while (true)
+                {
+                    if (!Partners.Remove(hero))
+                        break;
+                }
+                if (Partners.Count == 0)
+                    Partners = null;
             }
-        }
+        } 
 
         #region vie de l'objet
         public MARomanceCampaignBehavior()
@@ -118,28 +123,28 @@ namespace MarryAnyone.Behaviors
                             , null
                             , 100, null);
 
-            starter.AddPlayerLine("player_courtship_argument_0", "player_courtship_argument", "hero_courtship_reaction", "{=!}{ROMANCE_PERSUADE_ATTEMPT_0}"
+            starter.AddPlayerLine("player_courtship_argument_0", "player_courtship_argument", "hero_courtship_reaction_forcheat", "{=!}{ROMANCE_PERSUADE_ATTEMPT_0}"
                             , delegate { return persuasion_conversation_player_line(0); }
                             , delegate { persuasion_conversation_player_line_clique(0); }
                             , 100
                             , /*ConversationSentence.OnClickableConditionDelegate*/ delegate (out TextObject explanation) { return persuasion_conversation_player_clickable(0, out explanation); }
                             , /* ConversationSentence.OnPersuasionOptionDelegate */ delegate { return persuasion_conversation_player_get_optionArgs(0); } );
 
-            starter.AddPlayerLine("player_courtship_argument_1", "player_courtship_argument", "hero_courtship_reaction", "{=!}{ROMANCE_PERSUADE_ATTEMPT_1}"
+            starter.AddPlayerLine("player_courtship_argument_1", "player_courtship_argument", "hero_courtship_reaction_forcheat", "{=!}{ROMANCE_PERSUADE_ATTEMPT_1}"
                             , delegate { return persuasion_conversation_player_line(1); }
                             , delegate { persuasion_conversation_player_line_clique(1); }
                             , 100
                             , delegate (out TextObject explanation) { return persuasion_conversation_player_clickable(1, out explanation); }
                             , delegate { return persuasion_conversation_player_get_optionArgs(1); });
 
-            starter.AddPlayerLine("player_courtship_argument_2", "player_courtship_argument", "hero_courtship_reaction", "{=!}{ROMANCE_PERSUADE_ATTEMPT_2}"
+            starter.AddPlayerLine("player_courtship_argument_2", "player_courtship_argument", "hero_courtship_reaction_forcheat", "{=!}{ROMANCE_PERSUADE_ATTEMPT_2}"
                             , delegate { return persuasion_conversation_player_line(2); }
                             , delegate { persuasion_conversation_player_line_clique(2); }
                             , 100
                             , delegate (out TextObject explanation) { return persuasion_conversation_player_clickable(2, out explanation); }
                             , delegate { return persuasion_conversation_player_get_optionArgs(2); });
 
-            starter.AddPlayerLine("player_courtship_argument_3", "player_courtship_argument", "hero_courtship_reaction", "{=!}{ROMANCE_PERSUADE_ATTEMPT_3}"
+            starter.AddPlayerLine("player_courtship_argument_3", "player_courtship_argument", "hero_courtship_reaction_forcheat", "{=!}{ROMANCE_PERSUADE_ATTEMPT_3}"
                             , delegate { return persuasion_conversation_player_line(3); }
                             , delegate { persuasion_conversation_player_line_clique(3); }
                             , 100
@@ -151,7 +156,7 @@ namespace MarryAnyone.Behaviors
                             , persuation_abandon_courtship
                             , 100, null, null);
 
-            starter.AddDialogLine("lord_ask_recruit_argument_reaction", "hero_courtship_reaction", "heroPersuasionNextQuestion", "{=!}{PERSUASION_REACTION}"
+            starter.AddDialogLine("lord_ask_recruit_argument_reaction", "hero_courtship_reaction_forcheat", "heroPersuasionNextQuestion", "{=!}{PERSUASION_REACTION}"
                             , persuasion_go_next
                             , Persuasion_go_next_clique
                             , 100, null);
@@ -175,8 +180,35 @@ namespace MarryAnyone.Behaviors
          
             starter.AddDialogLine("persuasion_leave_faction_npc_result_success_2", "lord_conclude_courtship_stage_2", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(conversation_finalize_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(this.conversation_courtship_success_on_consequence), 140, null);
 
+            starter.AddPlayerLine("hero_want_to_marry", "hero_main_options", "lord_pretalk", "{=endcourthip}Sorry {INTERLOCUTOR.NAME}, i don't want marry you anymore."
+                                                , conversation_player_end_courtship
+                                                , conversation_player_end_courtship_do
+                                                , 100, null, null);
+
             //starter.AddDialogLine("hero_courtship_final_barter_setup", "hero_courtship_final_barter_conclusion", "close_window", "{=k7nGxksk}Splendid! Let us conduct the ceremony, then.", new ConversationSentence.OnConditionDelegate(this.conversation_marriage_barter_successful_on_condition), new ConversationSentence.OnConsequenceDelegate(this.conversation_courtship_success_on_consequence), 100, null);
             //starter.AddDialogLine("hero_courtship_final_barter_setup", "hero_courtship_final_barter_conclusion", "close_window", "{=iunPaMFv}I guess we should put this aside, for now. But perhaps we can speak again at a later date.", () => !this.conversation_marriage_barter_successful_on_condition(), null, 100, null);
+        }
+
+        private void conversation_player_end_courtship_do()
+        {
+            if (Hero.OneToOneConversationHero != null)
+            {
+                Util.Util.CleanRomance(Hero.MainHero, Hero.OneToOneConversationHero);
+                ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.Untested);
+                ChangeRelationAction.ApplyPlayerRelation(Hero.OneToOneConversationHero, -10, true, true);
+            }
+        }
+
+        private bool conversation_player_end_courtship()
+        {
+
+            if (Hero.OneToOneConversationHero != null
+                && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage)
+            {
+                StringHelpers.SetCharacterProperties("INTERLOCUTOR", Hero.OneToOneConversationHero.CharacterObject, null, false);
+                return true;
+            }
+            return false;
         }
 
         private bool conversation_begin_courtship_for_hero_on_condition()
@@ -273,7 +305,7 @@ namespace MarryAnyone.Behaviors
 
                 ret = MarryAnyone.Patches.Behaviors.RomanceCampaignBehaviorPatch.conversation_player_can_open_courtship_on_condition(true)
                         && ((Hero.OneToOneConversationHero.Occupation != Occupation.Lord) 
-                            || (!MAHelper.FactionAtWar(Hero.MainHero, Hero.OneToOneConversationHero) && (Hero.MainHero.CurrentSettlement.IsTown || Hero.MainHero.CurrentSettlement.IsCastle)));
+                            || (!MAHelper.FactionAtWar(Hero.MainHero, Hero.OneToOneConversationHero) && Hero.MainHero.CurrentSettlement != null && (Hero.MainHero.CurrentSettlement.IsTown || Hero.MainHero.CurrentSettlement.IsCastle)));
                         //|| MAHelper.CheatEnabled(Hero.OneToOneConversationHero, Hero.MainHero);
             }
             return ret;
@@ -321,7 +353,7 @@ namespace MarryAnyone.Behaviors
             Tuple<TraitObject, int>[] traitCorrelations2 = this.GetTraitCorrelations(1, 0, 0, -1, 1);
             PersuasionArgumentStrength argumentStrengthBasedOnTargetTraits2 = Campaign.Current.Models.PersuasionModel.GetArgumentStrengthBasedOnTargetTraits(CharacterObject.OneToOneConversationCharacter, traitCorrelations2);
             PersuasionOptionArgs option2 = new PersuasionOptionArgs(DefaultSkills.Roguery, DefaultTraits.Valor, TraitEffect.Positive, argumentStrengthBasedOnTargetTraits2, false
-                                                                    , new TextObject("{=CheatCalculateChoice}If the two of us have the same think in mine, let's go", null)
+                                                                    , new TextObject("{=CheatCalculateChoice}If the two of us have the same think in mind, let's go", null)
                                                                     , traitCorrelations2, false, true, false);
 
             persuasionTask.AddOptionToTask(option2);

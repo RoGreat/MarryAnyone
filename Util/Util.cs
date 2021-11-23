@@ -51,7 +51,7 @@ namespace MarryAnyone.Util
                     break;
             }
 
-            MAHelper.Print(String.Format("Nettoyage romances entre {0} et {1} => {2} suppressions", hero.Name, otherHero.Name, n));
+            MAHelper.Print(String.Format("Nettoyage romances entre {0} et {1} => {2} suppressions", hero.Name, otherHero.Name, n), MAHelper.PrintHow.PrintToLogAndWriteAndDisplay);
         }
 
 

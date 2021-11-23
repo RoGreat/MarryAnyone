@@ -3,7 +3,7 @@
 	<!-- Marry Anyone -->
   <PropertyGroup>
 		<ModuleName>$(MSBuildProjectName)</ModuleName>
-		<Version>2.5.0</Version>
+		<Version>2.5.3</Version>
 		<Authors>RoGreat, GrandesMarees</Authors>
 	</PropertyGroup>
 	
@@ -53,7 +53,7 @@
     <DefineConstants>RELEASE,V1620,V2,V1560LESS</DefineConstants>
 	  <DefineConstants>RELEASE,V1620,V2,V1560LESS</DefineConstants>
 	  <DefineConstants>RELEASE,V2,V1640,V1640MORE,TRACELOAD,TRACECREATECLAN,TRACEROMANCE</DefineConstants>-->
-	  <DefineConstants>RELEASE,V4,V1640,V1640MORE,V1560LESS</DefineConstants>
+	  <DefineConstants>RELEASE,V4,V1640,V1640MORE,V1560LESS,TRACEROMANCE,TRACEROMANCEISSUITABLE</DefineConstants>
 	  <!--<DefineConstants>RELEASE,V2,V1650,V1640MORE,V1650MORE</DefineConstants>-->
   </PropertyGroup>
 

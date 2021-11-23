@@ -16,5 +16,6 @@
 	"AdoptionTitles": false,
 	"RetryCourtship": false,
 	"Debug": false,
+	"NotifyRelationImprovementWithinFamily": false,
 	"Warning": true
 }

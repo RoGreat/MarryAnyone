@@ -242,11 +242,15 @@ namespace MarryAnyone.Patches.Behaviors
 #if TRACEPREGNANCY
             String traceAff = "";
 #endif
-
             if (MAHelper.MASettings.ImproveRelation && hero != null && (hero.Spouse != null || _sideFemaleHero != null))
             {
                 if (_sideFemaleHero == null)
                     _sideFemaleHero = hero.Spouse;
+
+                bool needNotify = _playerRelation;
+                if (needNotify && !MAHelper.MASettings.NotifyRelationImprovementWithinFamily)
+                    needNotify = (hero == Hero.MainHero) || (_sideFemaleHero == Hero.MainHero);
+
 
                 bool justPregnant = hero.IsPregnant && !_wasPregnant;
                 int relationChange = 0;
@@ -281,7 +285,7 @@ namespace MarryAnyone.Patches.Behaviors
 
                 if (relationChange != 0)
                 {
-                    if (_playerRelation)
+                    if (needNotify)
                     {
                         StringHelpers.SetCharacterProperties("HEROONE", hero.CharacterObject);
                         StringHelpers.SetCharacterProperties("HEROTOW", _sideFemaleHero.CharacterObject);

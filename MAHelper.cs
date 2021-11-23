@@ -487,7 +487,8 @@ namespace MarryAnyone
         public static bool MarryEnabledPathMA(Hero hero, Hero mainHero)
         {
 #if V4
-            return (hero.CharacterObject.Occupation != Occupation.Lord
+            return ((hero.CharacterObject.Occupation != Occupation.Lord
+                        || (hero.CharacterObject.Occupation == Occupation.Lord && hero.Spouse != null && hero.Spouse.IsDead))
                     && hero.IsAlive 
                     && (MASettings.Notable || (!MASettings.Notable && !hero.IsNotable))
                     && (MASettings.RelationLevelMinForRomance == -1

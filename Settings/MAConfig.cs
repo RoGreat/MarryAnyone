@@ -20,6 +20,7 @@
         public int RelationLevelMinForCheating { get; set; } = 10;
         public int RelationLevelMinForSex { get; set; } = 10;
         public bool ImproveRelation { get; set; } = false;
+        public bool NotifyRelationImprovementWithinFamily { get; set; } = false;
         public bool Notable { get; set; } = false;
     }
 }

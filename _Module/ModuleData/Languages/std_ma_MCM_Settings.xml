@@ -43,6 +43,7 @@
 	    <string id="ImproveRelation_desc" text="Improve relation when heroes have sexual relation" />
 		<string id="notable" text="With notable" />
 		<string id="notable_desc" text="Player character can marry notable" />
-	  
+		<string id="NotifyRelationImprovementWithinFamily" text="Notify relation improvement in your family" />
+		<string id="NotifyRelationImprovementWithinFamily_desc" text="Display relation improvement in your family in the game's message log" />
   </strings>
 </base>

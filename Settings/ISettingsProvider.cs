@@ -8,7 +8,6 @@
         bool Cheating { get; set; }
         bool Notable { get; set; }
         bool ImproveRelation { get; set; }
-        bool Debug { get; set; }
         string Difficulty { get; set; }
         string SexualOrientation { get; set; }
         bool Adoption { get; set; }
@@ -19,5 +18,7 @@
         int RelationLevelMinForRomance { get; set; }
         int RelationLevelMinForCheating { get; set; }
         int RelationLevelMinForSex { get; set; }
+        bool Debug { get; set; }
+        bool NotifyRelationImprovementWithinFamily { get; set; }
     }
 }
