@@ -17,7 +17,7 @@ namespace MarryAnyone.Patches.Behaviors
         }
         public static bool conversation_lord_agrees_to_discussion_on_condition()
         {
-            return conversation_lord_agrees_to_discussion_on_condition_patch(MarryAnyoneCampaignBehavior.LordConversationsCampaignBehaviorInstance);
+            return conversation_lord_agrees_to_discussion_on_condition_patch(MarryAnyoneCampaignBehavior.LordConversationsCampaignBehaviorInstance!);
         }
     }
 }

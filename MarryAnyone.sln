@@ -3,30 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarryAnyone", "MarryAnyone\MarryAnyone.csproj", "{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarryAnyone", "MarryAnyone\MarryAnyone.csproj", "{CFA80E98-93DC-470E-AC6E-5B55B6CEDAAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Beta_Debug|x64 = Beta_Debug|x64
-		Beta_Release|x64 = Beta_Release|x64
 		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64
-		Stable_Debug|x64 = Stable_Debug|x64
-		Stable_Release|x64 = Stable_Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Beta_Debug|x64.ActiveCfg = Beta_Debug|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Beta_Debug|x64.Build.0 = Beta_Debug|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Beta_Release|x64.ActiveCfg = Beta_Release|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Beta_Release|x64.Build.0 = Beta_Release|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Debug|x64.ActiveCfg = Debug|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Debug|x64.Build.0 = Debug|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Release|x64.ActiveCfg = Release|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Release|x64.Build.0 = Release|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Stable_Debug|x64.ActiveCfg = Stable_Debug|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Stable_Debug|x64.Build.0 = Stable_Debug|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Stable_Release|x64.ActiveCfg = Stable_Release|x64
-		{6DD23A01-1A04-4061-B6A7-77FAD4944BAF}.Stable_Release|x64.Build.0 = Stable_Release|x64
+		{CFA80E98-93DC-470E-AC6E-5B55B6CEDAAE}.Debug|x64.ActiveCfg = Debug|x64
+		{CFA80E98-93DC-470E-AC6E-5B55B6CEDAAE}.Debug|x64.Build.0 = Debug|x64
+		{CFA80E98-93DC-470E-AC6E-5B55B6CEDAAE}.Release|x64.ActiveCfg = Release|x64
+		{CFA80E98-93DC-470E-AC6E-5B55B6CEDAAE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
