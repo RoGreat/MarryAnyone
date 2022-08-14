@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Settings;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.Core;
@@ -13,6 +12,7 @@ namespace MarryAnyone.Patches.Helpers
         [HarmonyPatch("GetHeroRelationToHeroTextShort")]
         private static void Postfix1()
         {
+            /* Should be reimplemented */
         }
 
         private static TextObject FindText(string id)
@@ -22,7 +22,7 @@ namespace MarryAnyone.Patches.Helpers
 
         private static TextObject SpousesSpouse(Hero spouse, Hero queriedHero)
         {
-            IMASettingsProvider settings = new MASettings();
+            Settings settings = new();
 
             // Find out spouse's gender
             // Male spouse

@@ -1,5 +1,4 @@
-﻿using MarryAnyone.Settings;
-using System;
+﻿using System;
 using TaleWorlds.Library;
 
 namespace MarryAnyone.Helpers
@@ -8,7 +7,7 @@ namespace MarryAnyone.Helpers
     {
         public static void Print(string message)
         {
-            IMASettingsProvider settings = new MASettings();
+            Settings settings = new();
             if (settings.Debug)
             {
                 Color color = new(0.6f, 0.2f, 1f);
@@ -18,7 +17,7 @@ namespace MarryAnyone.Helpers
 
         public static void Error(Exception exception)
         {
-            InformationManager.DisplayMessage(new InformationMessage("Marry Anyone: " + exception.Message, Colors.Red));
+            InformationManager.DisplayMessage(new InformationMessage($"Marry Anyone: {exception.Message}", Colors.Red));
         }
     }
 }

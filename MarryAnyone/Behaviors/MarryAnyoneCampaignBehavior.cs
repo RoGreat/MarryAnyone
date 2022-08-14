@@ -1,9 +1,7 @@
 ﻿using HarmonyLib;
-using HarmonyLib.BUTR.Extensions;
 using Helpers;
 using MarryAnyone.Helpers;
 using MarryAnyone.Patches.Behaviors;
-using MarryAnyone.Settings;
 using SandBox.CampaignBehaviors;
 using System;
 using System.Collections.Generic;
@@ -15,7 +13,6 @@ using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Library;
-using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
 
 namespace MarryAnyone.Behaviors
@@ -26,29 +23,35 @@ namespace MarryAnyone.Behaviors
 
         public static LordConversationsCampaignBehavior? LordConversationsCampaignBehaviorInstance;
 
+        private Hero? _hero = null;
+
+        private static Dictionary<int, Hero>? _heroes;
+
+        private static List<int>? _courted;
+
+        private int _key;
+
         public MarryAnyoneCampaignBehavior()
         {
             _heroes = new();
+            _courted = new();
             RomanceCampaignBehaviorInstance = new();
             LordConversationsCampaignBehaviorInstance = new();
         }
 
-        private delegate bool MarriageCourtshipPossibilityDelegate(RomanceCampaignBehavior instance, Hero person1, Hero person2);
-        private static readonly MarriageCourtshipPossibilityDelegate MarriageCourtshipPossibility = AccessTools2.GetDelegate<MarriageCourtshipPossibilityDelegate>(typeof(bool), "MarriageCourtshipPossibility", new Type[] { typeof(Hero), typeof(Hero) });
-
         protected void AddDialogs(CampaignGameStarter starter)
         {
             /* RecruitEveryone-like dialogs that can handle hero creation process if needed */
-            RomanceCharacter(starter, "hero_main_options");
-            RomanceCharacter(starter, "tavernkeeper_talk");
+            RomanceCharacter(starter, "hero_main_options", "lord_pretalk");
+            RomanceCharacter(starter, "tavernkeeper_talk", "tavernkeeper_pretalk");
             RomanceCharacter(starter, "tavernmaid_talk");
             RomanceCharacter(starter, "talk_bard_player");
-            RomanceCharacter(starter, "taverngamehost_talk");
-            RomanceCharacter(starter, "town_or_village_player");
-            RomanceCharacter(starter, "weaponsmith_talk_player");
-            RomanceCharacter(starter, "barber_question1");
-            RomanceCharacter(starter, "shopworker_npc_player");
-            RomanceCharacter(starter, "blacksmith_player");
+            RomanceCharacter(starter, "taverngamehost_talk", "start");
+            RomanceCharacter(starter, "town_or_village_player", "town_or_village_pretalk");
+            RomanceCharacter(starter, "weaponsmith_talk_player", "merchant_response_3");
+            RomanceCharacter(starter, "barber_question1", "no_haircut_conversation_token");
+            RomanceCharacter(starter, "shopworker_npc_player", "start_2");
+            RomanceCharacter(starter, "blacksmith_player", "player_blacksmith_after_craft");
             RomanceCharacter(starter, "alley_talk_start");
 
             /* After the initial romance option */
@@ -61,25 +64,42 @@ namespace MarryAnyone.Behaviors
             starter.AddDialogLine("hero_courtship_final_barter_setup", "hero_courtship_final_barter_conclusion", "close_window", "{=iunPaMFv}I guess we should put this aside, for now. But perhaps we can speak again at a later date.", () => !RomanceCampaignBehaviorPatches.conversation_marriage_barter_successful_on_condition(), null, 100, null);
         }
 
-        private void RomanceCharacter(CampaignGameStarter starter, string start)
+        private void RomanceCharacter(CampaignGameStarter starter, string start, string end = "close_window")
         {
             /* LordConversationCampaignBehavior */
             // There is something to discuss
-            starter.AddPlayerLine("main_option_discussions_MA", start, start + "_lord_talk_speak_diplomacy_MA", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_begin_courtship_for_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(create_new_hero_consequence), 101, null, null);
+            starter.AddPlayerLine("MA_main_option_discussions_3", start, start + "_lord_talk_speak_diplomacy_MA", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_hero_main_options_discussions), new ConversationSentence.OnConsequenceDelegate(create_new_hero_consequence), 101, null, null);
             // Reply to inquiry
-            starter.AddDialogLine("character_agrees_to_discussion_MA", start + "_lord_talk_speak_diplomacy_MA", "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(LordConversationsCampaignBehaviorPatches.conversation_lord_agrees_to_discussion_on_condition), null, 100, null);
-            // Enter the romance question with patching
-            // ...
+            starter.AddDialogLine("MA_conversation_lord_agrees_to_discussion_on_condition", start + "_lord_talk_speak_diplomacy_MA", start + "_lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(LordConversationsCampaignBehaviorPatches.conversation_lord_agrees_to_discussion_on_condition), null, 100, null);
 
-            /* Need extra options when leaving convo for first time... */
+            /* RomanceCamapignBehavior */
+            // Need extra stuff when leaving convo for first time...
+            starter.AddDialogLine("MA_lord_start_courtship_response_3", start + "_lord_start_courtship_response_3", "close_window", "{=YHZsHohq}We meet from time to time, as is the custom, to see if we are right for each other. I hope to see you again soon.", null, new ConversationSentence.OnConsequenceDelegate(RomanceCampaignBehaviorPatches.courtship_conversation_leave_on_consequence), 100, null);
 
+            /* LordConversationCampaignBehavior */
+            // AddFinalLines
+            starter.AddPlayerLine("MA_hero_special_request", start + "_lord_talk_speak_diplomacy_2", end, "{=PznWhAdU}Actually, never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 1, null, null);
         }
 
-        private Hero? _hero = null;
+        private void RemoveHeroObjectFromCharacter()
+        {
+            CharacterObject character = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
 
-        private static Dictionary<int, Hero>? _heroes;
+            // Remove hero association from character
+            if (character.HeroObject is not null)
+            {
+                // character.HeroObject = null;
+                AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(character, null);
+            }
+        }
 
-        private int _key;
+        private void conversation_exit_consequence()
+        {
+            RemoveHeroObjectFromCharacter();
+
+            // Learned that this is used in some Issues to disable quest heroes!
+            DisableHeroAction.Apply(_hero);
+        }
 
         private void create_new_hero_consequence()
         {
@@ -94,9 +114,6 @@ namespace MarryAnyone.Behaviors
                 {
                     // Create a new hero!
                     _hero = HeroCreator.CreateSpecialHero(character, Hero.MainHero.CurrentSettlement, null, null, (int)agent.Age);
-
-                    // Disable character at first
-                    _hero.ChangeState(Hero.CharacterStates.Disabled);
 
                     // Meet character for first time
                     _hero.HasMet = true;
@@ -126,18 +143,18 @@ namespace MarryAnyone.Behaviors
             }
         }
 
-        private bool conversation_begin_courtship_for_hero_on_condition()
+        private bool conversation_hero_main_options_discussions()
         {
             if (Hero.OneToOneConversationHero is not null)
             {
                 // Returns false if it is a Lord
-                if (LordConversationsCampaignBehaviorInstance.conversation_hero_main_options_discussions())
+                if (LordConversationsCampaignBehaviorInstance!.conversation_hero_main_options_discussions())
                 {
                     return false;
                 }
             }
 
-            IMASettingsProvider settings = new MASettings();
+            Settings settings = new();
 
             Agent agent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
 
@@ -171,14 +188,14 @@ namespace MarryAnyone.Behaviors
 
             if (clanLeader)
             {
-                return MarriageCourtshipPossibility(RomanceCampaignBehaviorInstance, Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
+                return RomanceCampaignBehaviorPatches.MarriageCourtshipPossibility(RomanceCampaignBehaviorInstance!, Hero.MainHero, Hero.OneToOneConversationHero) && romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage;
             }
             return false;
         }
 
         private void conversation_courtship_success_on_consequence()
         {
-            IMASettingsProvider settings = new MASettings();
+            Settings settings = new();
 
             Hero hero = Hero.MainHero;
             Hero spouse = Hero.OneToOneConversationHero;
@@ -283,16 +300,6 @@ namespace MarryAnyone.Behaviors
 
         public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
-            foreach (Hero hero in Hero.AllAliveHeroes.ToList())
-            {
-                // The old fix for occupations not sticking
-                if (hero.Spouse == Hero.MainHero || Hero.MainHero.ExSpouses.Contains(hero))
-                {
-                    MAHelper.OccupationToLord(hero);
-                    hero.Clan = null;
-                    hero.Clan = Clan.PlayerClan;
-                }
-            }
             AddDialogs(campaignGameStarter);
         }
 
