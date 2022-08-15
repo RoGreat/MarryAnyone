@@ -228,19 +228,13 @@ namespace MarryAnyone.Behaviors
         private bool conversation_hero_main_options_discussions()
         {
             Settings settings = new();
-            if (settings.Debug)
-            {
-                MADebug.Print("Orientation: " + settings.SexualOrientation);
-                MADebug.Print("Cheating: " + settings.Cheating);
-                MADebug.Print("Polygamy: " + settings.Polygamy);
-                MADebug.Print("Incest: " + settings.Incest);
-                if (Hero.OneToOneConversationHero is not null)
-                {
-                    MADebug.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
-                }
-            }
+            MADebug.Print("Orientation: " + settings.SexualOrientation);
+            MADebug.Print("Cheating: " + settings.Cheating);
+            MADebug.Print("Polygamy: " + settings.Polygamy);
+            MADebug.Print("Incest: " + settings.Incest);
             if (Hero.OneToOneConversationHero is not null)
             {
+                MADebug.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
                 // Returns false if it is a Lord
                 if (SubModule.LordConversationsCampaignBehaviorInstance!.conversation_hero_main_options_discussions())
                 {
