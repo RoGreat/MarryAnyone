@@ -18,13 +18,13 @@ namespace MarryAnyone.Patches.Behaviors
 
         public static bool conversation_player_can_open_courtship_on_condition()
         {
-            Settings settings = new();
-
             if (Hero.OneToOneConversationHero is null)
             {
                 return false;
             }
-            bool flag = Hero.MainHero.IsFemale && settings.SexualOrientation == "Heterosexual" || !Hero.MainHero.IsFemale && settings.SexualOrientation == "Homosexual" 
+            Settings settings = new();
+            bool flag = Hero.MainHero.IsFemale && settings.SexualOrientation == "Heterosexual" 
+                || !Hero.MainHero.IsFemale && settings.SexualOrientation == "Homosexual" 
                 || !Hero.OneToOneConversationHero.IsFemale && settings.SexualOrientation == "Bisexual";
 
             Romance.RomanceLevelEnum romanceLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
