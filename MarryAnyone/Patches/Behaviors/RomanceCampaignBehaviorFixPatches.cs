@@ -1,8 +1,6 @@
 ﻿using HarmonyLib;
-using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
-using MarryAnyone.Behaviors;
 
 namespace MarryAnyone.Patches.Behaviors
 {
@@ -15,7 +13,7 @@ namespace MarryAnyone.Patches.Behaviors
         {
             __result = Hero.OneToOneConversationHero is not null 
                 && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) is null 
-                && MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
+                && MarriageCourtshipPossibilityPatch(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
         }
 
         [HarmonyPostfix]
