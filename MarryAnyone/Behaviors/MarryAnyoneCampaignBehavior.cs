@@ -164,62 +164,64 @@ namespace MarryAnyone.Behaviors
 
         private void create_new_hero_consequence()
         {
+            if (Hero.OneToOneConversationHero is not null)
+            {
+                return;
+            }
+
             Settings settings = new();
             CharacterObject character = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
 
-            if (Hero.OneToOneConversationHero is null)
+            if (!_heroes!.ContainsKey(_key))
             {
-                if (!_heroes!.ContainsKey(_key))
+                Agent agent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
+
+                CharacterObject template = character;
+                // CompanionCampaignBehavior -> IntializeCompanionTemplateList()
+                if (settings.TemplateCharacter == "Wanderer")
                 {
-                    Agent agent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
-
-                    CharacterObject template = character;
-                    // CompanionCampaignBehavior -> IntializeCompanionTemplateList()
-                    if (settings.TemplateCharacter == "Wanderer")
-                    {
-                        // Give hero random wanderer's focus, skills, and combat equipment with same culture and sex
-                        template = character.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && x.IsFemale == character.IsFemale);
-                    }
-
-                    // Create a new hero!
-                    _hero = HeroCreator.CreateSpecialHero(template, Hero.MainHero.CurrentSettlement, null, null, (int)agent.Age);
-
-                    // Meet character for first time
-                    _hero.HasMet = true;
-
-                    // Add hero to heroes list
-                    _heroes.Add(_key, _hero);
-
-                    // Give hero the agent's appearance
-                    // hero.StaticBodyProperties = agent.BodyPropertiesValue.StaticProperties;
-                    AccessTools.Property(typeof(Hero), "StaticBodyProperties").SetValue(_hero, agent.BodyPropertiesValue.StaticProperties);
-
-                    // Give hero agent's equipment
-                    Equipment civilianEquipment = agent.SpawnEquipment.Clone();
-                    // CharacterObject -> RandomBattleEquipment
-                    Equipment battleEquipment = template.AllEquipments.GetRandomElementWithPredicate((Equipment e) => !e.IsCivilian).Clone();
-                    EquipmentHelper.AssignHeroEquipmentFromEquipment(_hero, civilianEquipment);
-                    EquipmentHelper.AssignHeroEquipmentFromEquipment(_hero, battleEquipment);
-                    // Do equipment adjustment with companions
-                    // Not exactly sure what it does...
-                    // this.AdjustEquipment(_hero);
-                    AccessTools.Method(typeof(CompanionsCampaignBehavior), "AdjustEquipment").Invoke(SubModule.CompanionsCampaignBehaviorInstance, new object[] { _hero });
-
-                    HeroHelper.DetermineInitialLevel(_hero);
-                    SubModule.CharacterDevelopmentCampaignBehaviorInstance!.DevelopCharacterStats(_hero);
-                }
-                else
-                {
-                    // Use existing hero
-                    _heroes.TryGetValue(_key, out _hero);
+                    // Give hero random wanderer's focus, skills, and combat equipment with same culture and sex
+                    template = character.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && x.IsFemale == character.IsFemale);
                 }
 
-                // Attach hero to character for now
-                if (character.HeroObject is null)
-                {
-                    // character.HeroObject = _hero;
-                    AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(character, _hero);
-                }
+                // Create a new hero!
+                _hero = HeroCreator.CreateSpecialHero(template, Hero.MainHero.CurrentSettlement, null, null, (int)agent.Age);
+
+                // Meet character for first time
+                _hero.HasMet = true;
+
+                // Add hero to heroes list
+                _heroes.Add(_key, _hero);
+
+                // Give hero the agent's appearance
+                // hero.StaticBodyProperties = agent.BodyPropertiesValue.StaticProperties;
+                AccessTools.Property(typeof(Hero), "StaticBodyProperties").SetValue(_hero, agent.BodyPropertiesValue.StaticProperties);
+
+                // Give hero agent's equipment
+                Equipment civilianEquipment = agent.SpawnEquipment.Clone();
+                // CharacterObject -> RandomBattleEquipment
+                Equipment battleEquipment = template.AllEquipments.GetRandomElementWithPredicate((Equipment e) => !e.IsCivilian).Clone();
+                EquipmentHelper.AssignHeroEquipmentFromEquipment(_hero, civilianEquipment);
+                EquipmentHelper.AssignHeroEquipmentFromEquipment(_hero, battleEquipment);
+                // Do equipment adjustment with companions
+                // Not exactly sure what it does...
+                // this.AdjustEquipment(_hero);
+                AccessTools.Method(typeof(CompanionsCampaignBehavior), "AdjustEquipment").Invoke(SubModule.CompanionsCampaignBehaviorInstance, new object[] { _hero });
+
+                HeroHelper.DetermineInitialLevel(_hero);
+                SubModule.CharacterDevelopmentCampaignBehaviorInstance!.DevelopCharacterStats(_hero);
+            }
+            else
+            {
+                // Use existing hero
+                _heroes.TryGetValue(_key, out _hero);
+            }
+
+            // Attach hero to character for now
+            if (character.HeroObject is null)
+            {
+                // character.HeroObject = _hero;
+                AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(character, _hero);
             }
         }
 
@@ -244,7 +246,7 @@ namespace MarryAnyone.Behaviors
                 {
                     return false;
                 }
-                if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested)
+                if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) != Romance.RomanceLevelEnum.Untested)
                 {
                     return false;
                 }
