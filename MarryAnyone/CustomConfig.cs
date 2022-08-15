@@ -15,6 +15,7 @@ namespace MarryAnyone
         public bool SkipCourtship { get; set; }
         public bool RetryCourtship { get; set; }
         public bool Debug { get; set; }
+        public string? TemplateCharacter { get; set; }
     }
 
     internal sealed class CustomConfig : ISettingsProvider
@@ -46,6 +47,8 @@ namespace MarryAnyone
 
         private string _sexualOrientation = "Heterosexual";
 
+        private string _templateCharacter = "Default";
+
         private void WriteConfig()
         {
             try
@@ -59,7 +62,8 @@ namespace MarryAnyone
                     Cheating = _cheating,
                     SkipCourtship = _skipCourtship,
                     RetryCourtship = _retryCourtship,
-                    Debug = _debug
+                    Debug = _debug,
+                    TemplateCharacter = _templateCharacter
                 };
                 string jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
                 File.WriteAllText(_filePath, jsonString);
@@ -84,6 +88,7 @@ namespace MarryAnyone
                 _retryCourtship = config!.RetryCourtship;
                 _skipCourtship = config!.SkipCourtship;
                 _debug = config!.Debug;
+                _templateCharacter = config!.TemplateCharacter!;
             }
             catch (Exception e)
             {
@@ -221,6 +226,23 @@ namespace MarryAnyone
                 if (_debug != value)
                 {
                     _debug = value;
+                    WriteConfig();
+                }
+            }
+        }
+
+        public string TemplateCharacter
+        {
+            get
+            {
+                ReadConfig();
+                return _templateCharacter;
+            }
+            set
+            {
+                if (_templateCharacter != value)
+                {
+                    _templateCharacter = value;
                     WriteConfig();
                 }
             }
