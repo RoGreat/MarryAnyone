@@ -27,6 +27,12 @@
             set => _provider.SexualOrientation = value;
         }
 
+        public string TemplateCharacter
+        {
+            get => _provider.TemplateCharacter;
+            set => _provider.TemplateCharacter = value;
+        }
+
         public bool Polygamy
         {
             get => _provider.Polygamy;

@@ -10,7 +10,7 @@ namespace MarryAnyone
     // Have to reload save in order for it to work.
     internal class MCMSettings : AttributePerSaveSettings<MCMSettings>, ISettingsProvider
     {
-        public override string Id => "MASettings";
+        public override string Id => "Settings";
 
         public override string DisplayName => "Marry Anyone" + $" {typeof(MCMSettings).Assembly.GetName().Version.ToString(3)}";
 
@@ -33,6 +33,26 @@ namespace MarryAnyone
                 if (SexualOrientationDropdown.SelectedValue != value)
                 {
                     SexualOrientationDropdown.SelectedValue = value;
+                }
+            }
+        }
+
+        [SettingPropertyDropdown("{=templatechar}Template Character", RequireRestart = false, HintText = "{=templatechar_desc}Set the template character that is used to set things like hero name, skills, and equipment.")]
+        [SettingPropertyGroup("{=hero}Hero")]
+        public DropdownDefault<string> TemplateCharacterDropdown { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "Default",
+            "Wanderer"
+        }, 0);
+
+        public string TemplateCharacter
+        {
+            get => TemplateCharacterDropdown.SelectedValue;
+            set
+            {
+                if (TemplateCharacterDropdown.SelectedValue != value)
+                {
+                    TemplateCharacterDropdown.SelectedValue = value;
                 }
             }
         }

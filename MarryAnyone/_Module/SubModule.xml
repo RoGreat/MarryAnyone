@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Module xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
         xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/BUTR/Bannerlord.XmlSchemas/master/SubModule.xsd" >
-  <Id value="$moduleid$" />
-  <Name value="$modulename$" />
-  <Version value="v$version$" />
-  <Official value="false" />
-  <DefaultModule value="false" />
+	<Id value="$modulename$" />
+	<Name value="$modulename$" />
+	<Version value="v$version$" />
+	<Official value="false" />
+	<DefaultModule value="false" />
+	<ModuleCategory value="Singleplayer"/>
 	<Url value="https://www.nexusmods.com/mountandblade2bannerlord/mods/1483" />
   <!-- e1.8.0 -->
-  <ModuleCategory value="Singleplayer"/>
   <DependedModules>
     <DependedModule Id="Native" DependentVersion="e$gameversion$" />
     <DependedModule Id="SandBoxCore" DependentVersion="e$gameversion$" />
@@ -26,8 +26,8 @@
   <SubModules>
     <SubModule>
       <Name value="$modulename$" />
-      <DLLName value="$moduleid$.$gameversion$.dll" />
-      <SubModuleClassType value="$moduleid$.SubModule" />
+      <DLLName value="$modulename$.dll" />
+      <SubModuleClassType value="$modulename$.SubModule" />
       <Tags />
     </SubModule>
   </SubModules>

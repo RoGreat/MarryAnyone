@@ -10,5 +10,6 @@
         bool SkipCourtship { get; set; }
         bool RetryCourtship { get; set; }
         bool Debug { get; set; }
+        string TemplateCharacter { get; set; }
     }
 }

@@ -7,7 +7,7 @@ using TaleWorlds.Library;
 
 namespace MarryAnyone.Helpers
 {
-    internal static class MAHelper
+    internal static class MAHelpers
     {
         public static void RemoveExSpouses(Hero hero, bool completelyRemove = false)
         {
