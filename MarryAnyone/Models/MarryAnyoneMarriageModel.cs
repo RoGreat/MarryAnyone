@@ -16,6 +16,14 @@ namespace MarryAnyone.Models
                 _instance = new();
             }
 
+            /* Section for AI heroes from the original method */
+            bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
+            if (!isMainHero)
+            {
+                return base.IsCoupleSuitableForMarriage(firstHero, secondHero);
+            }
+
+            /* Section for Marry Anyone method */
             // Does not directly call IsSuitableForMarriage, instead calls CanMarry
             bool canMarry = firstHero.CanMarry() && secondHero.CanMarry();
             if (!canMarry)
@@ -23,21 +31,11 @@ namespace MarryAnyone.Models
                 return false;
             }
 
-            bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
-
-            // Section for AI heroes from the original method
-            if (!isMainHero)
-            {
-                base.IsCoupleSuitableForMarriage(firstHero, secondHero);
-            }
-
-            // Section for Marry Anyone method
             MASettings settings = new();
             bool isHeterosexual = settings.SexualOrientation == "Heterosexual";
             bool isHomosexual = settings.SexualOrientation == "Homosexual";
             bool isIncestuous = settings.Incest;
             bool discoverAncestors = DefaultMarriageModelPatches.DiscoverAncestors(_instance, firstHero, 3).Intersect(DefaultMarriageModelPatches.DiscoverAncestors(_instance, secondHero, 3)).Any();
-
             if (!isIncestuous)
             {
                 if (discoverAncestors)
@@ -60,6 +58,7 @@ namespace MarryAnyone.Models
 
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
+            /* Reminder that AI also uses this method */
             MASettings settings = new();
             bool isCheating = false;
             bool isPolygamous = false;

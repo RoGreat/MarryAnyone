@@ -12,14 +12,14 @@ namespace MarryAnyone
             {
                 _provider = MCMSettings.Instance;
             }
-            else if (CustomConfig.Instance is not null)
+            else if (MAConfig.Instance is not null)
             {
-                _provider = CustomConfig.Instance!;
+                _provider = MAConfig.Instance!;
             }
             else
             {
-                new CustomConfig();
-                _provider = CustomConfig.Instance!;
+                new MAConfig();
+                _provider = MAConfig.Instance!;
             }
         }
 
