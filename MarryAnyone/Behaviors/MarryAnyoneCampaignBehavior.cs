@@ -13,7 +13,6 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.CampaignSystem.Settlements.Locations;
 
 namespace MarryAnyone.Behaviors
 {
@@ -24,8 +23,6 @@ namespace MarryAnyone.Behaviors
         private Hero? _hero = null;
 
         private static Dictionary<int, Hero>? _heroes;
-
-        private static List<int>? _courted;
 
         private static int _key
         {
@@ -39,7 +36,6 @@ namespace MarryAnyone.Behaviors
         {
             Instance = this;
             _heroes = new();
-            _courted = new();
             SubModule.RomanceCampaignBehaviorInstance = new();
             SubModule.CompanionsCampaignBehaviorInstance = new();
             SubModule.LordConversationsCampaignBehaviorInstance = new();
@@ -78,16 +74,16 @@ namespace MarryAnyone.Behaviors
             // Reply to inquiry
             starter.AddDialogLine("MA_conversation_lord_agrees_to_discussion_on_condition", start + "lord_talk_speak_diplomacy", start + "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", null, null, 100, null);
             // AddFinalLines
-            starter.AddPlayerLine("MA_hero_special_request", start + "_lord_talk_speak_diplomacy_2", end, "{=PznWhAdU}Actually, never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 1, null, null);
+            starter.AddPlayerLine("MA_hero_special_request", start + "lord_talk_speak_diplomacy_2", end, "{=PznWhAdU}Actually, never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 1, null, null);
 
             /* RomanceCamapignBehavior */
             // Need to initiate a romance option since we are going off the usual path
             starter.AddPlayerLine("MA_lord_special_request_flirt", start + "lord_talk_speak_diplomacy_2", start + "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(RomanceCampaignBehaviorPatches.conversation_player_can_open_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
-            // Leave now if you aren't willing
-            starter.AddPlayerLine("lord_start_courtship_response_player_offer_nevermind", "lord_start_courtship_response_player_offer", "lord_pretalk", "{=D33fIGQe}Never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 120, null, null);
-            // Continue courtship part 1
+            // Courtship initiation
             starter.AddDialogLine("MA_lord_start_courtship_response", start + "lord_start_courtship_response", start + "lord_start_courtship_response_player_offer", "{=!}{INITIAL_COURTSHIP_REACTION}", new ConversationSentence.OnConditionDelegate(conversation_courtship_initial_reaction_on_condition), null, 100, null);
             starter.AddPlayerLine("MA_lord_start_courtship_response_player_offer", start + "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), null, 120, null, null);
+            starter.AddPlayerLine("MA_lord_start_courtship_response_player_offer_2", "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=gnXoIChw}Perhaps you and I...", new ConversationSentence.OnConditionDelegate(conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), null, 120, null, null);
+            starter.AddPlayerLine("MA_lord_start_courtship_response_player_offer_nevermind", start + "lord_start_courtship_response_player_offer", end, "{=D33fIGQe}Never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 120, null, null);
             // Need extra stuff when leaving convo for first time...
             starter.AddDialogLine("MA_lord_start_courtship_response_3", "lord_start_courtship_response_3", "close_window", "{=YHZsHohq}We meet from time to time, as is the custom, to see if we are right for each other. I hope to see you again soon.", null, new ConversationSentence.OnConsequenceDelegate(courtship_conversation_leave_on_consequence), 200, null);
         }
@@ -97,12 +93,11 @@ namespace MarryAnyone.Behaviors
             Settlement settlement = Hero.MainHero.CurrentSettlement;
 
             _hero!.SetNewOccupation(Occupation.Wanderer);
-            _hero.StayingInSettlement = settlement;
-            _hero.ChangeState(Hero.CharacterStates.Active);
+            _hero!.StayingInSettlement = settlement;
+            _hero!.ChangeState(Hero.CharacterStates.Active);
 
             RomanceCampaignBehaviorPatches.courtship_conversation_leave_on_consequence_patch(SubModule.RomanceCampaignBehaviorInstance!);
 
-            _courted!.Add(_key);
             RemoveHeroObjectFromCharacter();
         }
 
