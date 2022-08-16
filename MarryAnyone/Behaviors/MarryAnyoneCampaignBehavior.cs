@@ -70,15 +70,17 @@ namespace MarryAnyone.Behaviors
         {
             /* LordConversationCampaignBehavior */
             // There is something to discuss
-            starter.AddPlayerLine("MA_main_option_discussions_3", start, start + "lord_talk_speak_diplomacy", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_hero_main_options_discussions), new ConversationSentence.OnConsequenceDelegate(create_new_hero_consequence), 100, null, null);
+            // starter.AddPlayerLine("MA_main_option_discussions_3", start, start + "lord_talk_speak_diplomacy", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_hero_main_options_discussions), new ConversationSentence.OnConsequenceDelegate(create_new_hero_consequence), 100, null, null);
             // Reply to inquiry
-            starter.AddDialogLine("MA_conversation_lord_agrees_to_discussion_on_condition", start + "lord_talk_speak_diplomacy", start + "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", null, null, 100, null);
+            // starter.AddDialogLine("MA_conversation_lord_agrees_to_discussion_on_condition", start + "lord_talk_speak_diplomacy", start + "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", null, null, 100, null);
             // AddFinalLines
-            starter.AddPlayerLine("MA_hero_special_request", start + "lord_talk_speak_diplomacy_2", end, "{=PznWhAdU}Actually, never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 1, null, null);
+            // starter.AddPlayerLine("MA_hero_special_request", start + "lord_talk_speak_diplomacy_2", end, "{=PznWhAdU}Actually, never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 1, null, null);
 
             /* RomanceCamapignBehavior */
             // Need to initiate a romance option since we are going off the usual path
-            starter.AddPlayerLine("MA_lord_special_request_flirt", start + "lord_talk_speak_diplomacy_2", start + "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(RomanceCampaignBehaviorPatches.conversation_player_can_open_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
+            // starter.AddPlayerLine("MA_lord_special_request_flirt", start + "lord_talk_speak_diplomacy_2", start + "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(RomanceCampaignBehaviorPatches.conversation_player_can_open_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
+            // Cut straight to the chase
+            starter.AddPlayerLine("MA_lord_special_request_flirt", start, start + "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(RomanceCampaignBehaviorPatches.conversation_player_can_open_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
             // Courtship initiation
             starter.AddDialogLine("MA_lord_start_courtship_response", start + "lord_start_courtship_response", start + "lord_start_courtship_response_player_offer", "{=!}{INITIAL_COURTSHIP_REACTION}", new ConversationSentence.OnConditionDelegate(conversation_courtship_initial_reaction_on_condition), null, 100, null);
             starter.AddPlayerLine("MA_lord_start_courtship_response_player_offer", start + "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), null, 120, null, null);
@@ -90,15 +92,25 @@ namespace MarryAnyone.Behaviors
 
         private void courtship_conversation_leave_on_consequence()
         {
-            Settlement settlement = Hero.MainHero.CurrentSettlement;
-
-            _hero!.SetNewOccupation(Occupation.Wanderer);
-            _hero!.StayingInSettlement = settlement;
-            _hero!.ChangeState(Hero.CharacterStates.Active);
+            // Wanderer will still remain in town
+            // Perhaps notables as well later on
+            if (_hero!.Occupation != Occupation.Wanderer)
+            {
+                Settlement settlement = Hero.MainHero.CurrentSettlement;
+                _hero!.SetNewOccupation(Occupation.Wanderer);
+                if (_hero!.StayingInSettlement != settlement)
+                {
+                    _hero!.StayingInSettlement = settlement;
+                }
+                _hero!.ChangeState(Hero.CharacterStates.Active);
+            }
 
             RomanceCampaignBehaviorPatches.courtship_conversation_leave_on_consequence_patch(SubModule.RomanceCampaignBehaviorInstance!);
 
-            RemoveHeroObjectFromCharacter();
+            if (_heroes!.ContainsKey(_key))
+            {
+                RemoveHeroObjectFromCharacter();
+            }
         }
 
         private bool conversation_player_eligible_for_marriage_with_conversation_hero_on_condition()
@@ -133,28 +145,28 @@ namespace MarryAnyone.Behaviors
 
         public void RemoveHeroObjectFromCharacter()
         {
-            if (_heroes!.ContainsKey(_key))
-            {
-                CharacterObject character = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
+            CharacterObject character = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
 
-                // Remove hero association from character
-                if (character.HeroObject is not null)
-                {
-                    // character.HeroObject = null;
-                    AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(character, null);
-                }
+            // Remove hero association from character
+            if (character.HeroObject is not null)
+            {
+                // character.HeroObject = null;
+                AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(character, null);
             }
+
         }
 
         private void conversation_exit_consequence()
         {
-            if (_heroes!.ContainsKey(_key))
+            if (!_heroes!.ContainsKey(_key))
             {
-                RemoveHeroObjectFromCharacter();
-
-                // Learned that this is used in some Issues to disable quest heroes!
-                DisableHeroAction.Apply(_hero);
+                return;
             }
+
+            RemoveHeroObjectFromCharacter();
+
+            // Learned that this is used in some Issues to disable quest heroes!
+            DisableHeroAction.Apply(_hero);
         }
 
         private void create_new_hero_consequence()
@@ -164,7 +176,7 @@ namespace MarryAnyone.Behaviors
                 return;
             }
 
-            Settings settings = new();
+            MASettings settings = new();
             CharacterObject character = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
 
             if (!_heroes!.ContainsKey(_key))
@@ -222,7 +234,7 @@ namespace MarryAnyone.Behaviors
 
         private bool conversation_hero_main_options_discussions()
         {
-            Settings settings = new();
+            MASettings settings = new();
             MADebug.Print("Orientation: " + settings.SexualOrientation);
             MADebug.Print("Cheating: " + settings.Cheating);
             MADebug.Print("Polygamy: " + settings.Polygamy);
@@ -249,8 +261,9 @@ namespace MarryAnyone.Behaviors
 
         private bool IsAttractedToCharacter()
         {
-            Settings settings = new();
-            
+            MASettings settings = new();
+
+            // Using Agent can cause crashes in this case. Use IAgent instead.
             IAgent agent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
 
             CharacterObject character = Campaign.Current.ConversationManager.OneToOneConversationCharacter;

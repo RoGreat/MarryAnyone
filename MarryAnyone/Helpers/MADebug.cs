@@ -7,7 +7,7 @@ namespace MarryAnyone.Helpers
     {
         public static void Print(string message)
         {
-            Settings settings = new();
+            MASettings settings = new();
             if (settings.Debug)
             {
                 Color color = new(0.6f, 0.2f, 1f);

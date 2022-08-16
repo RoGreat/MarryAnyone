@@ -3,7 +3,7 @@ using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Dropdown;
 using MCM.Abstractions.Settings.Base.PerSave;
 
-namespace MarryAnyone
+namespace MarryAnyone.Settings
 {
     // Instance is null for some reason...
     // Seems to be that setting fields are null on new game creation

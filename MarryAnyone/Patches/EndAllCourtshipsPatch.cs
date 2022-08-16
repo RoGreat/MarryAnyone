@@ -2,14 +2,14 @@
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 
-namespace MarryAnyone.Patches.Methods
+namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(Romance), "EndAllCourtships")]
     internal class EndAllCourtshipsPatch
     {
         private static bool Prefix(Hero forHero)
         {
-            Settings settings = new();
+            MASettings settings = new();
 
             if (settings.Polygamy)
             {

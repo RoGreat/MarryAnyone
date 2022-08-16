@@ -22,7 +22,7 @@ namespace MarryAnyone.Patches.Behaviors
             {
                 return false;
             }
-            Settings settings = new();
+            MASettings settings = new();
             bool flag = Hero.MainHero.IsFemale && settings.SexualOrientation == "Heterosexual" 
                 || !Hero.MainHero.IsFemale && settings.SexualOrientation == "Homosexual" 
                 || !Hero.OneToOneConversationHero.IsFemale && settings.SexualOrientation == "Bisexual";

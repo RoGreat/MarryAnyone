@@ -1,4 +1,4 @@
-﻿namespace MarryAnyone
+﻿namespace MarryAnyone.Settings
 {
     internal interface ISettingsProvider
     {
