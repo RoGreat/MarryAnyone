@@ -1,10 +1,12 @@
-﻿namespace MarryAnyone
+﻿using MarryAnyone.Settings;
+
+namespace MarryAnyone
 {
-    internal sealed class Settings
+    internal sealed class MASettings
     {
         private readonly ISettingsProvider _provider;
 
-        public Settings()
+        public MASettings()
         {
             if (MCMSettings.Instance is not null)
             {

@@ -2,8 +2,6 @@
 using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
-using MarryAnyone.Behaviors;
-using TaleWorlds.InputSystem;
 
 namespace MarryAnyone.Patches.Behaviors
 {

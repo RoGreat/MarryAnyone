@@ -23,11 +23,12 @@ namespace MarryAnyone.Patches.Behaviors
             __result = Hero.OneToOneConversationHero is not null;
         }
 
+        // Would really like to make this better...
         [HarmonyPostfix]
         [HarmonyPatch("RomanceCourtshipAttemptCooldown", MethodType.Getter)]
         private static void Postfix3(ref CampaignTime __result)
         {
-            Settings settings = new();
+            MASettings settings = new();
             if (settings.RetryCourtship)
             {
                 __result = CampaignTime.DaysFromNow(1f);

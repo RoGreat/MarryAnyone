@@ -4,7 +4,7 @@ using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
-namespace MarryAnyone.Patches.Helpers
+namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(ConversationHelper))]
     internal class ConversationHelperPatches
@@ -22,7 +22,7 @@ namespace MarryAnyone.Patches.Helpers
 
         private static TextObject SpousesSpouse(Hero spouse, Hero queriedHero)
         {
-            Settings settings = new();
+            MASettings settings = new();
 
             // Find out spouse's gender
             // Male spouse

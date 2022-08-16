@@ -1,7 +1,7 @@
-﻿using MarryAnyone.Patches.Behaviors;
-using TaleWorlds.CampaignSystem;
+﻿using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameComponents;
 using System.Linq;
+using MarryAnyone.Patches;
 
 namespace MarryAnyone.Models
 {
@@ -16,22 +16,28 @@ namespace MarryAnyone.Models
                 _instance = new();
             }
 
-            Settings settings = new();
+            // Does not directly call IsSuitableForMarriage, instead calls CanMarry
+            bool canMarry = firstHero.CanMarry() && secondHero.CanMarry();
+            if (!canMarry)
+            {
+                return false;
+            }
+
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
-            bool isHomosexual = settings.SexualOrientation == "Homosexual" && isMainHero;
-            bool isBisexual = settings.SexualOrientation == "Bisexual" && isMainHero;
-            bool isIncestuous = settings.Incest && isMainHero;
+
+            // Section for AI heroes from the original method
+            if (!isMainHero)
+            {
+                base.IsCoupleSuitableForMarriage(firstHero, secondHero);
+            }
+
+            // Section for Marry Anyone method
+            MASettings settings = new();
+            bool isHeterosexual = settings.SexualOrientation == "Heterosexual";
+            bool isHomosexual = settings.SexualOrientation == "Homosexual";
+            bool isIncestuous = settings.Incest;
             bool discoverAncestors = DefaultMarriageModelPatches.DiscoverAncestors(_instance, firstHero, 3).Intersect(DefaultMarriageModelPatches.DiscoverAncestors(_instance, secondHero, 3)).Any();
 
-            Clan clan = firstHero.Clan;
-            if (clan?.Leader == firstHero && !isMainHero)
-            {
-                Clan clan2 = secondHero.Clan;
-                if (clan2?.Leader == secondHero)
-                {
-                    return false;
-                }
-            }
             if (!isIncestuous)
             {
                 if (discoverAncestors)
@@ -39,27 +45,33 @@ namespace MarryAnyone.Models
                     return false;
                 }
             }
+
+            bool isAttracted = true;
+            if (isHeterosexual)
+            {
+                isAttracted = firstHero.IsFemale != secondHero.IsFemale;
+            }
             if (isHomosexual)
             {
-                return firstHero.IsFemale == secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+                isAttracted = firstHero.IsFemale == secondHero.IsFemale;
             }
-            if (isBisexual)
-            {
-                return IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
-            }
-            return firstHero.IsFemale != secondHero.IsFemale && IsSuitableForMarriage(firstHero) && IsSuitableForMarriage(secondHero);
+            return isAttracted;
         }
 
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            Settings settings = new();
-            bool inConversation, isCheating, isPolygamous;
-            inConversation = isCheating = isPolygamous = false;
+            MASettings settings = new();
+            bool isCheating = false;
+            bool isPolygamous = false;
+
             if (Hero.OneToOneConversationHero is not null)
             {
-                inConversation = maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero;
-                isCheating = settings.Cheating && inConversation;
-                isPolygamous = settings.Polygamy && inConversation;
+                bool inConversation = maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero;
+                if (inConversation)
+                {
+                    isCheating = settings.Cheating;
+                    isPolygamous = settings.Polygamy;
+                }
             }
             if (!maidenOrSuitor.IsAlive || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
             {

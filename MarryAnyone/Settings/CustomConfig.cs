@@ -3,7 +3,7 @@ using System.IO;
 using MarryAnyone.Helpers;
 using Newtonsoft.Json;
 
-namespace MarryAnyone
+namespace MarryAnyone.Settings
 {
     internal sealed class Config
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameComponents;
 
-namespace MarryAnyone.Patches.Behaviors
+namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(DefaultMarriageModel))]
     internal class DefaultMarriageModelPatches
