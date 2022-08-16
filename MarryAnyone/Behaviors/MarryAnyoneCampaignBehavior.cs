@@ -70,38 +70,38 @@ namespace MarryAnyone.Behaviors
         {
             /* LordConversationCampaignBehavior */
             // There is something to discuss
-            // starter.AddPlayerLine("MA_main_option_discussions_3", start, start + "lord_talk_speak_diplomacy", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_hero_main_options_discussions), new ConversationSentence.OnConsequenceDelegate(create_new_hero_consequence), 100, null, null);
+            starter.AddPlayerLine("MA_main_option_discussions_3", start, start + "lord_talk_speak_diplomacy", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_hero_main_options_discussions), new ConversationSentence.OnConsequenceDelegate(create_new_hero_consequence), 100, null, null);
             // Reply to inquiry
-            // starter.AddDialogLine("MA_conversation_lord_agrees_to_discussion_on_condition", start + "lord_talk_speak_diplomacy", start + "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", null, null, 100, null);
+            starter.AddDialogLine("MA_conversation_lord_agrees_to_discussion_on_condition", start + "lord_talk_speak_diplomacy", start + "lord_talk_speak_diplomacy_2", "{=OD1m1NYx}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_lord_agrees_to_discussion_on_condition), null, 100, null);
             // AddFinalLines
-            // starter.AddPlayerLine("MA_hero_special_request", start + "lord_talk_speak_diplomacy_2", end, "{=PznWhAdU}Actually, never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 1, null, null);
+            starter.AddPlayerLine("MA_hero_special_request", start + "lord_talk_speak_diplomacy_2", end, "{=PznWhAdU}Actually, never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 1, null, null);
 
             /* RomanceCamapignBehavior */
-            // Need to initiate a romance option since we are going off the usual path
-            // starter.AddPlayerLine("MA_lord_special_request_flirt", start + "lord_talk_speak_diplomacy_2", start + "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(RomanceCampaignBehaviorPatches.conversation_player_can_open_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
-            // Cut straight to the chase
-            starter.AddPlayerLine("MA_lord_special_request_flirt", start, start + "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(RomanceCampaignBehaviorPatches.conversation_player_can_open_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
+            // Need to create a romance option since this splits off from the usual path
+            starter.AddPlayerLine("MA_lord_special_request_flirt", start + "lord_talk_speak_diplomacy_2", start + "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(conversation_hero_main_options_discussions), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
             // Courtship initiation
             starter.AddDialogLine("MA_lord_start_courtship_response", start + "lord_start_courtship_response", start + "lord_start_courtship_response_player_offer", "{=!}{INITIAL_COURTSHIP_REACTION}", new ConversationSentence.OnConditionDelegate(conversation_courtship_initial_reaction_on_condition), null, 100, null);
             starter.AddPlayerLine("MA_lord_start_courtship_response_player_offer", start + "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), null, 120, null, null);
             starter.AddPlayerLine("MA_lord_start_courtship_response_player_offer_2", "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=gnXoIChw}Perhaps you and I...", new ConversationSentence.OnConditionDelegate(conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), null, 120, null, null);
             starter.AddPlayerLine("MA_lord_start_courtship_response_player_offer_nevermind", start + "lord_start_courtship_response_player_offer", end, "{=D33fIGQe}Never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 120, null, null);
             // Need extra stuff when leaving convo for first time...
+            // This overwrites the usual dialog
             starter.AddDialogLine("MA_lord_start_courtship_response_3", "lord_start_courtship_response_3", "close_window", "{=YHZsHohq}We meet from time to time, as is the custom, to see if we are right for each other. I hope to see you again soon.", null, new ConversationSentence.OnConsequenceDelegate(courtship_conversation_leave_on_consequence), 200, null);
         }
 
         private void courtship_conversation_leave_on_consequence()
         {
-            // Wanderer will still remain in town
-            // Perhaps notables as well later on
+            Settlement settlement = Hero.MainHero.CurrentSettlement;
             if (_hero!.Occupation != Occupation.Wanderer)
             {
-                Settlement settlement = Hero.MainHero.CurrentSettlement;
                 _hero!.SetNewOccupation(Occupation.Wanderer);
-                if (_hero!.StayingInSettlement != settlement)
-                {
-                    _hero!.StayingInSettlement = settlement;
-                }
+            }
+            if (_hero!.StayingInSettlement != settlement)
+            {
+                _hero!.StayingInSettlement = settlement;
+            }
+            if (_hero.HeroState != Hero.CharacterStates.Active)
+            {
                 _hero!.ChangeState(Hero.CharacterStates.Active);
             }
 
@@ -111,6 +111,15 @@ namespace MarryAnyone.Behaviors
             {
                 RemoveHeroObjectFromCharacter();
             }
+        }
+
+        private bool conversation_lord_agrees_to_discussion_on_condition()
+        {
+            // Get a random lord response that is valid
+            CharacterObject randomLord = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject x) => 
+                Campaign.Current.ConversationManager.FindMatchingTextOrNull("str_lord_intrigue_accept", x) is not null);
+            MBTextManager.SetTextVariable("STR_INTRIGUE_AGREEMENT", Campaign.Current.ConversationManager.FindMatchingTextOrNull("str_lord_intrigue_accept", randomLord));
+            return true;
         }
 
         private bool conversation_player_eligible_for_marriage_with_conversation_hero_on_condition()
@@ -242,16 +251,10 @@ namespace MarryAnyone.Behaviors
             if (Hero.OneToOneConversationHero is not null)
             {
                 MADebug.Print("Romantic Level: " + Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero).ToString());
-                // Returns false if it is a Lord
-                if (SubModule.LordConversationsCampaignBehaviorInstance!.conversation_hero_main_options_discussions())
-                {
-                    return false;
-                }
-                if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) != Romance.RomanceLevelEnum.Untested)
-                {
-                    return false;
-                }
+                // Hero patch for courtship condition
+                return conversation_player_can_open_courtship_on_condition();
             }
+            // For agents
             if (IsAttractedToCharacter())
             {
                 return true;
@@ -280,6 +283,86 @@ namespace MarryAnyone.Behaviors
                     isAttracted = character.IsFemale == Hero.MainHero.IsFemale;
                 }
                 return isAttracted;
+            }
+            return false;
+        }
+
+        public bool conversation_player_can_open_courtship_on_condition()
+        {
+            if (Hero.OneToOneConversationHero is null)
+            {
+                return false;
+            }
+            MASettings settings = new();
+            bool flag = Hero.MainHero.IsFemale && settings.SexualOrientation == "Heterosexual"
+                || !Hero.MainHero.IsFemale && settings.SexualOrientation == "Homosexual"
+                || !Hero.OneToOneConversationHero.IsFemale && settings.SexualOrientation == "Bisexual";
+
+            Romance.RomanceLevelEnum romanceLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
+            MADebug.Print("Courtship Possible: " + RomanceCampaignBehaviorPatches.MarriageCourtshipPossibilityPatch(SubModule.RomanceCampaignBehaviorInstance!, Hero.MainHero, Hero.OneToOneConversationHero));
+            MADebug.Print("Romantic Level: " + romanceLevel);
+            MADebug.Print("Retry Courtship: " + settings.RetryCourtship);
+
+            if (RomanceCampaignBehaviorPatches.MarriageCourtshipPossibilityPatch(SubModule.RomanceCampaignBehaviorInstance!, Hero.MainHero, Hero.OneToOneConversationHero)
+                && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested)
+            {
+                if ((Hero.OneToOneConversationHero.Clan?.IsNoble ?? false) || Hero.OneToOneConversationHero.IsMinorFactionHero)
+                {
+                    if (Hero.OneToOneConversationHero.Spouse is null)
+                    {
+                        MBTextManager.SetTextVariable("FLIRTATION_LINE",
+                            flag
+                                ? "{=lord_flirt}My lord, I note that you have not yet taken a spouse."
+                                : "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer.", false);
+                    }
+                    else
+                    {
+                        MBTextManager.SetTextVariable("FLIRTATION_LINE",
+                            flag
+                                ? "{=lord_cheating_flirt}My lord, I note that you might wish for a new spouse."
+                                : "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer.", false);
+                    }
+                }
+                else
+                {
+                    MBTextManager.SetTextVariable("FLIRTATION_LINE",
+                        flag
+                            ? "{=goodman_flirt}Goodman, I note that you have not yet taken a spouse."
+                            : "{=goodwife_flirt}Goodwife, I wish to profess myself your most ardent admirer.", false);
+                }
+                return true;
+            }
+            if (romanceLevel == Romance.RomanceLevelEnum.FailedInCompatibility
+                || romanceLevel == Romance.RomanceLevelEnum.FailedInPracticalities
+                || (romanceLevel == Romance.RomanceLevelEnum.Ended && settings.RetryCourtship))
+            {
+                if ((Hero.OneToOneConversationHero.Clan?.IsNoble ?? false) || Hero.OneToOneConversationHero.IsMinorFactionHero)
+                {
+                    MBTextManager.SetTextVariable("FLIRTATION_LINE",
+                        flag
+                            ? "{=2WnhUBMM}My lord, may you give me another chance to prove myself?"
+                            : "{=4iTaEZKg}My lady, may you give me another chance to prove myself?", false);
+                }
+                else
+                {
+                    MBTextManager.SetTextVariable("FLIRTATION_LINE",
+                        flag
+                            ? "{=goodman_chance}Goodman, may you give me another chance to prove myself?"
+                            : "{=goodwife_chance}Goodwife, may you give me another chance to prove myself?", false);
+                }
+                // Retry Courtship feature!
+                if (settings.RetryCourtship)
+                {
+                    if (romanceLevel == Romance.RomanceLevelEnum.FailedInCompatibility || romanceLevel == Romance.RomanceLevelEnum.Ended)
+                    {
+                        ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
+                    }
+                    else if (romanceLevel == Romance.RomanceLevelEnum.FailedInPracticalities)
+                    {
+                        ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CoupleDecidedThatTheyAreCompatible);
+                    }
+                }
+                return true;
             }
             return false;
         }

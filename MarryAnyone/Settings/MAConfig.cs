@@ -18,13 +18,13 @@ namespace MarryAnyone.Settings
         public string? TemplateCharacter { get; set; }
     }
 
-    internal sealed class CustomConfig : ISettingsProvider
+    internal sealed class MAConfig : ISettingsProvider
     {
-        public static CustomConfig? Instance;
+        public static MAConfig? Instance;
 
         private readonly string _filePath = "..\\..\\Modules\\MarryAnyone\\Config.json";
 
-        public CustomConfig()
+        public MAConfig()
         {
             Instance = this;
             ReadConfig();

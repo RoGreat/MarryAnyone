@@ -10,7 +10,7 @@ namespace MarryAnyone.Settings
     // Have to reload save in order for it to work.
     internal class MCMSettings : AttributePerSaveSettings<MCMSettings>, ISettingsProvider
     {
-        public override string Id => "Settings";
+        public override string Id => "MASettings";
 
         public override string DisplayName => "Marry Anyone" + $" {typeof(MCMSettings).Assembly.GetName().Version.ToString(3)}";
 

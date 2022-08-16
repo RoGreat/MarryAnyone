@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using MarryAnyone.Behaviors;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 
@@ -45,6 +46,14 @@ namespace MarryAnyone.Patches.Behaviors
                 return false;
             }
             return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(RomanceCampaignBehavior), "conversation_player_can_open_courtship_on_condition")]
+        private static bool Prefix2(ref bool __result)
+        {
+            __result = MarryAnyoneCampaignBehavior.Instance!.conversation_player_can_open_courtship_on_condition();
+            return false;
         }
     }
 }
