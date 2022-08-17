@@ -15,9 +15,13 @@ using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.Settlements;
 using MarryAnyone.Actions;
 
+// Attempt to use AccessTools2 to boost performance with Delegates over MethodInfo
+using HarmonyLib.BUTR.Extensions;
+using TaleWorlds.CampaignSystem.Conversation.Persuasion;
+
 namespace MarryAnyone.Behaviors
 {
-    internal class MarryAnyoneCampaignBehavior : CampaignBehaviorBase
+    internal class MarryAnyoneCampaignBehavior : RomanceCampaignBehavior
     {
         public static MarryAnyoneCampaignBehavior? Instance { get; private set; }
 
@@ -30,6 +34,9 @@ namespace MarryAnyone.Behaviors
             Instance = this;
             _heroes = new();
         }
+
+        // https://butr.github.io/documentation/advanced/switching-from-membertinfo-to-accesstools2/
+        private static readonly AccessTools.FieldRef<RomanceCampaignBehavior, List<PersuasionTask>>? _allReservations = AccessTools2.FieldRefAccess<RomanceCampaignBehavior, List<PersuasionTask>>("_allReservations");
 
         protected void AddDialogs(CampaignGameStarter starter)
         {
@@ -79,7 +86,7 @@ namespace MarryAnyone.Behaviors
             starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_nevermind", start + "lord_start_courtship_response_player_offer", end, "{=D33fIGQe}Never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 120, null, null);
 
             // This will occur first before the original dialog
-            starter.AddDialogLine("MA" + "lord_start_courtship_response_3", "lord_start_courtship_response_3", "close_window", "{=YHZsHohq}We meet from time to time, as is the custom, to see if we are right for each other. I hope to see you again soon.", null, new ConversationSentence.OnConsequenceDelegate(first_time_courtship_conversation_leave_on_consequence), 200, null);
+            starter.AddDialogLine("MA" + "lord_start_courtship_response_3", "lord_start_courtship_response_3", "close_window", "{=YHZsHohq}We meet from time to time, as is the custom, to see if we are right for each other. I hope to see you again soon.", null, new ConversationSentence.OnConsequenceDelegate(courtship_conversation_leave_on_consequence), 200, null);
         }
 
         private bool marriage_on_condition()
@@ -91,7 +98,7 @@ namespace MarryAnyone.Behaviors
             return false;
         }
 
-        private void first_time_courtship_conversation_leave_on_consequence()
+        private void courtship_conversation_leave_on_consequence()
         {
             IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
             int agentKey = MathF.Abs(conversationAgent.GetHashCode());
@@ -165,14 +172,24 @@ namespace MarryAnyone.Behaviors
             Hero spouseHero = Hero.OneToOneConversationHero;
             IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
             int agentKey = MathF.Abs(conversationAgent.GetHashCode());
+
             // Skip courtship means there is no prior romance so crash. Crash crash crash...
             // Need a better check for null here
-            if (!settings.SkipCourtship)
-            {            
-                // Couple agreed on marriage
+            if (settings.SkipCourtship)
+            {
+                // base._allReservations = null;
+                // Originally would do this:
+                // AccessTools.Field(typeof(RomanceCampaignBehavior), "_allReservations").SetValue(GetType(), null);
+                // This should work better:
+                _allReservations!(this) = null!;
+                ConversationManager.EndPersuasion();
+            }
+            else
+            {
                 RomanceCampaignBehaviorPatches.conversation_courtship_stage_2_success_on_consequence(SubModule.RomanceCampaignBehaviorInstance!);
             }
-            else if (_heroes.ContainsKey(agentKey) && _companionHero == Hero.OneToOneConversationHero)
+
+            if (_heroes.ContainsKey(agentKey) && _companionHero == Hero.OneToOneConversationHero)
             {
                 RemoveHeroObjectFromCharacter();
                 spouseHero = _companionHero;

@@ -34,7 +34,6 @@ namespace MarryAnyone
                 campaignGameStarter.AddBehavior(new MarryAnyoneCampaignBehavior());
                 campaignGameStarter.AddModel(new MarryAnyoneMarriageModel());
                 /* Used for calling private methods in these instances */
-                RomanceCampaignBehaviorInstance = new();
                 CompanionsCampaignBehaviorInstance = new();
                 LordConversationsCampaignBehaviorInstance = new();
                 CharacterDevelopmentCampaignBehaviorInstance = new();
