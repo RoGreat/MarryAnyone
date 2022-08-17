@@ -2,7 +2,6 @@
 using TaleWorlds.CampaignSystem.GameComponents;
 using System.Linq;
 using MarryAnyone.Patches;
-using MarryAnyone.Behaviors;
 
 namespace MarryAnyone.Models
 {

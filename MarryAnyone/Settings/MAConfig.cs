@@ -80,15 +80,15 @@ namespace MarryAnyone.Settings
             {
                 string jsonString = File.ReadAllText(_filePath);
                 var config = JsonConvert.DeserializeObject<Config>(jsonString);
-                _sexualOrientation = config!.SexualOrientation!;
-                _polygamy = config!.Polygamy;
-                _polyamory = config!.Polyamory;
-                _incest = config!.Incest;
-                _cheating = config!.Cheating;
-                _retryCourtship = config!.RetryCourtship;
-                _skipCourtship = config!.SkipCourtship;
-                _debug = config!.Debug;
-                _templateCharacter = config!.TemplateCharacter!;
+                _sexualOrientation = config.SexualOrientation!;
+                _polygamy = config.Polygamy;
+                _polyamory = config.Polyamory;
+                _incest = config.Incest;
+                _cheating = config.Cheating;
+                _retryCourtship = config.RetryCourtship;
+                _skipCourtship = config.SkipCourtship;
+                _debug = config.Debug;
+                _templateCharacter = config.TemplateCharacter!;
             }
             catch (Exception e)
             {
