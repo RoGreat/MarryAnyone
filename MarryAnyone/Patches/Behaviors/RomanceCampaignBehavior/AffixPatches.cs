@@ -8,13 +8,35 @@ namespace MarryAnyone.Patches.Behaviors
     [HarmonyPatch(typeof(RomanceCampaignBehavior))]
     internal partial class RomanceCampaignBehaviorPatches
     {
+        /* Prefixes */
+        [HarmonyPrefix]
+        [HarmonyPatch("conversation_finalize_courtship_for_hero_on_condition")]
+        private static bool Prefix1(ref bool __result)
+        {
+            if (CharacterObject.OneToOneConversationCharacter.Occupation == Occupation.Wanderer && !Hero.OneToOneConversationHero.IsPlayerCompanion)
+            {
+                __result = false;
+                return false;
+            }
+            return true;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(RomanceCampaignBehavior), "conversation_player_can_open_courtship_on_condition")]
+        private static bool Prefix2(ref bool __result)
+        {
+            __result = MarryAnyoneCampaignBehavior.Instance!.conversation_player_can_open_courtship_on_condition();
+            return false;
+        }
+
+        /* Postfixes */
         [HarmonyPostfix]
         [HarmonyPatch("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition")]
         private static void Postfix1(ref bool __result, object __instance)
         {
             __result = Hero.OneToOneConversationHero is not null 
                 && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) is null 
-                && MarriageCourtshipPossibilityPatch(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
+                && MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
         }
 
         [HarmonyPostfix]
@@ -34,26 +56,6 @@ namespace MarryAnyone.Patches.Behaviors
             {
                 __result = CampaignTime.DaysFromNow(1f);
             }
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch("conversation_finalize_courtship_for_hero_on_condition")]
-        private static bool Prefix1(ref bool __result)
-        {
-            if (CharacterObject.OneToOneConversationCharacter.Occupation == Occupation.Wanderer && !Hero.OneToOneConversationHero.IsPlayerCompanion)
-            {
-                __result = false;
-                return false;
-            }
-            return true;
-        }
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(RomanceCampaignBehavior), "conversation_player_can_open_courtship_on_condition")]
-        private static bool Prefix2(ref bool __result)
-        {
-            __result = MarryAnyoneCampaignBehavior.Instance!.conversation_player_can_open_courtship_on_condition();
-            return false;
         }
     }
 }
