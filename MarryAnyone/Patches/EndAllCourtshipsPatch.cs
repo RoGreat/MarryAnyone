@@ -24,5 +24,10 @@ namespace MarryAnyone.Patches
             }
             return true;
         }
+
+        public static void EndAllCourtships(Hero forHero)
+        {
+            Prefix(forHero);
+        }
     }
 }

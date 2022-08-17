@@ -13,11 +13,8 @@ using TaleWorlds.Core;
 using TaleWorlds.Library;
 using TaleWorlds.Localization;
 using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.CampaignSystem.Encounters;
-using TaleWorlds.CampaignSystem.BarterSystem.Barterables;
-using TaleWorlds.CampaignSystem.BarterSystem;
-using TaleWorlds.CampaignSystem.Party;
 using MarryAnyone.Actions;
+using System.Runtime;
 
 namespace MarryAnyone.Behaviors
 {
@@ -70,8 +67,8 @@ namespace MarryAnyone.Behaviors
             RomanceCharacter(starter, "alley_talk_start");
 
             /* After the initial romance option */
-            // Instead of continuing, go to a marriage barter without the barter
-            starter.AddDialogLine("MA" + "hero_courtship_persuasion_2_success", "hero_courtship_task_2_next_reservation", "close_window", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", null, new ConversationSentence.OnConsequenceDelegate(marriage_on_consequence), 200, null);
+            // Skip barter and marry immediately
+            starter.AddDialogLine("MA" + "hero_courtship_persuasion_2_success", "hero_courtship_task_2_next_reservation", "close_window", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(marriage_on_condition), new ConversationSentence.OnConsequenceDelegate(marriage_on_consequence), 200, null);
         }
 
         private void RomanceCharacter(CampaignGameStarter starter, string start, string end = "close_window")
@@ -91,13 +88,27 @@ namespace MarryAnyone.Behaviors
             starter.AddDialogLine("MA" + "lord_start_courtship_response", start + "lord_start_courtship_response", start + "lord_start_courtship_response_player_offer", "{=!}{INITIAL_COURTSHIP_REACTION}", new ConversationSentence.OnConditionDelegate(conversation_courtship_initial_reaction_on_condition), null, 100, null);
             // Decline courtship reaction
             starter.AddDialogLine("MA" + "lord_start_courtship_response_decline", start + "lord_start_courtship_response", end, "{=!}{COURTSHIP_DECLINE_REACTION}", new ConversationSentence.OnConditionDelegate(conversation_courtship_decline_reaction_to_player_on_condition), null, 100, null);
+
+            // Skip courtship option
+            starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer", start + "lord_start_courtship_response_player_offer", "hero_courtship_task_2_next_reservation", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), null, 120, null, null);
+            starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_2", start + "lord_start_courtship_response_player_offer", "hero_courtship_task_2_next_reservation", "{=gnXoIChw}Perhaps you and I...", new ConversationSentence.OnConditionDelegate(skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), null, 120, null, null);
             // After initial courtship ask for hand in marriage
             starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer", start + "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), null, 120, null, null);
-            starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_2", "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=gnXoIChw}Perhaps you and I...", new ConversationSentence.OnConditionDelegate(conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), null, 120, null, null);
+            starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_2", start + "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=gnXoIChw}Perhaps you and I...", new ConversationSentence.OnConditionDelegate(conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), null, 120, null, null);
             // Leave if not ready
             starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_nevermind", start + "lord_start_courtship_response_player_offer", end, "{=D33fIGQe}Never mind.", null, new ConversationSentence.OnConsequenceDelegate(conversation_exit_consequence), 120, null, null);
+
             // This will occur first before the original dialog
             starter.AddDialogLine("MA" + "lord_start_courtship_response_3", "lord_start_courtship_response_3", "close_window", "{=YHZsHohq}We meet from time to time, as is the custom, to see if we are right for each other. I hope to see you again soon.", null, new ConversationSentence.OnConsequenceDelegate(first_time_courtship_conversation_leave_on_consequence), 200, null);
+        }
+
+        private bool marriage_on_condition()
+        {
+            if (Hero.OneToOneConversationHero.Occupation != Occupation.Lord)
+            {
+                return true;
+            }
+            return false;
         }
 
         private void first_time_courtship_conversation_leave_on_consequence()
@@ -141,9 +152,17 @@ namespace MarryAnyone.Behaviors
             return true;
         }
 
+        private bool skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition()
+        {
+            MASettings settings = new();
+            return settings.SkipCourtship && Hero.OneToOneConversationHero is not null &&
+                RomanceCampaignBehaviorPatches.MarriageCourtshipPossibility(SubModule.RomanceCampaignBehaviorInstance!, Hero.MainHero, Hero.OneToOneConversationHero);
+        }
+
         private bool conversation_player_eligible_for_marriage_with_conversation_hero_on_condition()
         {
-            return Hero.OneToOneConversationHero is not null && 
+            MASettings settings = new();
+            return !settings.SkipCourtship && Hero.OneToOneConversationHero is not null && 
                 RomanceCampaignBehaviorPatches.MarriageCourtshipPossibility(SubModule.RomanceCampaignBehaviorInstance!, Hero.MainHero, Hero.OneToOneConversationHero);
         }
 
@@ -279,6 +298,11 @@ namespace MarryAnyone.Behaviors
             // Hero patch for courtship condition
             if (Hero.OneToOneConversationHero is not null)
             {
+                // Lords will go the old fashion way!
+                if (Hero.OneToOneConversationHero.Occupation == Occupation.Lord)
+                {
+                    return false;
+                }
                 return conversation_player_can_open_courtship_on_condition();
             }
             // For agents

@@ -1,6 +1,6 @@
 ﻿using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem;
-using HarmonyLib;
+using MarryAnyone.Patches;
 
 namespace MarryAnyone.Actions
 {
@@ -26,9 +26,9 @@ namespace MarryAnyone.Actions
                 secondHero.SetNewOccupation(Occupation.Lord);
             }
             // Romance.EndAllCourtships(firstHero);
-            AccessTools.Method(typeof(Romance), "EndAllCourtships").Invoke(null, new object[] { firstHero });
+            EndAllCourtshipsPatch.EndAllCourtships(firstHero);
             // Romance.EndAllCourtships(secondHero);
-            AccessTools.Method(typeof(Romance), "EndAllCourtships").Invoke(null, new object[] { secondHero });
+            EndAllCourtshipsPatch.EndAllCourtships(secondHero);
             ChangeRomanticStateAction.Apply(firstHero, secondHero, Romance.RomanceLevelEnum.Marriage);
             CampaignEventDispatcher.Instance.OnHeroesMarried(firstHero, secondHero, showNotification);
         }
