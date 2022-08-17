@@ -17,13 +17,11 @@ namespace MarryAnyone.Actions
             {
                 firstHero.Clan = clanAfterMarriage;
                 firstHero.UpdateHomeSettlement();
-                firstHero.SetNewOccupation(Occupation.Lord);
             }
             else
             {
                 secondHero.Clan = clanAfterMarriage;
                 secondHero.UpdateHomeSettlement();
-                secondHero.SetNewOccupation(Occupation.Lord);
             }
             // Romance.EndAllCourtships(firstHero);
             EndAllCourtshipsPatch.EndAllCourtships(firstHero);
