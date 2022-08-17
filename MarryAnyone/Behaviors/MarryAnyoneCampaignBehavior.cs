@@ -22,21 +22,6 @@ namespace MarryAnyone.Behaviors
     {
         public static MarryAnyoneCampaignBehavior? Instance { get; private set; }
 
-        private CharacterObject ConversationCharacter
-        {
-            get => Campaign.Current.ConversationManager.OneToOneConversationCharacter;
-        }
-
-        private IAgent ConversationAgent
-        {
-            get => Campaign.Current.ConversationManager.OneToOneConversationAgent;
-        }
-
-        private int AgentKey
-        {
-            get => MathF.Abs(ConversationAgent.GetHashCode());
-        }
-
         private Hero? _companionHero;
 
         private Dictionary<int, Hero> _heroes;
@@ -113,6 +98,9 @@ namespace MarryAnyone.Behaviors
 
         private void first_time_courtship_conversation_leave_on_consequence()
         {
+            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            int agentKey = MathF.Abs(conversationAgent.GetHashCode());
+
             // Activate!
             ActivateNewHero(Occupation.Wanderer);
 
@@ -120,7 +108,7 @@ namespace MarryAnyone.Behaviors
             RomanceCampaignBehaviorPatches.courtship_conversation_leave_on_consequence(SubModule.RomanceCampaignBehaviorInstance!);
 
             // Remove hero object from character if required
-            if (_heroes.ContainsKey(AgentKey))
+            if (_heroes.ContainsKey(agentKey))
             {
                 RemoveHeroObjectFromCharacter();
             }
@@ -180,6 +168,8 @@ namespace MarryAnyone.Behaviors
         {
             MASettings settings = new();
             Hero spouseHero = Hero.OneToOneConversationHero;
+            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            int agentKey = MathF.Abs(conversationAgent.GetHashCode());
             // Skip courtship means there is no prior romance so crash. Crash crash crash...
             // Need a better check for null here
             if (!settings.SkipCourtship)
@@ -187,7 +177,7 @@ namespace MarryAnyone.Behaviors
                 // Couple agreed on marriage
                 RomanceCampaignBehaviorPatches.conversation_courtship_stage_2_success_on_consequence(SubModule.RomanceCampaignBehaviorInstance!);
             }
-            else if (_heroes.ContainsKey(AgentKey) && _companionHero == Hero.OneToOneConversationHero)
+            else if (_heroes.ContainsKey(agentKey) && _companionHero == Hero.OneToOneConversationHero)
             {
                 RemoveHeroObjectFromCharacter();
                 spouseHero = _companionHero;
@@ -220,26 +210,32 @@ namespace MarryAnyone.Behaviors
 
         public void RemoveHeroObjectFromCharacter()
         {
+            CharacterObject conversationCharacter = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
+            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
+
             // Remove hero association from character
-            if (ConversationCharacter.HeroObject is not null)
+            if (conversationCharacter.HeroObject is not null)
             {
                 // character.HeroObject = null;
-                AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(ConversationCharacter, null);
+                AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(conversationCharacter, null);
             }
             if (_companionHero is null)
             {
                 return;
             }
             // Name permanence from the adoption module of old
-            if (((Agent)ConversationAgent).Name != _companionHero.Name.ToString())
+            if (((Agent)conversationAgent).Name != _companionHero.Name.ToString())
             {
-                AccessTools.Field(typeof(Agent), "_name").SetValue((Agent)ConversationAgent, _companionHero.Name);
+                AccessTools.Field(typeof(Agent), "_name").SetValue((Agent)conversationAgent, _companionHero.Name);
             }
         }
 
         private void conversation_exit_consequence()
         {
-            if (!_heroes.ContainsKey(AgentKey) || _companionHero is null)
+            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            int agentKey = MathF.Abs(conversationAgent.GetHashCode());
+
+            if (!_heroes.ContainsKey(agentKey) || _companionHero is null)
             {
                 return;
             }
@@ -257,39 +253,43 @@ namespace MarryAnyone.Behaviors
                 return;
             }
 
-            if (_heroes.ContainsKey(AgentKey))
+            CharacterObject conversationCharacter = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
+            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            int agentKey = MathF.Abs(conversationAgent.GetHashCode());
+
+            if (_heroes.ContainsKey(agentKey))
             {
                 // Use existing hero
-                _heroes.TryGetValue(AgentKey, out _companionHero);
+                _heroes.TryGetValue(agentKey, out _companionHero);
                 // character.HeroObject = _companionHero;
-                AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(ConversationCharacter, _companionHero);
+                AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(conversationCharacter, _companionHero);
                 return;
             }
 
             MASettings settings = new();
-            CharacterObject template = ConversationCharacter;
+            CharacterObject template = conversationCharacter;
             // CompanionCampaignBehavior -> IntializeCompanionTemplateList()
             if (settings.TemplateCharacter == "Wanderer")
             {
                 // Give hero random wanderer's focus, skills, and combat equipment with same culture and sex
-                template = ConversationCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && x.IsFemale == ConversationCharacter.IsFemale);
+                template = conversationCharacter.Culture.NotableAndWandererTemplates.GetRandomElementWithPredicate((CharacterObject x) => x.Occupation == Occupation.Wanderer && x.IsFemale == conversationCharacter.IsFemale);
             }
 
             // Create a new hero!
-            _companionHero = HeroCreator.CreateSpecialHero(template, Hero.MainHero.CurrentSettlement, null, null, (int)ConversationAgent.Age);
+            _companionHero = HeroCreator.CreateSpecialHero(template, Hero.MainHero.CurrentSettlement, null, null, (int)conversationAgent.Age);
 
             // Meet character for first time
             _companionHero.HasMet = true;
 
             // Add hero to heroes list
-            _heroes.Add(AgentKey, _companionHero);
+            _heroes.Add(agentKey, _companionHero);
 
             // Give hero the agent's appearance
             // hero.StaticBodyProperties = agent.BodyPropertiesValue.StaticProperties;
-            AccessTools.Property(typeof(Hero), "StaticBodyProperties").SetValue(_companionHero, ((Agent)ConversationAgent).BodyPropertiesValue.StaticProperties);
+            AccessTools.Property(typeof(Hero), "StaticBodyProperties").SetValue(_companionHero, ((Agent)conversationAgent).BodyPropertiesValue.StaticProperties);
 
             // Give hero agent's equipment
-            Equipment civilianEquipment = ((Agent)ConversationAgent).SpawnEquipment.Clone();
+            Equipment civilianEquipment = ((Agent)conversationAgent).SpawnEquipment.Clone();
             // CharacterObject -> RandomBattleEquipment
             Equipment battleEquipment = template.AllEquipments.GetRandomElementWithPredicate((Equipment e) => !e.IsCivilian).Clone();
             EquipmentHelper.AssignHeroEquipmentFromEquipment(_companionHero, civilianEquipment);
@@ -303,7 +303,7 @@ namespace MarryAnyone.Behaviors
             SubModule.CharacterDevelopmentCampaignBehaviorInstance!.DevelopCharacterStats(_companionHero);
 
             // character.HeroObject = _companionHero;
-            AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(ConversationCharacter, _companionHero);
+            AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(conversationCharacter, _companionHero);
         }
 
         private bool conversation_hero_main_options_discussions()
@@ -315,8 +315,7 @@ namespace MarryAnyone.Behaviors
             MADebug.Print("Polygamy: " + settings.Polygamy);
             MADebug.Print("Incest: " + settings.Incest);
             // Lords will go the old fashion way!
-            if (Hero.OneToOneConversationHero is not null 
-                && Hero.OneToOneConversationHero.Occupation == Occupation.Lord)
+            if (Hero.OneToOneConversationHero is not null && Hero.OneToOneConversationHero.Occupation == Occupation.Lord)
             {
                 return false;
             }
@@ -332,18 +331,19 @@ namespace MarryAnyone.Behaviors
         {
             MASettings settings = new();
 
-            CharacterObject character = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
+            CharacterObject conversationCharacter = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
+            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
 
-            if (ConversationAgent.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge)
+            if (conversationAgent.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
                 bool isAttracted = true;
                 if (settings.SexualOrientation == "Heterosexual")
                 {
-                    isAttracted = character.IsFemale != Hero.MainHero.IsFemale;
+                    isAttracted = conversationCharacter.IsFemale != Hero.MainHero.IsFemale;
                 }
                 if (settings.SexualOrientation == "Homosexual")
                 {
-                    isAttracted = character.IsFemale == Hero.MainHero.IsFemale;
+                    isAttracted = conversationCharacter.IsFemale == Hero.MainHero.IsFemale;
                 }
                 return isAttracted;
             }
