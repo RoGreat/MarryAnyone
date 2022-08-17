@@ -2,18 +2,19 @@
 using TaleWorlds.CampaignSystem.GameComponents;
 using System.Linq;
 using MarryAnyone.Patches;
+using MarryAnyone.Behaviors;
 
 namespace MarryAnyone.Models
 {
     internal class MarryAnyoneMarriageModel : DefaultMarriageModel
     {
-        private static DefaultMarriageModel? _instance;
+        public static DefaultMarriageModel? Instance { get; private set; }
 
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
-            if (_instance is null)
+            if (Instance is null)
             {
-                _instance = new();
+                Instance = new();
             }
 
             /* Section for AI heroes from the original method */
@@ -35,7 +36,7 @@ namespace MarryAnyone.Models
             bool isHeterosexual = settings.SexualOrientation == "Heterosexual";
             bool isHomosexual = settings.SexualOrientation == "Homosexual";
             bool isIncestuous = settings.Incest;
-            bool discoverAncestors = DefaultMarriageModelPatches.DiscoverAncestors(_instance, firstHero, 3).Intersect(DefaultMarriageModelPatches.DiscoverAncestors(_instance, secondHero, 3)).Any();
+            bool discoverAncestors = DefaultMarriageModelPatches.DiscoverAncestors(Instance, firstHero, 3).Intersect(DefaultMarriageModelPatches.DiscoverAncestors(Instance, secondHero, 3)).Any();
             if (!isIncestuous)
             {
                 if (discoverAncestors)
