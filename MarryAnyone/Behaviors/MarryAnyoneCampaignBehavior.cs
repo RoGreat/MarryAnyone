@@ -136,9 +136,12 @@ namespace MarryAnyone.Behaviors
             courtship_conversation_leave_on_consequence(this);
 
             // Remove hero object from character if required
-            if (_heroes.ContainsKey(conversationAgent))
+            if (conversationAgent is not null)
             {
-                RemoveHeroObjectFromCharacter();
+                if (_heroes.ContainsKey(conversationAgent))
+                {
+                    RemoveHeroObjectFromCharacter();
+                }
             }
         }
 
@@ -196,7 +199,6 @@ namespace MarryAnyone.Behaviors
         {
             MASettings settings = new();
             Hero spouseHero = Hero.OneToOneConversationHero;
-            Agent conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
 
             // Skip courtship means there is no prior romance so crash. Crash crash crash...
             if (settings.SkipCourtship)
@@ -209,7 +211,7 @@ namespace MarryAnyone.Behaviors
                 conversation_courtship_stage_2_success_on_consequence(this);
             }
 
-            if (_heroes.ContainsKey(conversationAgent) && _companionHero == Hero.OneToOneConversationHero)
+            if (_companionHero == Hero.OneToOneConversationHero)
             {
                 RemoveHeroObjectFromCharacter();
                 spouseHero = _companionHero;
@@ -238,7 +240,6 @@ namespace MarryAnyone.Behaviors
         public void RemoveHeroObjectFromCharacter()
         {
             CharacterObject conversationCharacter = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
-            Agent conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
 
             // Remove hero association from character
             if (conversationCharacter.HeroObject is not null)
@@ -249,11 +250,6 @@ namespace MarryAnyone.Behaviors
             if (_companionHero is null)
             {
                 return;
-            }
-            // Name permanence from the adoption module of old
-            if (conversationAgent.Name != _companionHero.Name.ToString())
-            {
-                AccessTools.Field(typeof(Agent), "_name").SetValue(conversationAgent, _companionHero.Name);
             }
         }
 
@@ -306,6 +302,9 @@ namespace MarryAnyone.Behaviors
 
             // Create a new hero!
             _companionHero = HeroCreator.CreateSpecialHero(template, Hero.MainHero.CurrentSettlement, null, null, (int)conversationAgent.Age);
+
+            // Name permanence from the adoption module of old
+            AccessTools.Field(typeof(Agent), "_name").SetValue(conversationAgent, _companionHero.Name);
 
             // Meet character for first time
             _companionHero.HasMet = true;
