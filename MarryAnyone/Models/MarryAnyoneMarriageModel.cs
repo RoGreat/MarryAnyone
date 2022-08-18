@@ -1,21 +1,19 @@
 ﻿using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.GameComponents;
 using System.Linq;
-using MarryAnyone.Patches;
+using HarmonyLib.BUTR.Extensions;
+using System;
 
 namespace MarryAnyone.Models
 {
     internal class MarryAnyoneMarriageModel : DefaultMarriageModel
     {
-        public static DefaultMarriageModel? Instance { get; private set; }
+        // private IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)
+        private delegate IOrderedEnumerable<Hero> DiscoverAncestorsDelegate(DefaultMarriageModel instance, Hero hero, int n);
+        private static readonly DiscoverAncestorsDelegate DiscoverAncestors = AccessTools2.GetDelegate<DiscoverAncestorsDelegate>(typeof(DefaultMarriageModel), "DiscoverAncestors", new Type[] { typeof(Hero), typeof(int) });
 
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
-            if (Instance is null)
-            {
-                Instance = new();
-            }
-
             /* Section for AI heroes from the original method */
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
             if (!isMainHero)
@@ -35,7 +33,7 @@ namespace MarryAnyone.Models
             bool isHeterosexual = settings.SexualOrientation == "Heterosexual";
             bool isHomosexual = settings.SexualOrientation == "Homosexual";
             bool isIncestuous = settings.Incest;
-            bool discoverAncestors = DefaultMarriageModelPatches.DiscoverAncestors(Instance, firstHero, 3).Intersect(DefaultMarriageModelPatches.DiscoverAncestors(Instance, secondHero, 3)).Any();
+            bool discoverAncestors = DiscoverAncestors(this, firstHero, 3).Intersect(DiscoverAncestors(this, secondHero, 3)).Any();
             if (!isIncestuous)
             {
                 if (discoverAncestors)
