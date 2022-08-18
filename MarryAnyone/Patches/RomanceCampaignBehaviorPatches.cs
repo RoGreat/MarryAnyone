@@ -7,7 +7,7 @@ using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.Localization;
 
-namespace MarryAnyone.Patches.Behaviors
+namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(RomanceCampaignBehavior))]
     internal class RomanceCampaignBehaviorPatches
@@ -40,8 +40,8 @@ namespace MarryAnyone.Patches.Behaviors
         [HarmonyPatch("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition")]
         private static void Postfix1(ref bool __result, object __instance)
         {
-            __result = Hero.OneToOneConversationHero is not null 
-                && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) is null 
+            __result = Hero.OneToOneConversationHero is not null
+                && Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) is null
                 && MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
         }
 
@@ -106,7 +106,7 @@ namespace MarryAnyone.Patches.Behaviors
 
             if (romanticLevel == Romance.RomanceLevelEnum.FailedInCompatibility
                 || romanticLevel == Romance.RomanceLevelEnum.FailedInPracticalities
-                || (romanticLevel == Romance.RomanceLevelEnum.Ended && settings.RetryCourtship))
+                || romanticLevel == Romance.RomanceLevelEnum.Ended && settings.RetryCourtship)
             {
                 MBTextManager.SetTextVariable("FLIRTATION_LINE",
                     flag

@@ -11,16 +11,13 @@ namespace MarryAnyone
             if (MCMSettings.Instance is not null)
             {
                 _provider = MCMSettings.Instance;
+                return;
             }
-            else if (MAConfig.Instance is not null)
-            {
-                _provider = MAConfig.Instance!;
-            }
-            else
+            else if (MAConfig.Instance is null)
             {
                 new MAConfig();
-                _provider = MAConfig.Instance!;
             }
+            _provider = MAConfig.Instance!;
         }
 
         public string SexualOrientation

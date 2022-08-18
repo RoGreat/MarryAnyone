@@ -20,15 +20,13 @@ namespace MarryAnyone.Settings
 
     internal sealed class MAConfig : ISettingsProvider
     {
-        public static MAConfig? Instance;
+        public static MAConfig? Instance { get; private set; }
 
         private readonly string _filePath = "..\\..\\Modules\\MarryAnyone\\Config.json";
 
         public MAConfig()
         {
             Instance = this;
-            ReadConfig();
-            WriteConfig();
         }
 
         private bool _polyamory = false;
@@ -49,7 +47,7 @@ namespace MarryAnyone.Settings
 
         private string _templateCharacter = "Default";
 
-        private void WriteConfig()
+        public void WriteConfig()
         {
             try
             {
@@ -74,7 +72,7 @@ namespace MarryAnyone.Settings
             }
         }
 
-        private void ReadConfig()
+        public void ReadConfig()
         {
             try
             {
