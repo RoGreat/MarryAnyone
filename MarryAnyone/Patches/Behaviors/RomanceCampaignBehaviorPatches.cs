@@ -1,5 +1,7 @@
 ﻿using HarmonyLib;
+using MarryAnyone.Behaviors;
 using MarryAnyone.Helpers;
+using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
@@ -8,8 +10,16 @@ using TaleWorlds.Localization;
 namespace MarryAnyone.Patches.Behaviors
 {
     [HarmonyPatch(typeof(RomanceCampaignBehavior))]
-    internal partial class RomanceCampaignBehaviorPatches
+    internal class RomanceCampaignBehaviorPatches
     {
+        /* Reverse Patches */
+        [HarmonyReversePatch]
+        [HarmonyPatch("MarriageCourtshipPossibility")]
+        public static bool MarriageCourtshipPossibility(object instance, Hero person1, Hero person2)
+        {
+            throw new NotImplementedException();
+        }
+
         /* Prefixes */
         [HarmonyPrefix]
         [HarmonyPatch("conversation_finalize_courtship_for_hero_on_condition")]
@@ -78,7 +88,7 @@ namespace MarryAnyone.Patches.Behaviors
                 || !Hero.OneToOneConversationHero.IsFemale && settings.SexualOrientation == "Bisexual";
 
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-            bool courtshipPossible = MarriageCourtshipPossibility(SubModule.RomanceCampaignBehaviorInstance!, Hero.MainHero, Hero.OneToOneConversationHero);
+            bool courtshipPossible = MarryAnyoneCampaignBehavior.MarriageCourtshipPossibility(SubModule.RomanceCampaignBehaviorInstance!, Hero.MainHero, Hero.OneToOneConversationHero);
 
             MADebug.Print("Romantic Level: " + romanticLevel);
             MADebug.Print("Courtship Possible: " + courtshipPossible);
