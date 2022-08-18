@@ -68,13 +68,13 @@ namespace MarryAnyone.Patches.Behaviors
         /* conversation_player_can_open_courtship_on_condition */
         [HarmonyPrefix]
         [HarmonyPatch("conversation_player_can_open_courtship_on_condition")]
-        private static bool Prefix2(ref bool __result)
+        private static bool Prefix2(ref bool __result, object __instance)
         {
-            __result = conversation_player_can_open_courtship_on_condition();
+            __result = conversation_player_can_open_courtship_on_condition(__instance);
             return false;
         }
 
-        private static bool conversation_player_can_open_courtship_on_condition()
+        private static bool conversation_player_can_open_courtship_on_condition(object __instance)
         {
             if (Hero.OneToOneConversationHero is null)
             {
@@ -88,7 +88,7 @@ namespace MarryAnyone.Patches.Behaviors
                 || !Hero.OneToOneConversationHero.IsFemale && settings.SexualOrientation == "Bisexual";
 
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-            bool courtshipPossible = MarryAnyoneCampaignBehavior.MarriageCourtshipPossibility(SubModule.RomanceCampaignBehaviorInstance!, Hero.MainHero, Hero.OneToOneConversationHero);
+            bool courtshipPossible = MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
 
             MADebug.Print("Romantic Level: " + romanticLevel);
             MADebug.Print("Courtship Possible: " + courtshipPossible);
