@@ -5,7 +5,7 @@ using TaleWorlds.CampaignSystem;
 namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(Romance), "EndAllCourtships")]
-    internal class EndAllCourtshipsPatch
+    internal sealed class EndAllCourtshipsPatch
     {
         private static bool Prefix(Hero forHero)
         {

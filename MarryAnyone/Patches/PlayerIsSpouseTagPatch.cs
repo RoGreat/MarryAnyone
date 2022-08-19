@@ -5,7 +5,7 @@ using TaleWorlds.CampaignSystem.Conversation.Tags;
 namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(PlayerIsSpouseTag), "IsApplicableTo")]
-    internal class PlayerIsSpouseTagPatch
+    internal sealed class PlayerIsSpouseTagPatch
     {
         private static void Postfix(ref bool __result, CharacterObject character)
         {

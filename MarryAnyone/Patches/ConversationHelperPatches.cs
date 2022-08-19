@@ -7,7 +7,7 @@ using TaleWorlds.Localization;
 namespace MarryAnyone.Patches
 {
     [HarmonyPatch(typeof(ConversationHelper))]
-    internal class ConversationHelperPatches
+    internal sealed class ConversationHelperPatches
     {
         [HarmonyPatch("GetHeroRelationToHeroTextShort")]
         private static void Postfix1()
