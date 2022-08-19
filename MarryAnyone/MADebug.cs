@@ -1,7 +1,7 @@
 ﻿using System;
 using TaleWorlds.Library;
 
-namespace MarryAnyone.Helpers
+namespace MarryAnyone
 {
     internal static class MADebug
     {
@@ -11,7 +11,7 @@ namespace MarryAnyone.Helpers
             if (settings.Debug)
             {
                 Color color = new(0.6f, 0.2f, 1f);
-                InformationManager.DisplayMessage(new InformationMessage($"Marry Anyone: {message}", color));
+                InformationManager.DisplayMessage(new InformationMessage(message, color));
             }
         }
 

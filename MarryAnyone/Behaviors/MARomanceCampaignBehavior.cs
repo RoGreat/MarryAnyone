@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Helpers;
+using HarmonyLib.BUTR.Extensions;
 using System;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
@@ -7,17 +7,18 @@ using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Conversation.Persuasion;
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.MountAndBlade;
 using Helpers;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
-using TaleWorlds.CampaignSystem.Settlements;
 using MarryAnyone.Actions;
-using HarmonyLib.BUTR.Extensions;
+using MarryAnyone.Helpers;
 
 namespace MarryAnyone.Behaviors
 {
-    internal sealed class MarryAnyoneCampaignBehavior : RomanceCampaignBehavior
+    internal sealed class MARomanceCampaignBehavior : RomanceCampaignBehavior
     {
         // public static MarryAnyoneCampaignBehavior? Instance { get; private set; }
 
@@ -25,7 +26,7 @@ namespace MarryAnyone.Behaviors
 
         private Dictionary<Agent, Hero> _heroes;
 
-        public MarryAnyoneCampaignBehavior()
+        public MARomanceCampaignBehavior()
         {
             // Instance = this;
             _heroes = new();
@@ -156,8 +157,16 @@ namespace MarryAnyone.Behaviors
             }
             // Change to Lord
             ActivateNewHero(Occupation.Lord);
+            // Remove duplicates
+            MAHelpers.RemoveExSpouses(Hero.MainHero);
+            MAHelpers.RemoveExSpouses(spouseHero);
             // Apply marriage action
-            MarryAnyoneMarriageAction.Apply(Hero.MainHero, spouseHero, true);
+            MAMarriageAction.Apply(Hero.MainHero, spouseHero, true);
+            // Leave encounter
+            if (PlayerEncounter.Current != null)
+            {
+                PlayerEncounter.LeaveEncounter = true;
+            }
         }
 
         private bool skip_courtship_on_condition()
@@ -194,7 +203,15 @@ namespace MarryAnyone.Behaviors
 
         private void MA_courtship_conversation_leave_on_consequence()
         {
-            Agent conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            Agent conversationAgent;
+            try
+            {
+                conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            }
+            catch
+            {
+                return;
+            }
 
             // Activate!
             ActivateNewHero(Occupation.Wanderer);
@@ -202,13 +219,15 @@ namespace MarryAnyone.Behaviors
             // Start courtship consequence after hero is setup
             courtship_conversation_leave_on_consequence(this);
 
-            // Remove hero object from character if required
-            if (conversationAgent is not null)
+            if (conversationAgent is null)
             {
-                if (_heroes.ContainsKey(conversationAgent))
-                {
-                    RemoveHeroObjectFromCharacter();
-                }
+                return;
+            }
+
+            // Remove hero object from character if required
+            if (_heroes.ContainsKey(conversationAgent))
+            {
+                RemoveHeroObjectFromCharacter();
             }
         }
 
@@ -293,7 +312,15 @@ namespace MarryAnyone.Behaviors
 
         private void conversation_exit_consequence()
         {
-            Agent conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            Agent conversationAgent;
+            try 
+            {
+                conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            }
+            catch
+            {
+                return;
+            }
 
             if (conversationAgent is null || _companionHero is null)
             {
@@ -313,7 +340,15 @@ namespace MarryAnyone.Behaviors
 
         private void create_new_hero_consequence()
         {
-            Agent conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            Agent conversationAgent;
+            try
+            {
+                conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            }
+            catch
+            {
+                return;
+            }
 
             if (Hero.OneToOneConversationHero is not null || conversationAgent is null)
             {
@@ -428,7 +463,7 @@ namespace MarryAnyone.Behaviors
             // Avoid potential crashes for quick talk by using IAgent
             IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
 
-            if (conversationAgent.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge && Hero.MainHero.CanMarry())
+            if (conversationAgent.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge)
             {
                 bool isAttracted = true;
                 if (settings.SexualOrientation == "Heterosexual")
@@ -502,10 +537,6 @@ namespace MarryAnyone.Behaviors
         public override void RegisterEvents()
         {
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, new Action<CampaignGameStarter>(OnSessionLaunched));
-        }
-
-        public override void SyncData(IDataStore dataStore)
-        {
         }
     }
 }

@@ -31,4 +31,9 @@
       <Tags />
     </SubModule>
   </SubModules>
+	<Xmls>
+		<XmlNode>
+			<XmlName id="GameText" path="ma_module_strings"/>
+		</XmlNode>
+	</Xmls>
 </Module>

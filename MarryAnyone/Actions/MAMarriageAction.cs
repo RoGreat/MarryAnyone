@@ -4,7 +4,7 @@ using MarryAnyone.Patches;
 
 namespace MarryAnyone.Actions
 {
-    internal static class MarryAnyoneMarriageAction
+    internal static class MAMarriageAction
     {
         private static void ApplyInternal(Hero firstHero, Hero secondHero, bool showNotification)
         {
