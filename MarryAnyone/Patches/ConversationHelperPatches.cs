@@ -1,6 +1,9 @@
 ﻿using HarmonyLib;
+using System.Collections.Generic;
+using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Conversation;
+using TaleWorlds.CampaignSystem.Extensions;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 
@@ -10,14 +13,112 @@ namespace MarryAnyone.Patches
     internal sealed class ConversationHelperPatches
     {
         [HarmonyPatch("GetHeroRelationToHeroTextShort")]
-        private static void Postfix1()
+        private static void Postfix(ref string __result, Hero queriedHero, Hero baseHero, bool uppercaseFirst)
         {
-            /* Should be reimplemented */
+            string tempResult = __result;
+            __result = GetHeroRelationToHeroTextShort(queriedHero, baseHero, uppercaseFirst);
+            if (__result == "")
+            {
+                __result = tempResult;
+            }
         }
 
-        private static TextObject FindText(string id)
+        private static string GetHeroRelationToHeroTextShort(Hero queriedHero, Hero baseHero, bool uppercaseFirst)
         {
-            return GameTexts.FindText(id, null);
+            TextObject? textObject = null;
+            if (baseHero.Father == queriedHero && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
+            {
+                textObject = GameTexts.FindText("str_fatherhusband");
+            }
+            if (baseHero.Mother == queriedHero && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
+            {
+                textObject = GameTexts.FindText("str_motherwife");
+            }
+            if (baseHero.Siblings.Contains(queriedHero) && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
+            {
+                if (!queriedHero.IsFemale)
+                {
+                    textObject = GameTexts.FindText("str_brotherhusband");
+                }
+                textObject = GameTexts.FindText("str_sisterwife");
+            }
+            if (baseHero.Children.Contains(queriedHero) && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
+            {
+                if (!queriedHero.IsFemale)
+                {
+                    textObject = GameTexts.FindText("str_sonhusband");
+                }
+                textObject = GameTexts.FindText("str_daughterwife");
+            }
+            if (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero))
+            {
+                if (!queriedHero.IsAlive || !baseHero.IsAlive)
+                {
+                    if (!queriedHero.IsFemale)
+                    {
+                        textObject = GameTexts.FindText("str_exhusband");
+                    }
+                    textObject = GameTexts.FindText("str_exwife");
+                }
+                else if (!queriedHero.IsFemale)
+                {
+                    textObject = GameTexts.FindText("str_husband");
+                }
+                textObject = GameTexts.FindText("str_wife");
+            }
+            // Revamped spouse's spouse
+            if (baseHero.Spouse is not null)
+            {
+                // Spouse to ExSpouse
+                foreach (Hero spouse in baseHero.Spouse.ExSpouses)
+                {
+                    List<Hero> otherSpouses = spouse.ExSpouses.Where(x => x.IsAlive).ToList();
+                    foreach (Hero otherSpouse in otherSpouses)
+                    {
+                        if (otherSpouse == queriedHero)
+                        {
+                            textObject = SpousesSpouse(spouse, queriedHero);
+                        }
+                    }
+                }
+            }
+            List<Hero> spouses = baseHero.ExSpouses.Where(x => x.IsAlive).ToList();
+            foreach (Hero spouse in spouses)
+            {
+                // ExSpouse to Spouse
+                if (spouse.Spouse == queriedHero)
+                {
+                    textObject = SpousesSpouse(spouse, queriedHero);
+                }
+                List<Hero> otherSpouses = spouse.ExSpouses.Where(x => x.IsAlive).ToList();
+                // ExSpouse to ExSpouse
+                foreach (Hero otherSpouse in otherSpouses)
+                {
+                    if (otherSpouse == queriedHero)
+                    {
+                        textObject = SpousesSpouse(spouse, queriedHero);
+                    }
+                }
+            }
+            if (textObject == null)
+            {
+                return "";
+            }
+            else if (queriedHero != null)
+            {
+                textObject.SetCharacterProperties("NPC", queriedHero.CharacterObject, false);
+            }
+            string text = textObject.ToString();
+            if (!char.IsLower(text[0]) != uppercaseFirst)
+            {
+                char[] array = text.ToCharArray();
+                text = uppercaseFirst ? array[0].ToString().ToUpper() : array[0].ToString().ToLower();
+                for (int i = 1; i < array.Count(); i++)
+                {
+                    text += array[i].ToString();
+                }
+            }
+            return text;
         }
 
         private static TextObject SpousesSpouse(Hero spouse, Hero queriedHero)
@@ -44,48 +145,9 @@ namespace MarryAnyone.Patches
             return settings.Polyamory ? FindText("str_wife") : FindText("str_wifes_wife");
         }
 
-        [HarmonyPatch("HeroRefersToHero")]
-        private static void Postfix2(ref TextObject __result, Hero talkTroop)
+        private static TextObject FindText(string id)
         {
-            TextObject tempResult = __result;
-            __result = HeroAddressesPlayer(talkTroop);
-            if (__result == TextObject.Empty)
-            {
-                __result = tempResult;
-            }
-        }
-
-        // Account for different relationships
-        private static TextObject HeroAddressesPlayer(Hero talkTroop)
-        {
-            // Same-sex
-            if (talkTroop.Spouse == Hero.MainHero && !talkTroop.IsFemale && !Hero.MainHero.IsFemale)
-            {
-                return new TextObject("{=rPrBa7gK}My husband", null);
-            }
-            if (talkTroop.Spouse == Hero.MainHero && talkTroop.IsFemale && Hero.MainHero.IsFemale)
-            {
-                return new TextObject("{=t6sRVI5C}My wife", null);
-            }
-            // Polygamy and same-sex
-            if (talkTroop.ExSpouses.Contains(Hero.MainHero) && !talkTroop.IsFemale && !Hero.MainHero.IsFemale)
-            {
-                return new TextObject("{=rPrBa7gK}My husband", null);
-            }
-            if (talkTroop.ExSpouses.Contains(Hero.MainHero) && talkTroop.IsFemale && Hero.MainHero.IsFemale)
-            {
-                return new TextObject("{=t6sRVI5C}My wife", null);
-            }
-            // Polygamy
-            if (talkTroop.ExSpouses.Contains(Hero.MainHero) && talkTroop.IsFemale)
-            {
-                return new TextObject("{=rPrBa7gK}My husband", null);
-            }
-            if (talkTroop.ExSpouses.Contains(Hero.MainHero))
-            {
-                return new TextObject("{=t6sRVI5C}My wife", null);
-            }
-            return TextObject.Empty;
+            return GameTexts.FindText(id, null);
         }
     }
 }

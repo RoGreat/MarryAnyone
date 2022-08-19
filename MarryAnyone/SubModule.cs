@@ -26,8 +26,8 @@ namespace MarryAnyone
             if (game.GameType is Campaign)
             {
                 CampaignGameStarter campaignGameStarter = (CampaignGameStarter)gameStarterObject;
-                campaignGameStarter.AddBehavior(new MarryAnyoneCampaignBehavior());
-                campaignGameStarter.AddModel(new MarryAnyoneMarriageModel());
+                campaignGameStarter.AddBehavior(new MARomanceCampaignBehavior());
+                campaignGameStarter.AddModel(new MAMarriageModel());
                 /* Used for calling private methods in these instances */
                 CompanionsCampaignBehaviorInstance = new();
                 CharacterDevelopmentCampaignBehaviorInstance = new();

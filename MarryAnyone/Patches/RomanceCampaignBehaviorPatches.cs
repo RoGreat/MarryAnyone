@@ -74,6 +74,24 @@ namespace MarryAnyone.Patches
             }
         }
 
+        // Need to clean up encyclopedia after marriage barter
+        [HarmonyPostfix]
+        [HarmonyPatch("conversation_finalize_marriage_barter_consequence")]
+        private static void Postfix4()
+        {
+            Hero spouseHero = Hero.OneToOneConversationHero;
+            Hero cheatedHero = spouseHero.Spouse;
+            MASettings settings = new();
+            if (settings.Cheating && cheatedHero is not null)
+            {
+                MAHelpers.RemoveExSpouses(cheatedHero, true);
+                MAHelpers.RemoveExSpouses(spouseHero, true);
+                MADebug.Print("Spouse Broke Off Past Marriage");
+            }
+            MAHelpers.RemoveExSpouses(Hero.MainHero);
+            MAHelpers.RemoveExSpouses(spouseHero);
+        }
+
         /* Methods */
         private static bool conversation_player_can_open_courtship_on_condition(object __instance)
         {

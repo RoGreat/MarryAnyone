@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace MarryAnyone.Models
 {
-    internal sealed class MarryAnyoneMarriageModel : DefaultMarriageModel
+    internal sealed class MAMarriageModel : DefaultMarriageModel
     {
         // private IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)
         private delegate IEnumerable<Hero> DiscoverAncestorsDelegate(DefaultMarriageModel instance, Hero hero, int n);
