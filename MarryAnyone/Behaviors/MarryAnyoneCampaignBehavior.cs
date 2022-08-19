@@ -42,10 +42,6 @@ namespace MarryAnyone.Behaviors
         private static readonly MarriageCourtshipPossibilityDelegate MarriageCourtshipPossibility = AccessTools2.GetDelegate<MarriageCourtshipPossibilityDelegate>(typeof(RomanceCampaignBehavior), "MarriageCourtshipPossibility", new Type[] { typeof(Hero), typeof(Hero) });
 
         /* Conditions */
-        // private bool conversation_finalize_courtship_for_hero_on_condition()
-        private delegate bool conversation_finalize_courtship_for_hero_on_condition_delegate(RomanceCampaignBehavior instance);
-        private static readonly conversation_finalize_courtship_for_hero_on_condition_delegate conversation_finalize_courtship_for_hero_on_condition = AccessTools2.GetDelegate<conversation_finalize_courtship_for_hero_on_condition_delegate>(typeof(RomanceCampaignBehavior), "conversation_finalize_courtship_for_hero_on_condition");
-
         // private bool conversation_courtship_decline_reaction_to_player_on_condition()
         private delegate bool conversation_courtship_decline_reaction_to_player_on_condition_delegate(RomanceCampaignBehavior instance);
         private static readonly conversation_courtship_decline_reaction_to_player_on_condition_delegate conversation_courtship_decline_reaction_to_player_on_condition = AccessTools2.GetDelegate<conversation_courtship_decline_reaction_to_player_on_condition_delegate>(typeof(RomanceCampaignBehavior), "conversation_courtship_decline_reaction_to_player_on_condition");
@@ -63,7 +59,7 @@ namespace MarryAnyone.Behaviors
         private delegate void courtship_conversation_leave_on_consequence_delegate(RomanceCampaignBehavior instance);
         private static readonly courtship_conversation_leave_on_consequence_delegate courtship_conversation_leave_on_consequence = AccessTools2.GetDelegate<courtship_conversation_leave_on_consequence_delegate>(typeof(RomanceCampaignBehavior), "courtship_conversation_leave_on_consequence");
 
-        // private void conversation_player_opens_courtship_on_consequence
+        // private void conversation_player_opens_courtship_on_consequence()
         private delegate void conversation_player_opens_courtship_on_consequence_delegate (RomanceCampaignBehavior instance);
         private static readonly conversation_player_opens_courtship_on_consequence_delegate conversation_player_opens_courtship_on_consequence = AccessTools2.GetDelegate<conversation_player_opens_courtship_on_consequence_delegate>(typeof(RomanceCampaignBehavior), "conversation_player_opens_courtship_on_consequence");
 
@@ -167,7 +163,7 @@ namespace MarryAnyone.Behaviors
         private bool skip_courtship_on_condition()
         {
             // Only for lords...
-            if (Hero.OneToOneConversationHero is null || Hero.OneToOneConversationHero.Occupation != Occupation.Lord)
+            if (Hero.OneToOneConversationHero.Occupation != Occupation.Lord)
             {
                 return false;
             }
@@ -179,7 +175,7 @@ namespace MarryAnyone.Behaviors
         private bool skip_courtship_conversation_courtship_reaction_to_player_on_condition()
         {
             // Only for lords...
-            if (Hero.OneToOneConversationHero is null || Hero.OneToOneConversationHero.Occupation != Occupation.Lord)
+            if (Hero.OneToOneConversationHero.Occupation != Occupation.Lord)
             {
                 return false;
             }

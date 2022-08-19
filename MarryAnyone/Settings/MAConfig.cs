@@ -78,6 +78,15 @@ namespace MarryAnyone.Settings
             {
                 string jsonString = File.ReadAllText(_filePath);
                 var config = JsonConvert.DeserializeObject<Config>(jsonString);
+                // Added error handling!
+                if (config.SexualOrientation != "Heterosexual" && config.SexualOrientation != "Homosexual" && config.SexualOrientation != "Bisexual")
+                {
+                    throw new Exception($"{config.SexualOrientation} is not a valid SexualOrientation. Valid options: \"Heterosexual\", \"Homosexual\", or \"Bisexual\"");
+                }
+                if (config.TemplateCharacter != "Default" && config.TemplateCharacter != "Wanderer")
+                {
+                    throw new Exception($"{config.TemplateCharacter} is not a valid TemplateCharacter. Valid options: \"Default\" or \"Wanderer\"");
+                }
                 _sexualOrientation = config.SexualOrientation!;
                 _polygamy = config.Polygamy;
                 _polyamory = config.Polyamory;

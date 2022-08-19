@@ -26,19 +26,13 @@ namespace MarryAnyone.Settings
         }, 0);
 
         public string SexualOrientation 
-        { 
+        {
             get => SexualOrientationDropdown.SelectedValue;
-            set
-            {
-                if (SexualOrientationDropdown.SelectedValue != value)
-                {
-                    SexualOrientationDropdown.SelectedValue = value;
-                }
-            }
+            set => SexualOrientationDropdown.SelectedValue = value;
         }
 
-        [SettingPropertyDropdown("{=templatechar}Template Character", RequireRestart = false, HintText = "{=templatechar_desc}Set the template character that is used to set things like hero name, skills, and equipment.")]
-        [SettingPropertyGroup("{=hero}Hero")]
+        [SettingPropertyDropdown("{=templatechar}Template Character", RequireRestart = false, HintText = "{=templatechar_desc}Set the template character that is used to set things like the hero name, skills, and equipment.")]
+        [SettingPropertyGroup("{=commonfolk}Commonfolk")]
         public DropdownDefault<string> TemplateCharacterDropdown { get; set; } = new DropdownDefault<string>(new string[]
         {
             "Default",
@@ -48,20 +42,14 @@ namespace MarryAnyone.Settings
         public string TemplateCharacter
         {
             get => TemplateCharacterDropdown.SelectedValue;
-            set
-            {
-                if (TemplateCharacterDropdown.SelectedValue != value)
-                {
-                    TemplateCharacterDropdown.SelectedValue = value;
-                }
-            }
+            set => TemplateCharacterDropdown.SelectedValue = value;
         }
 
         [SettingPropertyBool("{=cheating}Cheating", Order = 2, RequireRestart = false, HintText = "{=cheating_desc}Player character can marry characters that are already married.")]
         [SettingPropertyGroup("{=relationship}Relationship Options", GroupOrder = 2)]
         public bool Cheating { get; set; } = false;
 
-        [SettingPropertyBool("{=polygamy}Polygamy", Order = 0, RequireRestart = false, HintText = "{=polygamy_desc}Player character can have polygamous relationships.")]
+        [SettingPropertyBool("{=polygamy}Polygamy", Order = 0, RequireRestart = false, HintText = "{=polygamy_desc}Player character can have multiple marriages at once.")]
         [SettingPropertyGroup("{=relationship}Relationship Options", GroupOrder = 2)]
         public bool Polygamy { get; set; } = false;
 
