@@ -457,11 +457,13 @@ namespace MarryAnyone.Behaviors
             MADebug.Print("Cheating: " + settings.Cheating);
             MADebug.Print("Polygamy: " + settings.Polygamy);
             MADebug.Print("Incest: " + settings.Incest);
-            // Lords will go the old fashion way!
-            if (Hero.OneToOneConversationHero is not null 
-                && Hero.OneToOneConversationHero.Occupation == Occupation.Lord)
+            if (Hero.OneToOneConversationHero is not null)
             {
-                return false;
+                // Heroes will avoid romance if they are a lord or they cannot marry the player
+                if (Hero.OneToOneConversationHero.Occupation == Occupation.Lord || !Hero.OneToOneConversationHero.CanMarry())
+                {
+                    return false;
+                }
             }
             // For player agent interaction
             if (PlayerIsAttractedToAgent())
