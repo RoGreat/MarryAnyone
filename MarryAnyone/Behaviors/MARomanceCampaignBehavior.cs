@@ -115,6 +115,7 @@ namespace MarryAnyone.Behaviors
             // Skip courtship option
             starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer", start + "lord_start_courtship_response_player_offer", "hero_courtship_task_2_next_reservation", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(MA_skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 120, null, null);
             starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_2", start + "lord_start_courtship_response_player_offer", "hero_courtship_task_2_next_reservation", "{=gnXoIChw}Perhaps you and I...", new ConversationSentence.OnConditionDelegate(MA_skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 120, null, null);
+
             // After initial courtship ask for hand in marriage
             starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer", start + "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=cKtJBdPD}I wish to offer my hand in marriage.", new ConversationSentence.OnConditionDelegate(MA_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 120, null, null);
             starter.AddPlayerLine("MA" + "lord_start_courtship_response_player_offer_2", start + "lord_start_courtship_response_player_offer", "lord_start_courtship_response_2", "{=gnXoIChw}Perhaps you and I...", new ConversationSentence.OnConditionDelegate(MA_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 120, null, null);
@@ -150,6 +151,7 @@ namespace MarryAnyone.Behaviors
                 conversation_courtship_stage_2_success_on_consequence(this);
             }
 
+            // Need to clean out _companionHero after agent stage to prevent removal of hero...
             if (_companionHero == Hero.OneToOneConversationHero)
             {
                 RemoveHeroObjectFromCharacter();
@@ -157,11 +159,11 @@ namespace MarryAnyone.Behaviors
             }
             // Change to Lord
             ActivateNewHero(Occupation.Lord);
+            // Apply marriage action
+            MAMarriageAction.Apply(Hero.MainHero, spouseHero, true);
             // Remove duplicates
             MAHelpers.RemoveExSpouses(Hero.MainHero);
             MAHelpers.RemoveExSpouses(spouseHero);
-            // Apply marriage action
-            MAMarriageAction.Apply(Hero.MainHero, spouseHero, true);
             // Leave encounter
             if (PlayerEncounter.Current != null)
             {
@@ -436,6 +438,8 @@ namespace MarryAnyone.Behaviors
 
         private bool conversation_hero_main_options_discussions()
         {
+            // Clear previous companion heroes before starting
+            _companionHero = null;
             // Leave patch accounts for agents that are temporary heroes
             MASettings settings = new();
             MADebug.Print("Orientation: " + settings.SexualOrientation);
