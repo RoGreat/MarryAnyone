@@ -8,7 +8,7 @@ namespace MarryAnyone.Settings
     // Instance is null for some reason...
     // Seems to be that setting fields are null on new game creation
     // Have to reload save in order for it to work.
-    internal class MCMSettings : AttributePerSaveSettings<MCMSettings>, ISettingsProvider
+    internal sealed class MCMSettings : AttributePerSaveSettings<MCMSettings>, ISettingsProvider
     {
         public override string Id => "MASettings";
 

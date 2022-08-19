@@ -8,7 +8,7 @@ using TaleWorlds.MountAndBlade;
 
 namespace MarryAnyone
 {
-    internal class SubModule : MBSubModuleBase
+    internal sealed class SubModule : MBSubModuleBase
     {
         public static CompanionsCampaignBehavior? CompanionsCampaignBehaviorInstance { get; private set; }
 

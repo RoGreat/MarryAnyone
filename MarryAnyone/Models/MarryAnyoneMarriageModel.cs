@@ -3,13 +3,14 @@ using TaleWorlds.CampaignSystem.GameComponents;
 using System.Linq;
 using HarmonyLib.BUTR.Extensions;
 using System;
+using System.Collections.Generic;
 
 namespace MarryAnyone.Models
 {
-    internal class MarryAnyoneMarriageModel : DefaultMarriageModel
+    internal sealed class MarryAnyoneMarriageModel : DefaultMarriageModel
     {
         // private IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)
-        private delegate IOrderedEnumerable<Hero> DiscoverAncestorsDelegate(DefaultMarriageModel instance, Hero hero, int n);
+        private delegate IEnumerable<Hero> DiscoverAncestorsDelegate(DefaultMarriageModel instance, Hero hero, int n);
         private static readonly DiscoverAncestorsDelegate DiscoverAncestors = AccessTools2.GetDelegate<DiscoverAncestorsDelegate>(typeof(DefaultMarriageModel), "DiscoverAncestors", new Type[] { typeof(Hero), typeof(int) });
 
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
