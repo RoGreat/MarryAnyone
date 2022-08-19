@@ -444,6 +444,11 @@ namespace MarryAnyone.Behaviors
 
         private bool conversation_hero_main_options_discussions()
         {
+            // Can't marry, don't bother
+            if (!Hero.MainHero.CanMarry())
+            {
+                return false;
+            }
             // Clear previous companion heroes before starting
             _companionHero = null;
             // Leave patch accounts for agents that are temporary heroes
@@ -453,7 +458,8 @@ namespace MarryAnyone.Behaviors
             MADebug.Print("Polygamy: " + settings.Polygamy);
             MADebug.Print("Incest: " + settings.Incest);
             // Lords will go the old fashion way!
-            if (Hero.OneToOneConversationHero is not null && Hero.OneToOneConversationHero.Occupation == Occupation.Lord)
+            if (Hero.OneToOneConversationHero is not null 
+                && Hero.OneToOneConversationHero.Occupation == Occupation.Lord)
             {
                 return false;
             }
