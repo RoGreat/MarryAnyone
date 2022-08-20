@@ -43,13 +43,13 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=polygamy}Polygamy", GroupOrder = 1)]
         public bool Polygamy { get; set; } = false;
 
-        [SettingPropertyBool("{=polyamory}Polyamory", Order = 3, RequireRestart = false, HintText = "{=polyamory_desc}Player character's spouses can have relationships with each other.")]
+        [SettingPropertyBool("{=polyamory}Polyamory", Order = 2, RequireRestart = false, HintText = "{=polyamory_desc}Player character's spouses can have relationships with each other.")]
         [SettingPropertyGroup("{=polygamy}Polygamy", GroupOrder = 1)]
         public bool Polyamory { get; set; } = false;
 
-        [SettingPropertyBool("{=pregnancy}Pregnancy", RequireRestart = false, HintText = "{=pregnancy_desc}Pregnancy mod that allows pregnancy with multiple spouses.")]
-        [SettingPropertyGroup("{=pregnancy}Pregnancy", GroupOrder = 2)]
-        public bool Pregnancy { get; set; } = true;
+        [SettingPropertyBool("{=pregnancy}Pregnancy+", RequireRestart = false, HintText = "{=pregnancy_desc}Changes pregnancy behavior to allow pregnancy with multiple spouses.", IsToggle = true)]
+        [SettingPropertyGroup("{=pregnancy}Pregnancy+", GroupOrder = 2)]
+        public bool PregnancyPlus { get; set; } = true;
 
         [SettingPropertyBool("{=skip_courtship}Skip Courtship", Order = 0, RequireRestart = false, HintText = "{=skip_courtship_desc}Player can skip courtship and marry immediately.")]
         [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 3)]

@@ -26,17 +26,17 @@ namespace MarryAnyone.Patches
         private static string GetHeroRelationToHeroTextShort(Hero queriedHero, Hero baseHero, bool uppercaseFirst)
         {
             TextObject? textObject = null;
-            if (baseHero.Father == queriedHero 
+            if (baseHero.Father == queriedHero
                 && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 textObject = GameTexts.FindText("str_fatherhusband");
             }
-            else if (baseHero.Mother == queriedHero 
+            else if (baseHero.Mother == queriedHero
                 && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 textObject = GameTexts.FindText("str_motherwife");
             }
-            else if (baseHero.Siblings.Contains(queriedHero) 
+            else if (baseHero.Siblings.Contains(queriedHero)
                 && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 if (!queriedHero.IsFemale)
@@ -48,7 +48,7 @@ namespace MarryAnyone.Patches
                     textObject = GameTexts.FindText("str_sisterwife");
                 }
             }
-            else if (baseHero.Children.Contains(queriedHero) 
+            else if (baseHero.Children.Contains(queriedHero)
                 && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 if (!queriedHero.IsFemale)
@@ -82,37 +82,40 @@ namespace MarryAnyone.Patches
                     textObject = GameTexts.FindText("str_wife");
                 }
             }
-            /* Section for spouse's spouse */
-            if (baseHero.Spouse is not null)
+            else
             {
-                // Spouse to ExSpouse
-                foreach (Hero spouse in baseHero.Spouse.ExSpouses)
+                /* Section for spouse's spouse */
+                if (baseHero.Spouse is not null)
                 {
+                    // Spouse to ExSpouse
+                    foreach (Hero spouse in baseHero.Spouse.ExSpouses)
+                    {
+                        List<Hero> otherSpouses = spouse.ExSpouses.Where(x => x.IsAlive).ToList();
+                        foreach (Hero otherSpouse in otherSpouses)
+                        {
+                            if (otherSpouse == queriedHero)
+                            {
+                                textObject = SpousesSpouse(spouse, queriedHero);
+                            }
+                        }
+                    }
+                }
+                List<Hero> spouses = baseHero.ExSpouses.Where(x => x.IsAlive).ToList();
+                foreach (Hero spouse in spouses)
+                {
+                    // ExSpouse to Spouse
+                    if (spouse.Spouse == queriedHero)
+                    {
+                        textObject = SpousesSpouse(spouse, queriedHero);
+                    }
                     List<Hero> otherSpouses = spouse.ExSpouses.Where(x => x.IsAlive).ToList();
+                    // ExSpouse to ExSpouse
                     foreach (Hero otherSpouse in otherSpouses)
                     {
                         if (otherSpouse == queriedHero)
                         {
                             textObject = SpousesSpouse(spouse, queriedHero);
                         }
-                    }
-                }
-            }
-            List<Hero> spouses = baseHero.ExSpouses.Where(x => x.IsAlive).ToList();
-            foreach (Hero spouse in spouses)
-            {
-                // ExSpouse to Spouse
-                if (spouse.Spouse == queriedHero)
-                {
-                    textObject = SpousesSpouse(spouse, queriedHero);
-                }
-                List<Hero> otherSpouses = spouse.ExSpouses.Where(x => x.IsAlive).ToList();
-                // ExSpouse to ExSpouse
-                foreach (Hero otherSpouse in otherSpouses)
-                {
-                    if (otherSpouse == queriedHero)
-                    {
-                        textObject = SpousesSpouse(spouse, queriedHero);
                     }
                 }
             }
