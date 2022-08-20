@@ -4,9 +4,6 @@
     <tag language="English" />
   </tags>  
   <strings>
-		<!-- Romance -->
-		<string id="lord_flirt" text="My lord, I note that you have not yet taken a spouse." />
-		<string id="lord_cheating_flirt" text="My lord, I note that you might wish for a new spouse." /> 
 		<string id="goodman_flirt" text="Goodman, I note that you have not yet taken a wife." />
 		<string id="goodwife_flirt" text="Goodwife, I wish to profess myself your most ardent admirer." />  	
 		<string id="goodman_chance" text="Goodman, may you give me another chance to prove myself?" /> 
