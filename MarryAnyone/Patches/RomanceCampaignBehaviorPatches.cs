@@ -20,11 +20,12 @@ namespace MarryAnyone.Patches
         }
 
         /* Prefixes */
+        // This one is very important to avoid crashing with those that do not have clans...
         [HarmonyPrefix]
         [HarmonyPatch("conversation_finalize_courtship_for_hero_on_condition")]
         private static bool Prefix1(ref bool __result)
         {
-            if (CharacterObject.OneToOneConversationCharacter.Occupation == Occupation.Wanderer && !Hero.OneToOneConversationHero.IsPlayerCompanion)
+            if (Hero.OneToOneConversationHero.Clan is null)
             {
                 __result = false;
                 return false;
@@ -101,6 +102,10 @@ namespace MarryAnyone.Patches
             }
 
             MASettings settings = new();
+            if (Hero.MainHero.Spouse is not null && !settings.Polygamy)
+            {
+                return false;
+            }
 
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
             bool courtshipPossible = MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);

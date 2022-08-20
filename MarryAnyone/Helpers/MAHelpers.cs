@@ -9,14 +9,14 @@ namespace MarryAnyone.Helpers
 {
     internal static class MAHelpers
     {
-        public static void RemoveExSpouses(Hero hero, bool completelyRemove = false)
+        public static void RemoveExSpouses(Hero hero, bool removeCompletely = false)
         {
             FieldInfo _exSpouses = AccessTools.Field(typeof(Hero), "_exSpouses");
             List<Hero> _exSpousesList = (List<Hero>)_exSpouses.GetValue(hero);
             FieldInfo ExSpouses = AccessTools.Field(typeof(Hero), "ExSpouses");
             MBReadOnlyList<Hero> ExSpousesReadOnlyList;
 
-            if (completelyRemove)
+            if (removeCompletely)
             {
                 // Remove exspouse completely from list
                 _exSpousesList = _exSpousesList.ToList();
