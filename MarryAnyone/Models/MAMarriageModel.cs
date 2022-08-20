@@ -73,7 +73,7 @@ namespace MarryAnyone.Models
                     isPolygamous = settings.Polygamy;
                 }
             }
-            if (!maidenOrSuitor.IsAlive || maidenOrSuitor.IsNotable || maidenOrSuitor.IsTemplate)
+            if (!maidenOrSuitor.IsAlive || maidenOrSuitor.IsTemplate)
             {
                 return false;
             }

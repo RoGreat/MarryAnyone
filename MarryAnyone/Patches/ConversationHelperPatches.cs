@@ -26,47 +26,63 @@ namespace MarryAnyone.Patches
         private static string GetHeroRelationToHeroTextShort(Hero queriedHero, Hero baseHero, bool uppercaseFirst)
         {
             TextObject? textObject = null;
-            if (baseHero.Father == queriedHero && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
+            if (baseHero.Father == queriedHero 
+                && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 textObject = GameTexts.FindText("str_fatherhusband");
             }
-            if (baseHero.Mother == queriedHero && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
+            else if (baseHero.Mother == queriedHero 
+                && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 textObject = GameTexts.FindText("str_motherwife");
             }
-            if (baseHero.Siblings.Contains(queriedHero) && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
+            else if (baseHero.Siblings.Contains(queriedHero) 
+                && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 if (!queriedHero.IsFemale)
                 {
                     textObject = GameTexts.FindText("str_brotherhusband");
                 }
-                textObject = GameTexts.FindText("str_sisterwife");
+                else
+                {
+                    textObject = GameTexts.FindText("str_sisterwife");
+                }
             }
-            if (baseHero.Children.Contains(queriedHero) && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
+            else if (baseHero.Children.Contains(queriedHero) 
+                && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 if (!queriedHero.IsFemale)
                 {
                     textObject = GameTexts.FindText("str_sonhusband");
                 }
-                textObject = GameTexts.FindText("str_daughterwife");
+                else
+                {
+                    textObject = GameTexts.FindText("str_daughterwife");
+                }
             }
-            if (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero))
+            else if (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero))
             {
-                if (!queriedHero.IsAlive || !baseHero.IsAlive)
+                if (queriedHero.IsDead || baseHero.IsDead)
                 {
                     if (!queriedHero.IsFemale)
                     {
                         textObject = GameTexts.FindText("str_exhusband");
                     }
-                    textObject = GameTexts.FindText("str_exwife");
+                    else
+                    {
+                        textObject = GameTexts.FindText("str_exwife");
+                    }
                 }
                 else if (!queriedHero.IsFemale)
                 {
                     textObject = GameTexts.FindText("str_husband");
                 }
-                textObject = GameTexts.FindText("str_wife");
+                else
+                {
+                    textObject = GameTexts.FindText("str_wife");
+                }
             }
-            // Revamped spouse's spouse
+            /* Section for spouse's spouse */
             if (baseHero.Spouse is not null)
             {
                 // Spouse to ExSpouse
@@ -100,6 +116,7 @@ namespace MarryAnyone.Patches
                     }
                 }
             }
+            /* Continue through new uppercasing from Bannerlord */
             if (textObject == null)
             {
                 return "";

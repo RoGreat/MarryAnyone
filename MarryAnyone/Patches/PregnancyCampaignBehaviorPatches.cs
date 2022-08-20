@@ -16,9 +16,8 @@ namespace MarryAnyone.Patches
 
         private static void Prefix(Hero hero)
         {
-            if (hero != Hero.MainHero 
-                || hero.Spouse != Hero.MainHero
-                || !hero.ExSpouses.Contains(Hero.MainHero))
+            if (hero != Hero.MainHero || hero.Spouse != Hero.MainHero
+                || !hero.ExSpouses.Contains(Hero.MainHero) || !Hero.MainHero.ExSpouses.Contains(hero))
             {
                 return;
             }
@@ -145,9 +144,8 @@ namespace MarryAnyone.Patches
 
         private static void Postfix(Hero hero)
         {
-            if (hero != Hero.MainHero 
-                || hero.Spouse != Hero.MainHero
-                || !hero.ExSpouses.Contains(Hero.MainHero))
+            if (hero != Hero.MainHero || hero.Spouse != Hero.MainHero
+                || !hero.ExSpouses.Contains(Hero.MainHero) || !Hero.MainHero.ExSpouses.Contains(hero))
             {
                 return;
             }
