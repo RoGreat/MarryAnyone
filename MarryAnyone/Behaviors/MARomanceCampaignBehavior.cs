@@ -14,7 +14,6 @@ using Helpers;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using MarryAnyone.Actions;
-using TaleWorlds.CampaignSystem.Settlements.Locations;
 using MarryAnyone.Helpers;
 
 namespace MarryAnyone.Behaviors
@@ -30,7 +29,7 @@ namespace MarryAnyone.Behaviors
             _heroes = new();
         }
 
-        /* Patching private methods and fields in RomanceCampaignBehavior */
+        /* Patching private methods and fields in RomanceCampaignBehavior using Delegates */
         // https://butr.github.io/documentation/advanced/switching-from-membertinfo-to-accesstools2/
 
         // private List<PersuasionTask> _allReservations
@@ -98,7 +97,7 @@ namespace MarryAnyone.Behaviors
 
             /* After the initial romance option */
             // Skip barter and marry immediately
-            starter.AddDialogLine("MA" + "Commoner" + "hero_courtship_persuasion_2_success", "hero_courtship_task_2_next_reservation", "close_window", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(marriage_on_condition), new ConversationSentence.OnConsequenceDelegate(marriage_on_consequence), 200, null);
+            starter.AddDialogLine("MA" + "Commoner" + "hero_courtship_persuasion_2_success", "hero_courtship_task_2_next_reservation", "close_window", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(MA_marriage_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_marriage_on_consequence), 200, null);
 
             // Skip courtship later down the line immediately
             starter.AddDialogLine("MA" + "Commoner" + "hero_courtship_persuasion_start", "hero_courtship_task_1_begin_reservations", "hero_courtship_task_2_next_reservation", "{=bW3ygxro}Yes, it's good to have a chance to get to know each other.", new ConversationSentence.OnConditionDelegate(MA_skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 200, null);
@@ -143,7 +142,7 @@ namespace MarryAnyone.Behaviors
             starter.AddDialogLine("MA" + "lord_start_courtship_response_3", "lord_start_courtship_response_3", "close_window", "{=YHZsHohq}We meet from time to time, as is the custom, to see if we are right for each other. I hope to see you again soon.", () => Hero.OneToOneConversationHero.Occupation != Occupation.Lord, new ConversationSentence.OnConsequenceDelegate(MA_courtship_conversation_leave_on_consequence), 200, null);
         }
 
-        private bool marriage_on_condition()
+        private bool MA_marriage_on_condition()
         {
             if (Hero.OneToOneConversationHero.Occupation == Occupation.Lord)
             {
@@ -159,20 +158,17 @@ namespace MarryAnyone.Behaviors
             return true;
         }
 
-        private void marriage_on_consequence()
+        private void MA_marriage_on_consequence()
         {
             MASettings settings = new();
             Hero spouseHero = Hero.OneToOneConversationHero;
 
-            // Skip courtship means there is no prior romance so crash. Crash crash crash...
-            if (settings.SkipCourtship)
+            _allReservations!(this) = null!;
+            ConversationManager.EndPersuasion();
+
+            if (_companionHero is null)
             {
-                _allReservations!(this) = null!;
-                ConversationManager.EndPersuasion();
-            }
-            else
-            {
-                conversation_courtship_stage_2_success_on_consequence(this);
+                _companionHero = Hero.OneToOneConversationHero;
             }
 
             // Need to clean out _companionHero after agent stage to prevent removal of hero...
@@ -183,13 +179,18 @@ namespace MarryAnyone.Behaviors
             }
             // Change to Lord
             ActivateHero(Occupation.Lord);
+            // Deactivate all issues
+            if (_companionHero.Issue is not null)
+            {
+                _companionHero.OnIssueDeactivatedForHero();
+            }
             // Apply marriage action
             MAMarriageAction.Apply(Hero.MainHero, spouseHero, true);
             // Remove duplicates
             MAHelpers.RemoveExSpouses(Hero.MainHero);
             MAHelpers.RemoveExSpouses(spouseHero);
             // Leave encounter
-            if (PlayerEncounter.Current != null)
+            if (PlayerEncounter.Current is not null)
             {
                 PlayerEncounter.LeaveEncounter = true;
             }
@@ -197,7 +198,7 @@ namespace MarryAnyone.Behaviors
 
         private bool lord_skip_courtship_on_condition()
         {
-            // Only for lords...
+            // Make sure wanderers and notables do not go down this path
             if (Hero.OneToOneConversationHero.Occupation != Occupation.Lord)
             {
                 return false;
@@ -209,7 +210,7 @@ namespace MarryAnyone.Behaviors
 
         private bool lord_skip_courtship_conversation_courtship_reaction_to_player_on_condition()
         {
-            // Only for lords...
+            // Make sure wanderers and notables do not go down this path
             if (Hero.OneToOneConversationHero.Occupation != Occupation.Lord)
             {
                 return false;
@@ -263,28 +264,28 @@ namespace MarryAnyone.Behaviors
             Settlement settlement = Hero.MainHero.CurrentSettlement;
             if (_companionHero.Occupation != occupation)
             {
-                _companionHero.SetNewOccupation(occupation);
+                if ((_companionHero.IsNotable || _companionHero.IsWanderer) && occupation != Occupation.Lord)
+                {
+                    MADebug.Print("Did not change occupation");
+                }
+                else
+                {
+                    _companionHero.SetNewOccupation(occupation);
+                }
             }
             if (_companionHero.StayingInSettlement != settlement)
             {
                 _companionHero.StayingInSettlement = settlement;
-                // If not in a tavern or in the center... (i.e. arena master)
-                if (CampaignMission.Current.Location is not null 
-                    && (CampaignMission.Current.Location.StringId != "tavern" 
-                    || CampaignMission.Current.Location.StringId != "center"))
+                // If not in a tavern... (i.e. people in center, arena master, etc...)
+                if (CampaignMission.Current.Location is not null && CampaignMission.Current.Location.StringId != "tavern")
                 {
                     /* HeroAgentSpawnCampaignBehavior -> AddNotablesAndWanderers */
-                    AccessTools.Method(typeof(HeroAgentSpawnCampaignBehavior), "AddWandererLocationCharacter").Invoke(SubModule.HeroAgentSpawnCampaignBehaviorInstance, new object[] { _companionHero, settlement });
+                    AccessTools.Method(typeof(HeroAgentSpawnCampaignBehavior), "AddWandererLocationCharacter").Invoke(SubModule.HeroAgentSpawnCampaignBehaviorInstance!, new object[] { _companionHero, settlement });
                 }
             }
             if (_companionHero.HeroState != Hero.CharacterStates.Active)
             {
                 _companionHero.ChangeState(Hero.CharacterStates.Active);
-            }
-            // Necessary for Notables and the like
-            if (_companionHero.Issue is not null)
-            {
-                _companionHero.OnIssueDeactivatedForHero();
             }
         }
 
@@ -344,7 +345,7 @@ namespace MarryAnyone.Behaviors
             // Remove hero association from character
             if (conversationCharacter.HeroObject is not null)
             {
-                // character.HeroObject = null;
+                //character.HeroObject = null;
                 AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(conversationCharacter, null);
             }
         }
@@ -401,7 +402,7 @@ namespace MarryAnyone.Behaviors
             {
                 // Use existing hero
                 _heroes.TryGetValue(conversationAgent, out _companionHero);
-                // character.HeroObject = _companionHero;
+                //character.HeroObject = _companionHero;
                 AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(conversationCharacter, _companionHero);
                 return;
             }
@@ -432,7 +433,7 @@ namespace MarryAnyone.Behaviors
             _heroes.Add(conversationAgent, _companionHero);
 
             // Give hero the agent's appearance
-            // hero.StaticBodyProperties = agent.BodyPropertiesValue.StaticProperties;
+            //hero.StaticBodyProperties = agent.BodyPropertiesValue.StaticProperties;
             AccessTools.Property(typeof(Hero), "StaticBodyProperties").SetValue(_companionHero, conversationAgent.BodyPropertiesValue.StaticProperties);
 
             // Give hero agent's equipment
@@ -441,15 +442,13 @@ namespace MarryAnyone.Behaviors
             Equipment battleEquipment = template.AllEquipments.GetRandomElementWithPredicate((Equipment e) => !e.IsCivilian).Clone();
             EquipmentHelper.AssignHeroEquipmentFromEquipment(_companionHero, civilianEquipment);
             EquipmentHelper.AssignHeroEquipmentFromEquipment(_companionHero, battleEquipment);
-            // Do equipment adjustment with companions
-            // Not exactly sure what it does...
-            // this.AdjustEquipment(_companionHero);
+
             AccessTools.Method(typeof(CompanionsCampaignBehavior), "AdjustEquipment").Invoke(SubModule.CompanionsCampaignBehaviorInstance, new object[] { _companionHero });
 
             HeroHelper.DetermineInitialLevel(_companionHero);
             SubModule.CharacterDevelopmentCampaignBehaviorInstance!.DevelopCharacterStats(_companionHero);
 
-            // character.HeroObject = _companionHero;
+            //character.HeroObject = _companionHero;
             AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(conversationCharacter, _companionHero);
         }
 

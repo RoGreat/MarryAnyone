@@ -8,7 +8,7 @@ namespace MarryAnyone.Settings
     {
         public string? SexualOrientation { get; set; }
         public bool Polygamy { get; set; }
-        public bool Pregnancy { get; set; }
+        public bool PregnancyPlus { get; set; }
         public bool Polyamory { get; set; }
         public bool Incest { get; set; }
         public bool Cheating { get; set; }
@@ -27,13 +27,15 @@ namespace MarryAnyone.Settings
         public MAConfig()
         {
             Instance = this;
+            ReadConfig();
+            WriteConfig();
         }
 
         private bool _polyamory = false;
 
         private bool _polygamy = false;
 
-        private bool _pregnancy = true;
+        private bool _pregnancyPlus = true;
 
         private bool _incest = false;
 
@@ -58,7 +60,7 @@ namespace MarryAnyone.Settings
                     SexualOrientation = _sexualOrientation,
                     Polygamy = _polygamy,
                     Polyamory = _polyamory,
-                    Pregnancy = _pregnancy,
+                    PregnancyPlus = _pregnancyPlus,
                     Incest = _incest,
                     Cheating = _cheating,
                     SkipCourtship = _skipCourtship,
@@ -93,7 +95,7 @@ namespace MarryAnyone.Settings
                 _sexualOrientation = config.SexualOrientation!;
                 _polygamy = config.Polygamy;
                 _polyamory = config.Polyamory;
-                _pregnancy = config.Pregnancy;
+                _pregnancyPlus = config.PregnancyPlus;
                 _incest = config.Incest;
                 _cheating = config.Cheating;
                 _retryCourtship = config.RetryCourtship;
@@ -175,18 +177,18 @@ namespace MarryAnyone.Settings
             }
         }
 
-        public bool Pregnancy
+        public bool PregnancyPlus
         {
             get
             {
                 ReadConfig();
-                return _pregnancy;
+                return _pregnancyPlus;
             }
             set
             {
-                if (_pregnancy != value)
+                if (_pregnancyPlus != value)
                 {
-                    _pregnancy = value;
+                    _pregnancyPlus = value;
                     WriteConfig();
                 }
             }

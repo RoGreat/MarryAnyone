@@ -4,7 +4,7 @@
     {
         string SexualOrientation { get; set; }
         bool Polygamy { get; set; }
-        bool Pregnancy { get; set; }
+        bool PregnancyPlus { get; set; }
         bool Polyamory { get; set; }
         bool Incest { get; set; }
         bool Cheating { get; set; }
