@@ -8,6 +8,7 @@ namespace MarryAnyone.Settings
     {
         public string? SexualOrientation { get; set; }
         public bool Polygamy { get; set; }
+        public bool Pregnancy { get; set; }
         public bool Polyamory { get; set; }
         public bool Incest { get; set; }
         public bool Cheating { get; set; }
@@ -32,6 +33,8 @@ namespace MarryAnyone.Settings
 
         private bool _polygamy = false;
 
+        private bool _pregnancy = true;
+
         private bool _incest = false;
 
         private bool _cheating = false;
@@ -55,12 +58,13 @@ namespace MarryAnyone.Settings
                     SexualOrientation = _sexualOrientation,
                     Polygamy = _polygamy,
                     Polyamory = _polyamory,
+                    Pregnancy = _pregnancy,
                     Incest = _incest,
                     Cheating = _cheating,
                     SkipCourtship = _skipCourtship,
                     RetryCourtship = _retryCourtship,
-                    Debug = _debug,
-                    TemplateCharacter = _templateCharacter
+                    TemplateCharacter = _templateCharacter,
+                    Debug = _debug
                 };
                 string jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
                 File.WriteAllText(_filePath, jsonString);
@@ -89,12 +93,13 @@ namespace MarryAnyone.Settings
                 _sexualOrientation = config.SexualOrientation!;
                 _polygamy = config.Polygamy;
                 _polyamory = config.Polyamory;
+                _pregnancy = config.Pregnancy;
                 _incest = config.Incest;
                 _cheating = config.Cheating;
                 _retryCourtship = config.RetryCourtship;
                 _skipCourtship = config.SkipCourtship;
-                _debug = config.Debug;
                 _templateCharacter = config.TemplateCharacter!;
+                _debug = config.Debug;
             }
             catch (Exception e)
             {
@@ -169,6 +174,24 @@ namespace MarryAnyone.Settings
                 }
             }
         }
+
+        public bool Pregnancy
+        {
+            get
+            {
+                ReadConfig();
+                return _pregnancy;
+            }
+            set
+            {
+                if (_pregnancy != value)
+                {
+                    _pregnancy = value;
+                    WriteConfig();
+                }
+            }
+        }
+
         public bool Incest
         {
             get
