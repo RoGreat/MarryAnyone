@@ -5,9 +5,9 @@
   </tags>  
   <strings>
 		<string id="marryanyone" text="Marry Anyone" />
-		<string id="general" text="General" />
 		<string id="orientation" text="Sexual Orientation" />
 		<string id="orientation_desc" text="Player character can choose what gender the player can marry." />
+		<string id="spouses" text="Spouses" />
 		<string id="polygamy" text="Polygamy" />
 		<string id="polygamy_desc" text="Player character can have polygamous relationships." />
 		<string id="polyamory" text="Polyamory" />
@@ -18,10 +18,13 @@
 		<string id="debug_desc" text="Displays mod developer debug information in the game's message log." />
 		<string id="cheating" text="Cheating" />
 		<string id="cheating_desc" text="Player character can marry characters that are already married." />
-		<string id="relationship" text="Relationship Options" />
->
+		<string id="relationship" text="Relationship" />
 		<string id="courtship" text="Courtship" />
 		<string id="retry_courtship" text="Retry Courtship" />
 		<string id="retry_courtship_desc" text="Player can retry courtship after failure." />
+		<string id="templatechar" text="Template Character" />
+		<string id="templatechar_desc" text="Set the template character that is used to set things like the hero name, skills, and equipment." />
+		<string id="pregnancyplus" text="Pregnancy+" />
+		<string id="pregnancyplus_desc" text="Changes pregnancy behavior to allow pregnancy with multiple spouses. Keep disabled if you are using another pregnancy mod." />
   </strings>
 </base>

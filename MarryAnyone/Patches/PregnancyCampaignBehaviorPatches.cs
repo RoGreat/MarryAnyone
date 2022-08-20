@@ -21,9 +21,8 @@ namespace MarryAnyone.Patches
             {
                 return;
             }
-
-            if (hero != Hero.MainHero || hero.Spouse != Hero.MainHero
-                || !hero.ExSpouses.Contains(Hero.MainHero) || !Hero.MainHero.ExSpouses.Contains(hero))
+            if (hero != Hero.MainHero && hero.Spouse != Hero.MainHero && Hero.MainHero.Spouse != hero
+                && !hero.ExSpouses.Contains(Hero.MainHero) && !Hero.MainHero.ExSpouses.Contains(hero))
             {
                 return;
             }
@@ -151,9 +150,8 @@ namespace MarryAnyone.Patches
             {
                 return;
             }
-
-            if (hero != Hero.MainHero || hero.Spouse != Hero.MainHero
-                || !hero.ExSpouses.Contains(Hero.MainHero) || !Hero.MainHero.ExSpouses.Contains(hero))
+            if (hero != Hero.MainHero && hero.Spouse != Hero.MainHero && Hero.MainHero.Spouse != hero
+                && !hero.ExSpouses.Contains(Hero.MainHero) && !Hero.MainHero.ExSpouses.Contains(hero))
             {
                 return;
             }

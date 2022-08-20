@@ -7,15 +7,15 @@ namespace MarryAnyone.Settings
     internal sealed class Config
     {
         public string? SexualOrientation { get; set; }
+        public string? TemplateCharacter { get; set; }
         public bool Polygamy { get; set; }
         public bool PregnancyPlus { get; set; }
         public bool Polyamory { get; set; }
-        public bool Incest { get; set; }
         public bool Cheating { get; set; }
+        public bool Incest { get; set; }
         public bool SkipCourtship { get; set; }
         public bool RetryCourtship { get; set; }
         public bool Debug { get; set; }
-        public string? TemplateCharacter { get; set; }
     }
 
     internal sealed class MAConfig : ISettingsProvider
@@ -35,7 +35,7 @@ namespace MarryAnyone.Settings
 
         private bool _polygamy = false;
 
-        private bool _pregnancyPlus = true;
+        private bool _pregnancyPlus = false;
 
         private bool _incest = false;
 
