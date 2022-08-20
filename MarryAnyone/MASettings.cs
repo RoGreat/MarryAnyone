@@ -38,6 +38,12 @@ namespace MarryAnyone
             set => _provider.Polygamy = value;
         }
 
+        public bool Pregnancy
+        {
+            get => _provider.Pregnancy;
+            set => _provider.Pregnancy = value;
+        }
+
         public bool Polyamory
         {
             get => _provider.Polyamory;

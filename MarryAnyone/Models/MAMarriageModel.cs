@@ -19,11 +19,12 @@ namespace MarryAnyone.Models
             bool isMainHero = firstHero == Hero.MainHero || secondHero == Hero.MainHero;
             if (!isMainHero)
             {
+                // Other heroes use the DefaultMarriageModel
                 return base.IsCoupleSuitableForMarriage(firstHero, secondHero);
             }
 
             /* Section for Marry Anyone method */
-            // Does not directly call IsSuitableForMarriage, instead calls CanMarry
+            // Does not directly call IsSuitableForMarriage, instead calls CanMarry -> IsSuitableForMarriage
             bool canMarry = firstHero.CanMarry() && secondHero.CanMarry();
             if (!canMarry)
             {
@@ -35,6 +36,7 @@ namespace MarryAnyone.Models
             bool isHomosexual = settings.SexualOrientation == "Homosexual";
             bool isIncestuous = settings.Incest;
             bool discoverAncestors = DiscoverAncestors(this, firstHero, 3).Intersect(DiscoverAncestors(this, secondHero, 3)).Any();
+            // If incest setting is off then look for ancestor relations
             if (!isIncestuous)
             {
                 if (discoverAncestors)
@@ -48,7 +50,7 @@ namespace MarryAnyone.Models
             {
                 isAttracted = firstHero.IsFemale != secondHero.IsFemale;
             }
-            if (isHomosexual)
+            else if (isHomosexual)
             {
                 isAttracted = firstHero.IsFemale == secondHero.IsFemale;
             }

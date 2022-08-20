@@ -41,14 +41,5 @@ namespace MarryAnyone.Helpers
             _exSpouses.SetValue(hero, _exSpousesList);
             ExSpouses.SetValue(hero, ExSpousesReadOnlyList);
         }
-
-        public static void OccupationToLord(Hero hero)
-        {
-            if (hero.Occupation != Occupation.Lord)
-            {
-                hero.SetNewOccupation(Occupation.Lord);
-                MADebug.Print("Set New Occupation to Lord");
-            }
-        }
     }
 }
