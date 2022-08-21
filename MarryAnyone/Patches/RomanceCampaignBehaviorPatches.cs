@@ -51,11 +51,8 @@ namespace MarryAnyone.Patches
         [HarmonyPatch("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition")]
         private static void Postfix1(ref bool __result, object __instance)
         {
-            // GetCourtedHeroInOtherClan should be void when polygamy is on...
             MASettings settings = new();
-            __result = Hero.OneToOneConversationHero is not null
-                && (Romance.GetCourtedHeroInOtherClan(Hero.MainHero, Hero.OneToOneConversationHero) is null || settings.Polygamy)
-                && MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
+            __result = Hero.OneToOneConversationHero is not null && MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
         }
 
         // Original method but take out the spouse part
@@ -103,10 +100,6 @@ namespace MarryAnyone.Patches
             }
 
             MASettings settings = new();
-            if (Hero.MainHero.Spouse is not null && !settings.Polygamy)
-            {
-                return false;
-            }
 
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
             bool courtshipPossible = MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
