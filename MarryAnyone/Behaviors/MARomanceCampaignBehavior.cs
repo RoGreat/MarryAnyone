@@ -15,8 +15,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using MarryAnyone.Actions;
 using System.Reflection;
-
-using static MarryAnyone.Helpers.MAHelpers;
+using static MarryAnyone.Helpers;
 
 namespace MarryAnyone.Behaviors
 {
@@ -62,10 +61,6 @@ namespace MarryAnyone.Behaviors
         // private void conversation_player_opens_courtship_on_consequence()
         private delegate void conversation_player_opens_courtship_on_consequence_delegate(RomanceCampaignBehavior instance);
         private static readonly conversation_player_opens_courtship_on_consequence_delegate conversation_player_opens_courtship_on_consequence = AccessTools2.GetDelegate<conversation_player_opens_courtship_on_consequence_delegate>(typeof(RomanceCampaignBehavior), "conversation_player_opens_courtship_on_consequence");
-
-        // private void conversation_courtship_stage_2_success_on_consequence()
-        private delegate void conversation_courtship_stage_2_success_on_consequence_delegate(RomanceCampaignBehavior instance);
-        private static readonly conversation_courtship_stage_2_success_on_consequence_delegate conversation_courtship_stage_2_success_on_consequence = AccessTools2.GetDelegate<conversation_courtship_stage_2_success_on_consequence_delegate>(typeof(RomanceCampaignBehavior), "conversation_courtship_stage_2_success_on_consequence");
 
 
         /* MemberInfo caching */

@@ -4,8 +4,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.Localization;
-
-using static MarryAnyone.Helpers.MAHelpers;
+using static MarryAnyone.Helpers;
 
 namespace MarryAnyone.Patches
 {
