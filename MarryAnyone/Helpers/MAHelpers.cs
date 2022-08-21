@@ -14,11 +14,18 @@ namespace MarryAnyone.Helpers
 
         private static readonly FieldInfo? _exSpouses = AccessTools2.Field(typeof(Hero), "_exSpouses");
 
-        public static void RemoveExSpouses(Hero hero, bool duplicates = true)
+        public enum RemoveExSpousesEnum
+        {
+            Duplicates,
+            Self,
+            All
+        }
+
+        public static void RemoveExSpouses(Hero hero, RemoveExSpousesEnum removalMode = RemoveExSpousesEnum.Duplicates)
         {
             List<Hero> _exSpousesList = (List<Hero>)_exSpouses!.GetValue(hero);
 
-            if (duplicates)
+            if (removalMode == RemoveExSpousesEnum.Duplicates)
             {
                 // Standard remove duplicates spouse
                 // Get exspouse list without duplicates
@@ -27,7 +34,7 @@ namespace MarryAnyone.Helpers
                 if (_exSpousesList.Contains(hero.Spouse))
                 {
                     _exSpousesList.Remove(hero.Spouse);
-                    MADebug.Print($"Removed duplicate spouse {hero.Spouse.Name.ToString()}");
+                    MADebug.Print($"Removed duplicate spouse {hero.Spouse.Name}");
                 }
             }
             else
@@ -37,22 +44,27 @@ namespace MarryAnyone.Helpers
                 List<Hero> exSpouses = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).ToList();
                 foreach (Hero exSpouse in exSpouses)
                 {
-                    // Remove exspouse from list
-                    _exSpousesList.Remove(exSpouse);
+                    if (removalMode == RemoveExSpousesEnum.Self || removalMode == RemoveExSpousesEnum.All)
+                    {
+                        // Remove exspouse from list
+                        _exSpousesList.Remove(exSpouse);
+                    }
+                    if (removalMode == RemoveExSpousesEnum.All)
+                    {
+                        // Look into your exspouse's exspouse to remove yourself
+                        List<Hero> _exSpousesList2 = (List<Hero>)_exSpouses.GetValue(exSpouse);
+                        _exSpousesList2.Remove(hero);
 
-                    // Look into your exspouse's exspouse to remove yourself
-                    List<Hero> _exSpousesList2 = (List<Hero>)_exSpouses.GetValue(exSpouse);
-                    _exSpousesList2.Remove(hero);
-
-                    MBReadOnlyList<Hero> ExSpousesReadOnlyList2 = new(_exSpousesList2);
-                    _exSpouses.SetValue(exSpouse, _exSpousesList2);
-                    ExSpouses.SetValue(exSpouse, ExSpousesReadOnlyList2);
+                        MBReadOnlyList<Hero> ExSpousesReadOnlyList2 = new(_exSpousesList2);
+                        _exSpouses.SetValue(exSpouse, _exSpousesList2);
+                        ExSpouses!.SetValue(exSpouse, ExSpousesReadOnlyList2);
+                    }
                 }
             }
 
             MBReadOnlyList<Hero> ExSpousesReadOnlyList = new(_exSpousesList);
             _exSpouses.SetValue(hero, _exSpousesList);
-            ExSpouses.SetValue(hero, ExSpousesReadOnlyList);
+            ExSpouses!.SetValue(hero, ExSpousesReadOnlyList);
         }
 
         public static void CheatOnSpouse()
@@ -62,14 +74,14 @@ namespace MarryAnyone.Helpers
 
             foreach (Hero cheatedHero in cheatedHeroes)
             {
-                RemoveExSpouses(cheatedHero, false);
+                RemoveExSpouses(cheatedHero, RemoveExSpousesEnum.All);
                 if (cheatedHero != Hero.MainHero.Spouse)
                 {
-                    MADebug.Print($"Broke off marriage with {cheatedHero.Name.ToString()}");
+                    MADebug.Print($"Broke off marriage with {cheatedHero.Name}");
                 }
                 else
                 {
-                    MADebug.Print($"Removed duplicate spouse {cheatedHero.Name.ToString()}");
+                    MADebug.Print($"Removed duplicate spouse {cheatedHero.Name}");
                 }
             }
         }

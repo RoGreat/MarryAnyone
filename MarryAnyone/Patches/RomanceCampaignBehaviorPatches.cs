@@ -1,13 +1,15 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Helpers;
 using System;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.Localization;
 
+using static MarryAnyone.Helpers.MAHelpers;
+
 namespace MarryAnyone.Patches
 {
+    // Patches for Lords romance dialogs
     [HarmonyPatch(typeof(RomanceCampaignBehavior))]
     internal sealed class RomanceCampaignBehaviorPatches
     {
@@ -33,6 +35,7 @@ namespace MarryAnyone.Patches
             return true;
         }
 
+        // Completely replaces Lords
         [HarmonyPrefix]
         [HarmonyPatch("conversation_player_can_open_courtship_on_condition")]
         private static bool Prefix2(ref bool __result, object __instance)
@@ -85,10 +88,10 @@ namespace MarryAnyone.Patches
             // Do NOT break off marriages if polygamy is on...
             if (settings.Cheating && !settings.Polygamy)
             {
-                MAHelpers.CheatOnSpouse();
+                CheatOnSpouse();
             }
-            MAHelpers.RemoveExSpouses(Hero.MainHero);
-            MAHelpers.RemoveExSpouses(spouseHero);
+            RemoveExSpouses(Hero.MainHero);
+            RemoveExSpouses(spouseHero);
         }
 
         /* Methods */

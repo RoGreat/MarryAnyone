@@ -14,8 +14,9 @@ using Helpers;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using MarryAnyone.Actions;
-using MarryAnyone.Helpers;
 using System.Reflection;
+
+using static MarryAnyone.Helpers.MAHelpers;
 
 namespace MarryAnyone.Behaviors
 {
@@ -208,11 +209,11 @@ namespace MarryAnyone.Behaviors
             // Do NOT break off marriages if polygamy is on...
             if (settings.Cheating && !settings.Polygamy)
             {
-                MAHelpers.CheatOnSpouse();
+                CheatOnSpouse();
             }
             // Remove duplicates
-            MAHelpers.RemoveExSpouses(Hero.MainHero);
-            MAHelpers.RemoveExSpouses(spouseHero);
+            RemoveExSpouses(Hero.MainHero);
+            RemoveExSpouses(spouseHero);
             // Leave encounter
             if (PlayerEncounter.Current is not null)
             {
