@@ -9,6 +9,7 @@ using TaleWorlds.Localization;
 
 namespace MarryAnyone.Patches
 {
+    // Had to change it a bit from before... Might need to be loaded after some mods...
     [HarmonyPatch(typeof(ConversationHelper))]
     internal sealed class ConversationHelperPatches
     {

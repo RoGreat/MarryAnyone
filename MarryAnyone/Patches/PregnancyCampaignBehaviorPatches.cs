@@ -9,6 +9,7 @@ using TaleWorlds.Core;
 namespace MarryAnyone.Patches
 {
     /* Old pregnancy behavior without all the extra stuff... */
+    // Hope that it still works as intended heehee
     [HarmonyPatch(typeof(PregnancyCampaignBehavior), "DailyTickHero")]
     internal static class PregnancyCampaignBehaviorPatches
     {

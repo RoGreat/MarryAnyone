@@ -4,6 +4,7 @@ using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone.Patches
 {
+    // If polygamous the player does not end courtships with other heroes
     [HarmonyPatch(typeof(Romance), "EndAllCourtships")]
     internal sealed class EndAllCourtshipsPatch
     {
@@ -15,7 +16,11 @@ namespace MarryAnyone.Patches
             {
                 foreach (Romance.RomanticState romanticState in Romance.RomanticStateList.ToList())
                 {
-                    if (forHero == Hero.MainHero && romanticState.Level == Romance.RomanceLevelEnum.Marriage)
+                    if (romanticState.Person1 == Hero.MainHero || romanticState.Person2 == Hero.MainHero)
+                    {
+                        MADebug.Print("Main hero is polygamous, so do not end romances.");
+                    }
+                    else if (romanticState.Person1 == forHero || romanticState.Person2 == forHero)
                     {
                         romanticState.Level = Romance.RomanceLevelEnum.Ended;
                     }
