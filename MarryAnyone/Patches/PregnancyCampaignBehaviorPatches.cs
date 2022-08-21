@@ -6,6 +6,8 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.Core;
 
+using static MarryAnyone.Helpers.MAHelpers;
+
 namespace MarryAnyone.Patches
 {
     /* Old pregnancy behavior without all the extra stuff... */
@@ -166,18 +168,20 @@ namespace MarryAnyone.Patches
                     {
                         MADebug.Print("Post Pregnancy Check: " + hero);
                         MADebug.Print("   Spouse is Main Hero");
+                        // Possibly dangerous now...
+                        // Added mode to define remove exspouses from self
                         if (!settings.Polyamory)
                         {
-                            // Remove any extra duplicate exspouses
-                            MAHelpers.RemoveExSpouses(hero, false);
+                            // Remove all exspouses from self
+                            RemoveExSpouses(hero, RemoveExSpousesEnum.Self);
                         }
                         hero.Spouse = Hero.MainHero;
                     }
                 }
                 foreach (Hero exSpouse in hero.ExSpouses.ToList())
                 {
-                    MAHelpers.RemoveExSpouses(hero);
-                    MAHelpers.RemoveExSpouses(exSpouse);
+                    RemoveExSpouses(hero);
+                    RemoveExSpouses(exSpouse);
                 }
             }
         }
