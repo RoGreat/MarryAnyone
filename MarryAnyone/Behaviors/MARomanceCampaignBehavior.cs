@@ -557,6 +557,11 @@ namespace MarryAnyone.Behaviors
             MADebug.Print("Retry Courtship: " + settings.RetryCourtship);
             MADebug.Print("Courtship Possible: " + courtshipPossible);
 
+            if (romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage || romanticLevel == Romance.RomanceLevelEnum.Marriage)
+            {
+                return false;
+            }
+
             if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested)
             {
                 MBTextManager.SetTextVariable("FLIRTATION_LINE", Hero.OneToOneConversationHero.IsFemale
