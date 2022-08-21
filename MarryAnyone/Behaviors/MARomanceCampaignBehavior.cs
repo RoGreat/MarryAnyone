@@ -15,6 +15,7 @@ using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using MarryAnyone.Actions;
 using MarryAnyone.Helpers;
+using System.Reflection;
 
 namespace MarryAnyone.Behaviors
 {
@@ -64,6 +65,17 @@ namespace MarryAnyone.Behaviors
         // private void conversation_courtship_stage_2_success_on_consequence()
         private delegate void conversation_courtship_stage_2_success_on_consequence_delegate(RomanceCampaignBehavior instance);
         private static readonly conversation_courtship_stage_2_success_on_consequence_delegate conversation_courtship_stage_2_success_on_consequence = AccessTools2.GetDelegate<conversation_courtship_stage_2_success_on_consequence_delegate>(typeof(RomanceCampaignBehavior), "conversation_courtship_stage_2_success_on_consequence");
+
+
+        /* MemberInfo caching */
+        private static readonly FieldInfo? AgentName = AccessTools2.Field(typeof(Agent), "_name");
+
+        private static readonly PropertyInfo? CharacterHeroObject = AccessTools2.Property(typeof(CharacterObject), "HeroObject");
+
+        private static readonly PropertyInfo? HeroStaticBodyProperties = AccessTools2.Property(typeof(Hero), "StaticBodyProperties");
+
+        private static readonly MethodInfo? CompanionAdjustEquipment = AccessTools2.Method(typeof(CompanionsCampaignBehavior), "AdjustEquipment");
+
 
         protected new void AddDialogs(CampaignGameStarter starter)
         {
@@ -355,8 +367,7 @@ namespace MarryAnyone.Behaviors
             // Remove hero association from character
             if (conversationCharacter.HeroObject is not null)
             {
-                //character.HeroObject = null;
-                AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(conversationCharacter, null);
+                CharacterHeroObject!.SetValue(conversationCharacter, null);
             }
         }
 
@@ -412,8 +423,7 @@ namespace MarryAnyone.Behaviors
             {
                 // Use existing hero
                 _heroes.TryGetValue(conversationAgent, out _companionHero);
-                //character.HeroObject = _companionHero;
-                AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(conversationCharacter, _companionHero);
+                CharacterHeroObject!.SetValue(conversationCharacter, _companionHero);
                 return;
             }
 
@@ -434,7 +444,7 @@ namespace MarryAnyone.Behaviors
             _companionHero = HeroCreator.CreateSpecialHero(template, Hero.MainHero.CurrentSettlement, null, null, (int)conversationAgent.Age);
 
             // Name permanence from the adoption module of old
-            AccessTools.Field(typeof(Agent), "_name").SetValue(conversationAgent, _companionHero.Name);
+            AgentName!.SetValue(conversationAgent, _companionHero.Name);
 
             // Meet character for first time
             _companionHero.HasMet = true;
@@ -443,8 +453,7 @@ namespace MarryAnyone.Behaviors
             _heroes.Add(conversationAgent, _companionHero);
 
             // Give hero the agent's appearance
-            //hero.StaticBodyProperties = agent.BodyPropertiesValue.StaticProperties;
-            AccessTools.Property(typeof(Hero), "StaticBodyProperties").SetValue(_companionHero, conversationAgent.BodyPropertiesValue.StaticProperties);
+            HeroStaticBodyProperties!.SetValue(_companionHero, conversationAgent.BodyPropertiesValue.StaticProperties);
 
             // Give hero agent's equipment
             Equipment civilianEquipment = conversationAgent.SpawnEquipment.Clone();
@@ -453,13 +462,14 @@ namespace MarryAnyone.Behaviors
             EquipmentHelper.AssignHeroEquipmentFromEquipment(_companionHero, civilianEquipment);
             EquipmentHelper.AssignHeroEquipmentFromEquipment(_companionHero, battleEquipment);
 
-            AccessTools.Method(typeof(CompanionsCampaignBehavior), "AdjustEquipment").Invoke(SubModule.CompanionsCampaignBehaviorInstance, new object[] { _companionHero });
+            // Adjust Equipment like the wanderer do
+            CompanionAdjustEquipment!.Invoke(SubModule.CompanionsCampaignBehaviorInstance, new object[] { _companionHero });
 
             HeroHelper.DetermineInitialLevel(_companionHero);
             SubModule.CharacterDevelopmentCampaignBehaviorInstance!.DevelopCharacterStats(_companionHero);
 
             //character.HeroObject = _companionHero;
-            AccessTools.Property(typeof(CharacterObject), "HeroObject").SetValue(conversationCharacter, _companionHero);
+            CharacterHeroObject!.SetValue(conversationCharacter, _companionHero);
         }
 
         // Need to clean out agents that cannot be found anymore...
