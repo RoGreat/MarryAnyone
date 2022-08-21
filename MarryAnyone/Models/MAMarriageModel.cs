@@ -9,7 +9,6 @@ namespace MarryAnyone.Models
 {
     internal sealed class MAMarriageModel : DefaultMarriageModel
     {
-        // private IEnumerable<Hero> DiscoverAncestors(Hero hero, int n)
         private delegate IEnumerable<Hero> DiscoverAncestorsDelegate(DefaultMarriageModel instance, Hero hero, int n);
         private static readonly DiscoverAncestorsDelegate DiscoverAncestors = AccessTools2.GetDelegate<DiscoverAncestorsDelegate>(typeof(DefaultMarriageModel), "DiscoverAncestors", new Type[] { typeof(Hero), typeof(int) });
 

@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using HarmonyLib.BUTR.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,13 +10,13 @@ namespace MarryAnyone.Helpers
 {
     internal static class MAHelpers
     {
-        private static FieldInfo ExSpouses = AccessTools.Field(typeof(Hero), "ExSpouses");
+        private static readonly FieldInfo? ExSpouses = AccessTools2.Field(typeof(Hero), "ExSpouses");
 
-        private static FieldInfo _exSpouses = AccessTools.Field(typeof(Hero), "_exSpouses");
+        private static readonly FieldInfo? _exSpouses = AccessTools2.Field(typeof(Hero), "_exSpouses");
 
         public static void RemoveExSpouses(Hero hero, bool duplicates = true)
         {
-            List<Hero> _exSpousesList = (List<Hero>)_exSpouses.GetValue(hero);
+            List<Hero> _exSpousesList = (List<Hero>)_exSpouses!.GetValue(hero);
 
             if (duplicates)
             {
@@ -56,7 +57,7 @@ namespace MarryAnyone.Helpers
 
         public static void CheatOnSpouse()
         {
-            List<Hero> _exSpousesList = (List<Hero>)_exSpouses.GetValue(Hero.MainHero);
+            List<Hero> _exSpousesList = (List<Hero>)_exSpouses!.GetValue(Hero.MainHero);
             List<Hero> cheatedHeroes = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).ToList();
 
             foreach (Hero cheatedHero in cheatedHeroes)
