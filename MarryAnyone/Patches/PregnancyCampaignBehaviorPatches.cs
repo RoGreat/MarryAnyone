@@ -1,12 +1,10 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.Core;
-
-using static MarryAnyone.Helpers.MAHelpers;
+using static MarryAnyone.Helpers;
 
 namespace MarryAnyone.Patches
 {

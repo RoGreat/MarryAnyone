@@ -6,9 +6,9 @@ using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
 
-namespace MarryAnyone.Helpers
+namespace MarryAnyone
 {
-    internal static class MAHelpers
+    internal static class Helpers
     {
         private static readonly FieldInfo? ExSpouses = AccessTools2.Field(typeof(Hero), "ExSpouses");
 
