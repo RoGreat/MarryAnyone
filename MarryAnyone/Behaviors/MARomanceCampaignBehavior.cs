@@ -495,10 +495,10 @@ namespace MarryAnyone.Behaviors
             _companionHero = null;
             // Leave patch accounts for agents that are temporary heroes
             MASettings settings = new();
-            MADebug.Print("Orientation: " + settings.SexualOrientation);
-            MADebug.Print("Cheating: " + settings.Cheating);
-            MADebug.Print("Polygamy: " + settings.Polygamy);
-            MADebug.Print("Incest: " + settings.Incest);
+            Debug.Print("Orientation: " + settings.SexualOrientation);
+            Debug.Print("Cheating: " + settings.Cheating);
+            Debug.Print("Polygamy: " + settings.Polygamy);
+            Debug.Print("Incest: " + settings.Incest);
             if (Hero.OneToOneConversationHero is not null)
             {
                 // Heroes will avoid romance if they are a lord or they cannot marry the player
@@ -554,10 +554,10 @@ namespace MarryAnyone.Behaviors
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
             bool courtshipPossible = MarriageCourtshipPossibility(this, Hero.MainHero, Hero.OneToOneConversationHero);
 
-            MADebug.Print("Romantic Level: " + romanticLevel);
-            MADebug.Print("Skip Courtship: " + settings.SkipCourtship);
-            MADebug.Print("Retry Courtship: " + settings.RetryCourtship);
-            MADebug.Print("Courtship Possible: " + courtshipPossible);
+            Debug.Print("Romantic Level: " + romanticLevel);
+            Debug.Print("Skip Courtship: " + settings.SkipCourtship);
+            Debug.Print("Retry Courtship: " + settings.RetryCourtship);
+            Debug.Print("Courtship Possible: " + courtshipPossible);
 
             if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested
                 || (romanticLevel == Romance.RomanceLevelEnum.Ended && (settings.Cheating || settings.Polygamy)))
