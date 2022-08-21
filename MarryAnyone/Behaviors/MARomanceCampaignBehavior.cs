@@ -49,7 +49,7 @@ namespace MarryAnyone.Behaviors
         private static readonly conversation_player_eligible_for_marriage_with_conversation_hero_on_condition_delegate conversation_player_eligible_for_marriage_with_conversation_hero_on_condition = AccessTools2.GetDelegate<conversation_player_eligible_for_marriage_with_conversation_hero_on_condition_delegate>(typeof(RomanceCampaignBehavior), "conversation_player_eligible_for_marriage_with_conversation_hero_on_condition");
 
         // private void conversation_courtship_reaction_to_player_on_condition()
-        private delegate bool conversation_courtship_reaction_to_player_on_condition_delegate (RomanceCampaignBehavior instance);
+        private delegate bool conversation_courtship_reaction_to_player_on_condition_delegate(RomanceCampaignBehavior instance);
         private static readonly conversation_courtship_reaction_to_player_on_condition_delegate conversation_courtship_reaction_to_player_on_condition = AccessTools2.GetDelegate<conversation_courtship_reaction_to_player_on_condition_delegate>(typeof(RomanceCampaignBehavior), "conversation_courtship_reaction_to_player_on_condition");
 
         /* Consequences */
@@ -58,7 +58,7 @@ namespace MarryAnyone.Behaviors
         private static readonly courtship_conversation_leave_on_consequence_delegate courtship_conversation_leave_on_consequence = AccessTools2.GetDelegate<courtship_conversation_leave_on_consequence_delegate>(typeof(RomanceCampaignBehavior), "courtship_conversation_leave_on_consequence");
 
         // private void conversation_player_opens_courtship_on_consequence()
-        private delegate void conversation_player_opens_courtship_on_consequence_delegate (RomanceCampaignBehavior instance);
+        private delegate void conversation_player_opens_courtship_on_consequence_delegate(RomanceCampaignBehavior instance);
         private static readonly conversation_player_opens_courtship_on_consequence_delegate conversation_player_opens_courtship_on_consequence = AccessTools2.GetDelegate<conversation_player_opens_courtship_on_consequence_delegate>(typeof(RomanceCampaignBehavior), "conversation_player_opens_courtship_on_consequence");
 
         // private void conversation_courtship_stage_2_success_on_consequence()
@@ -152,12 +152,8 @@ namespace MarryAnyone.Behaviors
             }
 
             MASettings settings = new();
-            if (Hero.MainHero.Spouse is not null && !settings.Polygamy)
-            {
-                return false;
-            }
 
-            return true;
+            return Hero.MainHero.Spouse is null || settings.Polygamy || settings.Cheating;
         }
 
         private bool MA_marriage_rejection_on_condition()
@@ -188,15 +184,20 @@ namespace MarryAnyone.Behaviors
             {
                 _companionHero = Hero.OneToOneConversationHero;
             }
-            // Change to Lord
-            ActivateHero(Occupation.Lord);
             // Deactivate all issues
             if (_companionHero.Issue is not null)
             {
                 _companionHero.OnIssueDeactivatedForHero();
             }
+            // Change to Lord
+            ActivateHero(Occupation.Lord);
             // Apply marriage action
             MAMarriageAction.Apply(Hero.MainHero, spouseHero, true);
+            // Do NOT break off marriages if polygamy is on...
+            if (settings.Cheating && !settings.Polygamy)
+            {
+                MAHelpers.CheatOnSpouse();
+            }
             // Remove duplicates
             MAHelpers.RemoveExSpouses(Hero.MainHero);
             MAHelpers.RemoveExSpouses(spouseHero);
@@ -301,7 +302,7 @@ namespace MarryAnyone.Behaviors
         private bool conversation_lord_agrees_to_discussion_on_condition()
         {
             // Get a random lord response that is valid
-            CharacterObject randomLord = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject x) => 
+            CharacterObject randomLord = CharacterObject.All.GetRandomElementWithPredicate((CharacterObject x) =>
                 Campaign.Current.ConversationManager.FindMatchingTextOrNull("str_lord_intrigue_accept", x) is not null);
             MBTextManager.SetTextVariable("STR_INTRIGUE_AGREEMENT", Campaign.Current.ConversationManager.FindMatchingTextOrNull("str_lord_intrigue_accept", randomLord));
             return true;
@@ -310,18 +311,18 @@ namespace MarryAnyone.Behaviors
         private bool MA_skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition()
         {
             MASettings settings = new();
-            return settings.SkipCourtship 
-                && Hero.OneToOneConversationHero is not null 
-                && Hero.OneToOneConversationHero.Occupation != Occupation.Lord 
+            return settings.SkipCourtship
+                && Hero.OneToOneConversationHero is not null
+                && Hero.OneToOneConversationHero.Occupation != Occupation.Lord
                 && MarriageCourtshipPossibility(this, Hero.MainHero, Hero.OneToOneConversationHero);
         }
 
         private bool MA_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition()
         {
             MASettings settings = new();
-            return !settings.SkipCourtship 
-                && Hero.OneToOneConversationHero is not null 
-                && Hero.OneToOneConversationHero.Occupation != Occupation.Lord 
+            return !settings.SkipCourtship
+                && Hero.OneToOneConversationHero is not null
+                && Hero.OneToOneConversationHero.Occupation != Occupation.Lord
                 && MarriageCourtshipPossibility(this, Hero.MainHero, Hero.OneToOneConversationHero);
         }
 
@@ -338,7 +339,7 @@ namespace MarryAnyone.Behaviors
         private bool conversation_courtship_initial_reaction_on_condition()
         {
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
-            if (romanticLevel == Romance.RomanceLevelEnum.FailedInPracticalities 
+            if (romanticLevel == Romance.RomanceLevelEnum.FailedInPracticalities
                 || romanticLevel == Romance.RomanceLevelEnum.FailedInCompatibility)
             {
                 return false;
@@ -511,27 +512,26 @@ namespace MarryAnyone.Behaviors
         private bool PlayerIsAttractedToAgent()
         {
             MASettings settings = new();
-            if (Hero.MainHero.Spouse is not null && !settings.Polygamy)
+            // Attracted under these conditions
+            if (Hero.MainHero.Spouse is null || settings.Polygamy || settings.Cheating)
             {
-                return false;
-            }
+                CharacterObject conversationCharacter = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
+                // Avoid potential crashes for quick talk by using IAgent
+                IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
 
-            CharacterObject conversationCharacter = Campaign.Current.ConversationManager.OneToOneConversationCharacter;
-            // Avoid potential crashes for quick talk by using IAgent
-            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
-
-            if (conversationAgent.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge)
-            {
-                bool isAttracted = true;
-                if (settings.SexualOrientation == "Heterosexual")
+                if (conversationAgent.Age >= Campaign.Current.Models.AgeModel.HeroComesOfAge)
                 {
-                    isAttracted = conversationCharacter.IsFemale != Hero.MainHero.IsFemale;
+                    bool isAttracted = true;
+                    if (settings.SexualOrientation == "Heterosexual")
+                    {
+                        isAttracted = conversationCharacter.IsFemale != Hero.MainHero.IsFemale;
+                    }
+                    else if (settings.SexualOrientation == "Homosexual")
+                    {
+                        isAttracted = conversationCharacter.IsFemale == Hero.MainHero.IsFemale;
+                    }
+                    return isAttracted;
                 }
-                else if (settings.SexualOrientation == "Homosexual")
-                {
-                    isAttracted = conversationCharacter.IsFemale == Hero.MainHero.IsFemale;
-                }
-                return isAttracted;
             }
             return false;
         }
@@ -544,10 +544,6 @@ namespace MarryAnyone.Behaviors
             }
 
             MASettings settings = new();
-            if (Hero.MainHero.Spouse is not null && !settings.Polygamy)
-            {
-                return false;
-            }
 
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
             bool courtshipPossible = MarriageCourtshipPossibility(this, Hero.MainHero, Hero.OneToOneConversationHero);
@@ -557,12 +553,8 @@ namespace MarryAnyone.Behaviors
             MADebug.Print("Retry Courtship: " + settings.RetryCourtship);
             MADebug.Print("Courtship Possible: " + courtshipPossible);
 
-            if (romanticLevel == Romance.RomanceLevelEnum.CoupleAgreedOnMarriage || romanticLevel == Romance.RomanceLevelEnum.Marriage)
-            {
-                return false;
-            }
-
-            if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested)
+            if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested
+                || (romanticLevel == Romance.RomanceLevelEnum.Ended && (settings.Cheating || settings.Polygamy)))
             {
                 MBTextManager.SetTextVariable("FLIRTATION_LINE", Hero.OneToOneConversationHero.IsFemale
                         ? "{=goodwife_flirt}Goodwife, I wish to profess myself your most ardent admirer."
@@ -571,8 +563,7 @@ namespace MarryAnyone.Behaviors
             }
 
             if (romanticLevel == Romance.RomanceLevelEnum.FailedInCompatibility 
-                || romanticLevel == Romance.RomanceLevelEnum.FailedInPracticalities
-                || (romanticLevel == Romance.RomanceLevelEnum.Ended && settings.RetryCourtship))
+                || romanticLevel == Romance.RomanceLevelEnum.FailedInPracticalities)
             {
                 MBTextManager.SetTextVariable("FLIRTATION_LINE", Hero.OneToOneConversationHero.IsFemale
                         ? "{=goodwife_chance}Goodwife, may you give me another chance to prove myself?"
@@ -581,7 +572,7 @@ namespace MarryAnyone.Behaviors
                 // Retry Courtship feature!
                 if (settings.RetryCourtship)
                 {
-                    if (romanticLevel == Romance.RomanceLevelEnum.FailedInCompatibility || romanticLevel == Romance.RomanceLevelEnum.Ended)
+                    if (romanticLevel == Romance.RomanceLevelEnum.FailedInCompatibility)
                     {
                         ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
                     }

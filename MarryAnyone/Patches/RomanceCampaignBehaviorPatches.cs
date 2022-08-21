@@ -1,9 +1,11 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Helpers;
 using System;
+using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
+using TaleWorlds.Library;
 using TaleWorlds.Localization;
 
 namespace MarryAnyone.Patches
@@ -77,17 +79,15 @@ namespace MarryAnyone.Patches
 
         // Need to clean up encyclopedia after marriage barter
         [HarmonyPostfix]
-        [HarmonyPatch("conversation_finalize_marriage_barter_consequence")]
+        [HarmonyPatch("conversation_marriage_barter_successful_on_consequence")]
         private static void Postfix4()
         {
-            Hero spouseHero = Hero.OneToOneConversationHero;
-            Hero cheatedHero = spouseHero.Spouse;
             MASettings settings = new();
-            if (settings.Cheating && cheatedHero is not null)
+            Hero spouseHero = Hero.OneToOneConversationHero;
+            // Do NOT break off marriages if polygamy is on...
+            if (settings.Cheating && !settings.Polygamy)
             {
-                MAHelpers.RemoveExSpouses(cheatedHero, true);
-                MAHelpers.RemoveExSpouses(spouseHero, true);
-                MADebug.Print("Spouse Broke Off Past Marriage");
+                MAHelpers.CheatOnSpouse();
             }
             MAHelpers.RemoveExSpouses(Hero.MainHero);
             MAHelpers.RemoveExSpouses(spouseHero);
@@ -115,7 +115,8 @@ namespace MarryAnyone.Patches
             MADebug.Print("Retry Courtship: " + settings.RetryCourtship);
             MADebug.Print("Courtship Possible: " + courtshipPossible);
 
-            if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested)
+            if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested
+                || (romanticLevel == Romance.RomanceLevelEnum.Ended && (settings.Cheating || settings.Polygamy)))
             {
                 MBTextManager.SetTextVariable("FLIRTATION_LINE", Hero.OneToOneConversationHero.IsFemale
                         ? "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer."
@@ -124,9 +125,7 @@ namespace MarryAnyone.Patches
                 return true;
             }
 
-            if (romanticLevel == Romance.RomanceLevelEnum.FailedInCompatibility
-                || romanticLevel == Romance.RomanceLevelEnum.FailedInPracticalities
-                || romanticLevel == Romance.RomanceLevelEnum.Ended && settings.RetryCourtship)
+            if (romanticLevel == Romance.RomanceLevelEnum.FailedInCompatibility || romanticLevel == Romance.RomanceLevelEnum.FailedInPracticalities)
             {
                 MBTextManager.SetTextVariable("FLIRTATION_LINE", Hero.OneToOneConversationHero.IsFemale
                         ? "{=4iTaEZKg}My lady, may you give me another chance to prove myself?"
@@ -135,7 +134,7 @@ namespace MarryAnyone.Patches
                 // Retry Courtship feature!
                 if (settings.RetryCourtship)
                 {
-                    if (romanticLevel == Romance.RomanceLevelEnum.FailedInCompatibility || romanticLevel == Romance.RomanceLevelEnum.Ended)
+                    if (romanticLevel == Romance.RomanceLevelEnum.FailedInCompatibility)
                     {
                         ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
                     }

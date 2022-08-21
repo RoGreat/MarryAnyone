@@ -14,8 +14,6 @@ namespace MarryAnyone
 
         public static CharacterDevelopmentCampaignBehavior? CharacterDevelopmentCampaignBehaviorInstance { get; private set; }
 
-        public static HeroAgentSpawnCampaignBehavior? HeroAgentSpawnCampaignBehaviorInstance { get; private set; }
-
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
@@ -33,7 +31,6 @@ namespace MarryAnyone
                 /* Used for calling private methods in these instances */
                 CompanionsCampaignBehaviorInstance = new();
                 CharacterDevelopmentCampaignBehaviorInstance = new();
-                HeroAgentSpawnCampaignBehaviorInstance = new();
             }
         }
     }
