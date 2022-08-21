@@ -110,10 +110,10 @@ namespace MarryAnyone.Patches
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
             bool courtshipPossible = MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
 
-            MADebug.Print("Romantic Level: " + romanticLevel);
-            MADebug.Print("Skip Courtship: " + settings.SkipCourtship);
-            MADebug.Print("Retry Courtship: " + settings.RetryCourtship);
-            MADebug.Print("Courtship Possible: " + courtshipPossible);
+            Debug.Print("Romantic Level: " + romanticLevel);
+            Debug.Print("Skip Courtship: " + settings.SkipCourtship);
+            Debug.Print("Retry Courtship: " + settings.RetryCourtship);
+            Debug.Print("Courtship Possible: " + courtshipPossible);
 
             if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested
                 || (romanticLevel == Romance.RomanceLevelEnum.Ended && (settings.Cheating || settings.Polygamy)))

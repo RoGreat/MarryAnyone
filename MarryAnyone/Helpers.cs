@@ -34,7 +34,7 @@ namespace MarryAnyone
                 if (_exSpousesList.Contains(hero.Spouse))
                 {
                     _exSpousesList.Remove(hero.Spouse);
-                    MADebug.Print($"Removed duplicate spouse {hero.Spouse.Name}");
+                    Debug.Print($"Removed duplicate spouse {hero.Spouse.Name}");
                 }
             }
             else
@@ -77,11 +77,11 @@ namespace MarryAnyone
                 RemoveExSpouses(cheatedHero, RemoveExSpousesEnum.All);
                 if (cheatedHero != Hero.MainHero.Spouse)
                 {
-                    MADebug.Print($"Broke off marriage with {cheatedHero.Name}");
+                    Debug.Print($"Broke off marriage with {cheatedHero.Name}");
                 }
                 else
                 {
-                    MADebug.Print($"Removed duplicate spouse {cheatedHero.Name}");
+                    Debug.Print($"Removed duplicate spouse {cheatedHero.Name}");
                 }
             }
         }

@@ -73,7 +73,7 @@ namespace MarryAnyone.Settings
             }
             catch (Exception e)
             {
-                MADebug.Error(e);
+                MarryAnyone.Debug.Error(e);
             }
         }
 
@@ -105,7 +105,7 @@ namespace MarryAnyone.Settings
             }
             catch (Exception e)
             {
-                MADebug.Error(e);
+                MarryAnyone.Debug.Error(e);
             }
         }
 

@@ -3,7 +3,7 @@ using TaleWorlds.Library;
 
 namespace MarryAnyone
 {
-    internal static class MADebug
+    internal static class Debug
     {
         public static void Print(string message)
         {
