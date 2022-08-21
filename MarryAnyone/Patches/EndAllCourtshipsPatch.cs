@@ -18,7 +18,6 @@ namespace MarryAnyone.Patches
                 {
                     if (romanticState.Person1 == Hero.MainHero || romanticState.Person2 == Hero.MainHero)
                     {
-                        MADebug.Print("Main hero is polygamous, so do not end romances.");
                     }
                     else if (romanticState.Person1 == forHero || romanticState.Person2 == forHero)
                     {
