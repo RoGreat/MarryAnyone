@@ -16,6 +16,7 @@ using TaleWorlds.Localization;
 using MarryAnyone.Actions;
 using System.Reflection;
 using static MarryAnyone.Helpers;
+using static MarryAnyone.Debug;
 
 namespace MarryAnyone.Behaviors
 {
@@ -495,10 +496,10 @@ namespace MarryAnyone.Behaviors
             _companionHero = null;
             // Leave patch accounts for agents that are temporary heroes
             MASettings settings = new();
-            Debug.Print("Orientation: " + settings.SexualOrientation);
-            Debug.Print("Cheating: " + settings.Cheating);
-            Debug.Print("Polygamy: " + settings.Polygamy);
-            Debug.Print("Incest: " + settings.Incest);
+            Print("Orientation: " + settings.SexualOrientation);
+            Print("Cheating: " + settings.Cheating);
+            Print("Polygamy: " + settings.Polygamy);
+            Print("Incest: " + settings.Incest);
             if (Hero.OneToOneConversationHero is not null)
             {
                 // Heroes will avoid romance if they are a lord or they cannot marry the player
@@ -554,10 +555,10 @@ namespace MarryAnyone.Behaviors
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
             bool courtshipPossible = MarriageCourtshipPossibility(this, Hero.MainHero, Hero.OneToOneConversationHero);
 
-            Debug.Print("Romantic Level: " + romanticLevel);
-            Debug.Print("Skip Courtship: " + settings.SkipCourtship);
-            Debug.Print("Retry Courtship: " + settings.RetryCourtship);
-            Debug.Print("Courtship Possible: " + courtshipPossible);
+            Print("Romantic Level: " + romanticLevel);
+            Print("Skip Courtship: " + settings.SkipCourtship);
+            Print("Retry Courtship: " + settings.RetryCourtship);
+            Print("Courtship Possible: " + courtshipPossible);
 
             if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested
                 || (romanticLevel == Romance.RomanceLevelEnum.Ended && (settings.Cheating || settings.Polygamy)))

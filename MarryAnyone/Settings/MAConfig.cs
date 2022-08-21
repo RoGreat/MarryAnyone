@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Newtonsoft.Json;
+using static MarryAnyone.Debug;
 
 namespace MarryAnyone.Settings
 {
@@ -9,8 +10,8 @@ namespace MarryAnyone.Settings
         public string? SexualOrientation { get; set; }
         public string? TemplateCharacter { get; set; }
         public bool Polygamy { get; set; }
-        public bool PregnancyPlus { get; set; }
         public bool Polyamory { get; set; }
+        public bool PregnancyPlus { get; set; }
         public bool Cheating { get; set; }
         public bool Incest { get; set; }
         public bool SkipCourtship { get; set; }
@@ -73,7 +74,7 @@ namespace MarryAnyone.Settings
             }
             catch (Exception e)
             {
-                MarryAnyone.Debug.Error(e);
+                Error(e);
             }
         }
 
@@ -105,7 +106,7 @@ namespace MarryAnyone.Settings
             }
             catch (Exception e)
             {
-                MarryAnyone.Debug.Error(e);
+                Error(e);
             }
         }
 

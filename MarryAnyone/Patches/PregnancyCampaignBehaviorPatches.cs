@@ -5,6 +5,7 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.Core;
 using static MarryAnyone.Helpers;
+using static MarryAnyone.Debug;
 
 namespace MarryAnyone.Patches
 {
@@ -32,35 +33,35 @@ namespace MarryAnyone.Patches
                     {
                         if (hero.Spouse is null && (hero.ExSpouses.IsEmpty() || hero.ExSpouses is null))
                         {
-                            Debug.Print("    No Spouse");
+                            Print("    No Spouse");
                             return;
                         }
                         _spouses = new List<Hero>();
-                        Debug.Print("Hero: " + hero);
+                        Print("Hero: " + hero);
                         if (hero.Spouse is not null && hero == Hero.MainHero)
                         {
                             _spouses.Add(hero.Spouse);
-                            Debug.Print("Spouse to Collection: " + hero.Spouse);
+                            Print("Spouse to Collection: " + hero.Spouse);
                         }
                         if (settings.Polyamory && hero != Hero.MainHero)
                         {
-                            Debug.Print("Polyamory");
+                            Print("Polyamory");
                             if (hero.Spouse != Hero.MainHero)
                             {
                                 _spouses.Add(Hero.MainHero);
-                                Debug.Print("Main Hero to Collection: " + Hero.MainHero);
+                                Print("Main Hero to Collection: " + Hero.MainHero);
                             }
                             if (Hero.MainHero.Spouse is not null && Hero.MainHero.Spouse != hero)
                             {
                                 _spouses.Add(Hero.MainHero.Spouse);
-                                Debug.Print("Main Hero Spouse to Collection: " + Hero.MainHero.Spouse);
+                                Print("Main Hero Spouse to Collection: " + Hero.MainHero.Spouse);
                             }
                             foreach (Hero exSpouse in Hero.MainHero.ExSpouses.Distinct().ToList())
                             {
                                 if (exSpouse != hero && exSpouse.IsAlive)
                                 {
                                     _spouses.Add(exSpouse);
-                                    Debug.Print("Main Hero ExSpouse to Collection: " + exSpouse);
+                                    Print("Main Hero ExSpouse to Collection: " + exSpouse);
                                 }
                             }
                         }
@@ -70,7 +71,7 @@ namespace MarryAnyone.Patches
                             if (hero.Spouse != Hero.MainHero && hero != Hero.MainHero)
                             {
                                 _spouses.Add(Hero.MainHero);
-                                Debug.Print("Spouse is Main Hero: " + Hero.MainHero);
+                                Print("Spouse is Main Hero: " + Hero.MainHero);
                             }
                             if (hero == Hero.MainHero)
                             {
@@ -79,7 +80,7 @@ namespace MarryAnyone.Patches
                                     if (exSpouse.IsAlive)
                                     {
                                         _spouses.Add(exSpouse);
-                                        Debug.Print("ExSpouse to Collection: " + exSpouse);
+                                        Print("ExSpouse to Collection: " + exSpouse);
                                     }
                                 }
                             }
@@ -93,17 +94,17 @@ namespace MarryAnyone.Patches
                             {
                                 attraction += Campaign.Current.Models.RomanceModel.GetAttractionValuePercentage(hero, spouse);
                                 attractionGoal.Add(attraction);
-                                Debug.Print("Spouse: " + spouse);
-                                Debug.Print("Attraction: " + attraction);
+                                Print("Spouse: " + spouse);
+                                Print("Attraction: " + attraction);
                             }
                             int attractionRandom = MBRandom.RandomInt(attraction);
-                            Debug.Print("Random: " + attractionRandom);
+                            Print("Random: " + attractionRandom);
                             int i = 0;
                             while (i < _spouses.Count)
                             {
                                 if (attractionRandom < attractionGoal[i])
                                 {
-                                    Debug.Print("Index: " + i);
+                                    Print("Index: " + i);
                                     break;
                                 }
                                 i++;
@@ -122,11 +123,11 @@ namespace MarryAnyone.Patches
                         }
                         if (hero.Spouse is null)
                         {
-                            Debug.Print("   No Spouse");
+                            Print("   No Spouse");
                         }
                         else
                         {
-                            Debug.Print("   Spouse Assigned: " + hero.Spouse);
+                            Print("   Spouse Assigned: " + hero.Spouse);
                         }
                     }
                 }
@@ -135,7 +136,7 @@ namespace MarryAnyone.Patches
                     if (hero.IsFemale == hero.Spouse.IsFemale)
                     {
                         // Decided to do this at the end so that you are not always going out with the opposite gender
-                        Debug.Print("   Spouse Unassigned: " + hero.Spouse);
+                        Print("   Spouse Unassigned: " + hero.Spouse);
                         hero.Spouse.Spouse = null;
                         hero.Spouse = null;
                     }
@@ -156,16 +157,16 @@ namespace MarryAnyone.Patches
                 // Make things looks better in the encyclopedia
                 if (hero == Hero.MainHero)
                 {
-                    Debug.Print("Post Pregnancy Check: " + hero);
-                    Debug.Print("   Main Hero Spouse Unassigned");
+                    Print("Post Pregnancy Check: " + hero);
+                    Print("   Main Hero Spouse Unassigned");
                     hero.Spouse = null;
                 }
                 if (Hero.MainHero.ExSpouses.Contains(hero) || hero.Spouse == Hero.MainHero)
                 {
                     if (hero.Spouse is null || hero.Spouse != Hero.MainHero)
                     {
-                        Debug.Print("Post Pregnancy Check: " + hero);
-                        Debug.Print("   Spouse is Main Hero");
+                        Print("Post Pregnancy Check: " + hero);
+                        Print("   Spouse is Main Hero");
                         // Possibly dangerous now...
                         // Added mode to define remove exspouses from self
                         if (!settings.Polyamory)

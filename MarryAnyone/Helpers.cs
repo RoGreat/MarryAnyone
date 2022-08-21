@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Library;
+using static MarryAnyone.Debug;
 
 namespace MarryAnyone
 {
@@ -34,7 +35,7 @@ namespace MarryAnyone
                 if (_exSpousesList.Contains(hero.Spouse))
                 {
                     _exSpousesList.Remove(hero.Spouse);
-                    Debug.Print($"Removed duplicate spouse {hero.Spouse.Name}");
+                    Print($"Removed duplicate spouse {hero.Spouse.Name}");
                 }
             }
             else
@@ -77,11 +78,11 @@ namespace MarryAnyone
                 RemoveExSpouses(cheatedHero, RemoveExSpousesEnum.All);
                 if (cheatedHero != Hero.MainHero.Spouse)
                 {
-                    Debug.Print($"Broke off marriage with {cheatedHero.Name}");
+                    Print($"Broke off marriage with {cheatedHero.Name}");
                 }
                 else
                 {
-                    Debug.Print($"Removed duplicate spouse {cheatedHero.Name}");
+                    Print($"Removed duplicate spouse {cheatedHero.Name}");
                 }
             }
         }
