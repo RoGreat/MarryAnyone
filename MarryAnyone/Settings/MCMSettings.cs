@@ -32,7 +32,6 @@ namespace MarryAnyone.Settings
             set => SexualOrientationDropdown.SelectedValue = value;
         }
 
-
         [SettingPropertyBool("{=cheating}Cheating", Order = 1, RequireRestart = false, HintText = "{=cheating_desc}Player character can marry characters that are already married.")]
         [SettingPropertyGroup("{=relationship}Relationship", GroupOrder = 0)]
         public bool Cheating { get; set; } = false;

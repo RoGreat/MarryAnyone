@@ -5,6 +5,7 @@ using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.Localization;
 using static MarryAnyone.Helpers;
+using static MarryAnyone.Debug;
 
 namespace MarryAnyone.Patches
 {
@@ -110,10 +111,10 @@ namespace MarryAnyone.Patches
             Romance.RomanceLevelEnum romanticLevel = Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero);
             bool courtshipPossible = MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
 
-            Debug.Print("Romantic Level: " + romanticLevel);
-            Debug.Print("Skip Courtship: " + settings.SkipCourtship);
-            Debug.Print("Retry Courtship: " + settings.RetryCourtship);
-            Debug.Print("Courtship Possible: " + courtshipPossible);
+            Print("Romantic Level: " + romanticLevel);
+            Print("Skip Courtship: " + settings.SkipCourtship);
+            Print("Retry Courtship: " + settings.RetryCourtship);
+            Print("Courtship Possible: " + courtshipPossible);
 
             if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested
                 || (romanticLevel == Romance.RomanceLevelEnum.Ended && (settings.Cheating || settings.Polygamy)))
