@@ -58,26 +58,19 @@ namespace MarryAnyone.Models
 
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
+            /* Reminder that AI also uses this method */
+            bool isMainHero = Hero.OneToOneConversationHero == maidenOrSuitor || Hero.MainHero == maidenOrSuitor;
+            if (!isMainHero)
+            {
+                return base.IsSuitableForMarriage(maidenOrSuitor);
+            }
+            /* Marry Anyone part */
             if (maidenOrSuitor.IsDead || maidenOrSuitor.IsTemplate)
             {
                 return false;
             }
-
-            /* Reminder that AI also uses this method */
             MASettings settings = new();
-            bool isCheating = false;
-            bool isPolygamous = false;
-
-            if (Hero.OneToOneConversationHero is not null)
-            {
-                bool inConversation = maidenOrSuitor == Hero.MainHero || maidenOrSuitor == Hero.OneToOneConversationHero;
-                if (inConversation)
-                {
-                    isCheating = settings.Cheating;
-                    isPolygamous = settings.Polygamy;
-                }
-            }
-            if ((maidenOrSuitor.Spouse is null && !maidenOrSuitor.ExSpouses.Any(exSpouse => exSpouse.IsAlive)) || isPolygamous || isCheating)
+            if ((maidenOrSuitor.Spouse is null && !maidenOrSuitor.ExSpouses.Any(exSpouse => exSpouse.IsAlive)) || settings.Polygamy || settings.Cheating)
             {
                 if (maidenOrSuitor.IsFemale)
                 {

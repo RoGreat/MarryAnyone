@@ -170,6 +170,7 @@ namespace MarryAnyone.Behaviors
             ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CoupleAgreedOnMarriage);
             // Apply marriage action
             MarriageAction.Apply(Hero.OneToOneConversationHero, Hero.MainHero, true);
+            // Leave encounter
             if (PlayerEncounter.Current is not null)
             {
                 PlayerEncounter.LeaveEncounter = true;
@@ -488,10 +489,13 @@ namespace MarryAnyone.Behaviors
             EquipmentHelper.AssignHeroEquipmentFromEquipment(_companionHero, battleEquipment);
 
             // Adjust Equipment like the wanderer do
-            CompanionAdjustEquipment!.Invoke(SubModule.CompanionsCampaignBehaviorInstance, new object[] { _companionHero });
+            CompanionsCampaignBehavior instance1 = Campaign.Current.CampaignBehaviorManager.GetBehavior<CompanionsCampaignBehavior>();
+            CompanionAdjustEquipment!.Invoke(instance1, new object[] { _companionHero });
 
             HeroHelper.DetermineInitialLevel(_companionHero);
-            SubModule.CharacterDevelopmentCampaignBehaviorInstance!.DevelopCharacterStats(_companionHero);
+
+            CharacterDevelopmentCampaignBehavior instance2 = Campaign.Current.CampaignBehaviorManager.GetBehavior<CharacterDevelopmentCampaignBehavior>();
+            instance2.DevelopCharacterStats(_companionHero);
 
             //character.HeroObject = _companionHero;
             CharacterHeroObject!.SetValue(conversationCharacter, _companionHero);
