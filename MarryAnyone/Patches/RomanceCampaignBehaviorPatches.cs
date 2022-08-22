@@ -4,7 +4,6 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.Localization;
-using static MarryAnyone.Helpers;
 using static MarryAnyone.Debug;
 
 namespace MarryAnyone.Patches
@@ -73,22 +72,6 @@ namespace MarryAnyone.Patches
             {
                 __result = CampaignTime.DaysFromNow(1f);
             }
-        }
-
-        // Need to clean up encyclopedia after marriage barter
-        [HarmonyPostfix]
-        [HarmonyPatch("conversation_marriage_barter_successful_on_consequence")]
-        private static void Postfix4()
-        {
-            MASettings settings = new();
-            Hero spouseHero = Hero.OneToOneConversationHero;
-            // Do NOT break off marriages if polygamy is on...
-            if (settings.Cheating && !settings.Polygamy)
-            {
-                CheatOnSpouse();
-            }
-            RemoveExSpouses(Hero.MainHero);
-            RemoveExSpouses(spouseHero);
         }
 
         /* Methods */

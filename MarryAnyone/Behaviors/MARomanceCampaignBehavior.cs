@@ -109,7 +109,7 @@ namespace MarryAnyone.Behaviors
             // Skip barter and marry immediately
             starter.AddDialogLine("MA" + "hero_courtship_persuasion_2_success", "lord_conclude_courtship_stage_2", "close_window", "{=xwS10c1b}Yes... I think I would be honored to accept your proposal.", new ConversationSentence.OnConditionDelegate(MA_marriage_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_marriage_on_consequence), 200, null);
             // In case there is a fail
-            starter.AddDialogLine("MA" + "hero_courtship_persuasion_2_success", "lord_conclude_courtship_stage_2", "close_window", "{=PoDVgQaz}Well, it would take a bit long to discuss this.", new ConversationSentence.OnConditionDelegate(MA_marriage_rejection_on_condition), null, 200, null);
+            starter.AddDialogLine("MA" + "hero_courtship_persuasion_2_success", "lord_conclude_courtship_stage_2", "close_window", "{=PoDVgQaz}Well, it would take a bit long to discuss this.", new ConversationSentence.OnConditionDelegate(MA_marriage_rejection_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_courtship_conversation_leave_on_consequence), 200, null);
 
             // Skip courtship later down the line immediately
             starter.AddDialogLine("MA" + "hero_courtship_persuasion_start", "hero_courtship_task_1_begin_reservations", "lord_conclude_courtship_stage_2", "{=bW3ygxro}Yes, it's good to have a chance to get to know each other.", new ConversationSentence.OnConditionDelegate(MA_skip_courtship_conversation_player_eligible_for_marriage_with_conversation_hero_on_condition), new ConversationSentence.OnConsequenceDelegate(MA_conversation_player_opens_courtship_on_consequence), 200, null);
@@ -170,10 +170,9 @@ namespace MarryAnyone.Behaviors
             ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CoupleAgreedOnMarriage);
             // Apply marriage action
             MarriageAction.Apply(Hero.OneToOneConversationHero, Hero.MainHero, true);
-            // Do NOT break off marriages if polygamy is on...
-            if (settings.Cheating && !settings.Polygamy)
+            if (PlayerEncounter.Current is not null)
             {
-                CheatOnSpouse();
+                PlayerEncounter.LeaveEncounter = true;
             }
         }
 
@@ -296,6 +295,10 @@ namespace MarryAnyone.Behaviors
             if (_heroes.ContainsKey(conversationAgent))
             {
                 RemoveHeroObjectFromCharacter();
+            }
+            else if (PlayerEncounter.Current is not null)
+            {
+                PlayerEncounter.LeaveEncounter = true;
             }
         }
 

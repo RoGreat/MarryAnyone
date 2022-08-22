@@ -58,6 +58,11 @@ namespace MarryAnyone.Models
 
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
+            if (maidenOrSuitor.IsDead || maidenOrSuitor.IsTemplate)
+            {
+                return false;
+            }
+
             /* Reminder that AI also uses this method */
             MASettings settings = new();
             bool isCheating = false;
@@ -71,10 +76,6 @@ namespace MarryAnyone.Models
                     isCheating = settings.Cheating;
                     isPolygamous = settings.Polygamy;
                 }
-            }
-            if (!maidenOrSuitor.IsAlive || maidenOrSuitor.IsTemplate)
-            {
-                return false;
             }
             if ((maidenOrSuitor.Spouse is null && !maidenOrSuitor.ExSpouses.Any(exSpouse => exSpouse.IsAlive)) || isPolygamous || isCheating)
             {
