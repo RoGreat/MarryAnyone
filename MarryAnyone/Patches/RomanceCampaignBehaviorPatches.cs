@@ -44,27 +44,10 @@ namespace MarryAnyone.Patches
         }
 
         /* Postfixes */
-        // Player eligible for marriage with Lord patch
-        // How it was from the original mod just about
-        [HarmonyPostfix]
-        [HarmonyPatch("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition")]
-        private static void Postfix1(ref bool __result, object __instance)
-        {
-            __result = Hero.OneToOneConversationHero is not null && MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
-        }
-
-        // Original method but take out the spouse part
-        [HarmonyPostfix]
-        [HarmonyPatch("conversation_player_eligible_for_marriage_with_hero_rltv_on_condition")]
-        private static void Postfix2(ref bool __result)
-        {
-            __result = Hero.OneToOneConversationHero is not null;
-        }
-
         // Would really like to make this better...
         [HarmonyPostfix]
         [HarmonyPatch("RomanceCourtshipAttemptCooldown", MethodType.Getter)]
-        private static void Postfix3(ref CampaignTime __result)
+        private static void Postfix2(ref CampaignTime __result)
         {
             MASettings settings = new();
             if (settings.RetryCourtship)
@@ -72,6 +55,36 @@ namespace MarryAnyone.Patches
                 __result = CampaignTime.DaysFromNow(1f);
             }
         }
+
+        // Player eligible for marriage with Lord patch
+        // How it was from the original mod just about
+        [HarmonyPostfix]
+        [HarmonyPatch("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition")]
+        private static void Postfix3(ref bool __result, object __instance)
+        {
+            __result = Hero.OneToOneConversationHero is not null && MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
+        }
+
+        // Relative bartering with new settings
+        [HarmonyPostfix]
+        [HarmonyPatch("conversation_player_eligible_for_marriage_with_hero_rltv_on_condition")]
+        private static void Postfix4(ref bool __result)
+        {
+            MASettings settings = new();
+            __result = (Hero.MainHero.Spouse == null || settings.Polygamy || settings.Cheating) && Hero.OneToOneConversationHero is not null;
+        }
+
+        // conversation_player_rltv_agrees_on_courtship_on_condition
+        //[HarmonyPostfix]
+        //[HarmonyPatch("conversation_player_rltv_agrees_on_courtship_on_condition")]
+        //private static void Postfix5(ref bool __result)
+        //{
+        //    MASettings settings = new();
+        //    if (settings.Polygamy || settings.Cheating)
+        //    {
+        //        __result = true;
+        //    }
+        //}
 
         /* Methods */
         private static bool conversation_player_can_open_courtship_on_condition(object __instance)

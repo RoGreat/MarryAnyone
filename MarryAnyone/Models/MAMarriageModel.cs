@@ -10,7 +10,7 @@ namespace MarryAnyone.Models
     internal sealed class MAMarriageModel : DefaultMarriageModel
     {
         private delegate IEnumerable<Hero> DiscoverAncestorsDelegate(DefaultMarriageModel instance, Hero hero, int n);
-        private static readonly DiscoverAncestorsDelegate DiscoverAncestors = AccessTools2.GetDelegate<DiscoverAncestorsDelegate>(typeof(DefaultMarriageModel), "DiscoverAncestors", new Type[] { typeof(Hero), typeof(int) });
+        private static readonly DiscoverAncestorsDelegate? DiscoverAncestors = AccessTools2.GetDelegate<DiscoverAncestorsDelegate>(typeof(DefaultMarriageModel), "DiscoverAncestors", new Type[] { typeof(Hero), typeof(int) });
 
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
@@ -34,7 +34,7 @@ namespace MarryAnyone.Models
             bool isHeterosexual = settings.SexualOrientation == "Heterosexual";
             bool isHomosexual = settings.SexualOrientation == "Homosexual";
             bool isIncestuous = settings.Incest;
-            bool discoverAncestors = DiscoverAncestors(this, firstHero, 3).Intersect(DiscoverAncestors(this, secondHero, 3)).Any();
+            bool discoverAncestors = DiscoverAncestors!(this, firstHero, 3).Intersect(DiscoverAncestors(this, secondHero, 3)).Any();
             // If incest setting is off then look for ancestor relations
             if (!isIncestuous)
             {
@@ -65,7 +65,7 @@ namespace MarryAnyone.Models
                 return base.IsSuitableForMarriage(maidenOrSuitor);
             }
             /* Marry Anyone part */
-            if (maidenOrSuitor.IsDead || maidenOrSuitor.IsTemplate)
+            if (maidenOrSuitor.IsDead || maidenOrSuitor.IsTemplate || Romance.GetRomanticLevel(maidenOrSuitor, Hero.MainHero) == Romance.RomanceLevelEnum.Marriage)
             {
                 return false;
             }
