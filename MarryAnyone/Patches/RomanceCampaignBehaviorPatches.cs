@@ -50,7 +50,6 @@ namespace MarryAnyone.Patches
         [HarmonyPatch("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition")]
         private static void Postfix1(ref bool __result, object __instance)
         {
-            MASettings settings = new();
             __result = Hero.OneToOneConversationHero is not null && MarriageCourtshipPossibility(__instance, Hero.MainHero, Hero.OneToOneConversationHero);
         }
 

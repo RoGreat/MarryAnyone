@@ -10,10 +10,6 @@ namespace MarryAnyone
 {
     internal sealed class SubModule : MBSubModuleBase
     {
-        public static CompanionsCampaignBehavior? CompanionsCampaignBehaviorInstance { get; private set; }
-
-        public static CharacterDevelopmentCampaignBehavior? CharacterDevelopmentCampaignBehaviorInstance { get; private set; }
-
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
@@ -28,9 +24,6 @@ namespace MarryAnyone
                 CampaignGameStarter campaignGameStarter = (CampaignGameStarter)gameStarterObject;
                 campaignGameStarter.AddBehavior(new MARomanceCampaignBehavior());
                 campaignGameStarter.AddModel(new MAMarriageModel());
-                /* Used for calling private methods in these instances */
-                CompanionsCampaignBehaviorInstance = new();
-                CharacterDevelopmentCampaignBehaviorInstance = new();
             }
         }
     }
