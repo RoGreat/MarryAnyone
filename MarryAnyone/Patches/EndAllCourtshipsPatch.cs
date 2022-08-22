@@ -4,7 +4,7 @@ using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone.Patches
 {
-    // If polygamous the player does not end courtships with other heroes
+    // If polygamous or cheating, the player does not end courtships with other heroes
     [HarmonyPatch(typeof(Romance), "EndAllCourtships")]
     internal sealed class EndAllCourtshipsPatch
     {
@@ -12,7 +12,7 @@ namespace MarryAnyone.Patches
         {
             MASettings settings = new();
 
-            if (settings.Polygamy)
+            if (settings.Polygamy || settings.Cheating)
             {
                 foreach (Romance.RomanticState romanticState in Romance.RomanticStateList.ToList())
                 {
