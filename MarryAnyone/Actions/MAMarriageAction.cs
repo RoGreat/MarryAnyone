@@ -13,6 +13,7 @@ namespace MarryAnyone.Actions
     {
         private static readonly PropertyInfo? CampaignPlayerDefaultFaction = AccessTools2.Property(typeof(Campaign), "PlayerDefaultFaction");
 
+        // Appears to ultimately avoid disbanding parties and the like...
         private static void ApplyInternal(Hero firstHero, Hero secondHero, bool showNotification)
         {
             firstHero.Spouse = secondHero;
@@ -28,15 +29,20 @@ namespace MarryAnyone.Actions
             else if (firstHero.Clan != clanAfterMarriage)
             {
                 Clan clan = firstHero.Clan;
-                firstHero.Clan = clanAfterMarriage;
+                if (firstHero.GovernorOf is not null)
+                {
+                    ChangeGovernorAction.RemoveGovernorOf(firstHero);
+                    Print($"{firstHero.Name} removed as governor");
+                }
                 if (clan is not null)
                 {
                     foreach (Hero hero in clan.Heroes)
                     {
                         hero.UpdateHomeSettlement();
-                        Print($"Updated settlement of {hero.Name}");
+                        Print($"Updated home settlement of {hero.Name}");
                     }
                 }
+                firstHero.Clan = clanAfterMarriage;
                 if (firstHero == Hero.MainHero)
                 {
                     CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, firstHero.Clan);
@@ -48,15 +54,20 @@ namespace MarryAnyone.Actions
             else if (secondHero.Clan != clanAfterMarriage)
             {
                 Clan clan = secondHero.Clan;
-                secondHero.Clan = clanAfterMarriage;
+                if (secondHero.GovernorOf is not null)
+                {
+                    ChangeGovernorAction.RemoveGovernorOf(secondHero);
+                    Print($"{secondHero.Name} removed as governor");
+                }
                 if (clan is not null)
                 {
                     foreach (Hero hero in clan.Heroes)
                     {
                         hero.UpdateHomeSettlement();
-                        Print($"Updated settlement of {hero.Name}");
+                        Print($"Updated home settlement of {hero.Name}");
                     }
                 }
+                secondHero.Clan = clanAfterMarriage;
                 if (secondHero == Hero.MainHero)
                 {
                     CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, secondHero.Clan);
@@ -68,7 +79,7 @@ namespace MarryAnyone.Actions
             foreach (Hero hero in clanAfterMarriage.Heroes)
             {
                 hero.UpdateHomeSettlement();
-                Print($"Updated settlement of {hero.Name}");
+                Print($"Updated home settlement of {hero.Name}");
             }
 
             // Romance.EndAllCourtships(firstHero);
