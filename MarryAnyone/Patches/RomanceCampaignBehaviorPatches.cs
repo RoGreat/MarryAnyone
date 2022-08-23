@@ -96,8 +96,7 @@ namespace MarryAnyone.Patches
             Print("Retry Courtship: " + settings.RetryCourtship);
             Print("Courtship Possible: " + courtshipPossible);
 
-            if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested
-                || (romanticLevel == Romance.RomanceLevelEnum.Ended && (settings.Cheating || settings.Polygamy)))
+            if (courtshipPossible && romanticLevel == Romance.RomanceLevelEnum.Untested)
             {
                 MBTextManager.SetTextVariable("FLIRTATION_LINE", Hero.OneToOneConversationHero.IsFemale
                         ? "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer."
