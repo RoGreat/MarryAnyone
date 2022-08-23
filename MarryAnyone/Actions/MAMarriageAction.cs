@@ -5,9 +5,9 @@ using HarmonyLib.BUTR.Extensions;
 using System.Reflection;
 using System.Collections.Generic;
 using Helpers;
-using static MarryAnyone.Debug;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.Core;
+using static MarryAnyone.Debug;
 
 namespace MarryAnyone.Actions
 {

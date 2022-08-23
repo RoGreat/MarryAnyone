@@ -2,7 +2,6 @@
 using MarryAnyone.Behaviors;
 using MarryAnyone.Models;
 using TaleWorlds.CampaignSystem;
-using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 
