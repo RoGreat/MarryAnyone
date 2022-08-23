@@ -12,6 +12,8 @@ namespace MarryAnyone.Models
         private delegate IEnumerable<Hero> DiscoverAncestorsDelegate(DefaultMarriageModel instance, Hero hero, int n);
         private static readonly DiscoverAncestorsDelegate? DiscoverAncestors = AccessTools2.GetDelegate<DiscoverAncestorsDelegate>(typeof(DefaultMarriageModel), "DiscoverAncestors", new Type[] { typeof(Hero), typeof(int) });
 
+        private static bool _mainHeroCourtship = false;
+
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
             /* Section for AI heroes from the original method */
@@ -21,51 +23,51 @@ namespace MarryAnyone.Models
                 // Other heroes use the DefaultMarriageModel
                 return base.IsCoupleSuitableForMarriage(firstHero, secondHero);
             }
-
             /* Section for Marry Anyone method */
+            // DO NOT MARRY AGAIN!
+            if (Romance.GetRomanticLevel(firstHero, secondHero) == Romance.RomanceLevelEnum.Marriage)
+            {
+                return false;
+            }
             // Does not directly call IsSuitableForMarriage, instead calls CanMarry -> IsSuitableForMarriage
+            _mainHeroCourtship = true;
             bool canMarry = firstHero.CanMarry() && secondHero.CanMarry();
+            _mainHeroCourtship = false;
             if (!canMarry)
             {
                 return false;
             }
 
             MASettings settings = new();
-            bool isHeterosexual = settings.SexualOrientation == "Heterosexual";
-            bool isHomosexual = settings.SexualOrientation == "Homosexual";
-            bool isIncestuous = settings.Incest;
-            bool discoverAncestors = DiscoverAncestors!(this, firstHero, 3).Intersect(DiscoverAncestors(this, secondHero, 3)).Any();
             // If incest setting is off then look for ancestor relations
-            if (!isIncestuous)
+            if (!settings.Incest)
             {
-                if (discoverAncestors)
+                if (DiscoverAncestors!(this, firstHero, 3).Intersect(DiscoverAncestors(this, secondHero, 3)).Any())
                 {
                     return false;
                 }
             }
 
             bool isAttracted = true;
-            if (isHeterosexual)
+            if (settings.SexualOrientation == "Heterosexual")
             {
                 isAttracted = firstHero.IsFemale != secondHero.IsFemale;
             }
-            else if (isHomosexual)
+            else if (settings.SexualOrientation == "Homosexual")
             {
                 isAttracted = firstHero.IsFemale == secondHero.IsFemale;
             }
             return isAttracted;
         }
 
+        // Problem is with marriage bartering with a lack of info...
         public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
         {
-            /* Reminder that AI also uses this method */
-            bool isMainHero = Hero.OneToOneConversationHero == maidenOrSuitor || Hero.MainHero == maidenOrSuitor;
-            if (!isMainHero)
+            if (!_mainHeroCourtship)
             {
                 return base.IsSuitableForMarriage(maidenOrSuitor);
             }
-            /* Marry Anyone part */
-            if (maidenOrSuitor.IsDead || maidenOrSuitor.IsTemplate || Romance.GetRomanticLevel(maidenOrSuitor, Hero.MainHero) == Romance.RomanceLevelEnum.Marriage)
+            if (maidenOrSuitor.IsDead || maidenOrSuitor.IsTemplate || maidenOrSuitor.IsPrisoner)
             {
                 return false;
             }
@@ -80,5 +82,76 @@ namespace MarryAnyone.Models
             }
             return false;
         }
+
+        // Borrowed from Family Tree
+        // Might adversely affect AI marriage barters
+        /*
+        public override Clan GetClanAfterMarriage(Hero firstHero, Hero secondHero)
+        {
+            List<Hero> heroes = new List<Hero>() { firstHero, secondHero };
+            // Kingdom Ruling Clan Leader
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.Kingdom?.Leader == hero)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Kingdom Ruling Clan
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.Kingdom?.RulingClan == hero.Clan)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Kingdom Clan Leader
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.IsKingdomFaction && hero.IsFactionLeader)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Kingdom Clan
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.IsKingdomFaction)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Minor Faction Leader
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.IsMinorFaction && hero.IsFactionLeader)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Minor Faction Clan
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.IsMinorFaction)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Clan Leader
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.Leader == hero)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Other
+            if (!firstHero.IsFemale)
+            {
+                return firstHero.Clan;
+            }
+            return secondHero.Clan;
+        }
+        */
     }
 }
