@@ -4,16 +4,15 @@
     <tag language="English" />
   </tags>  
   <strings>
-		<string id="marryanyone" text="Marry Anyone" />
 		<string id="orientation" text="Sexual Orientation" />
 		<string id="orientation_desc" text="Player character can choose what gender the player can marry." />
 		<string id="spouses" text="Spouses" />
 		<string id="polygamy" text="Polygamy" />
-		<string id="polygamy_desc" text="Player character can have polygamous relationships." />
+		<string id="polygamy_desc" text="Player character can have multiple marriages at once." />
 		<string id="polyamory" text="Polyamory" />
-		<string id="polyamory_desc" text="Player character's spouses can have relationships with each other." />
+		<string id="polyamory_desc" text="Player character's spouses can get each other pregnant." />
 		<string id="incest" text="Incest" />
-		<string id="incest_desc" text="Player character can have incestuous relationships." />
+		<string id="incest_desc" text="Player character can marry closely related family members." />
 		<string id="debug" text="Debug" />
 		<string id="debug_desc" text="Displays mod developer debug information in the game's message log." />
 		<string id="cheating" text="Cheating" />
@@ -22,8 +21,11 @@
 		<string id="courtship" text="Courtship" />
 		<string id="retry_courtship" text="Retry Courtship" />
 		<string id="retry_courtship_desc" text="Player can retry courtship after failure." />
+    <string id="skip_courtship" text="Skip Courtship" />
+		<string id="skip_courtship_desc" text="Player can skip courtship and marry immediately." />
+    <string id="commoners" text="Commoners" />
 		<string id="templatechar" text="Template Character" />
-		<string id="templatechar_desc" text="Set the template character that is used to set things like the hero name, skills, and equipment." />
+		<string id="templatechar_desc" text="Set the template character that is used to set the hero name, skills, and equipment for commoners." />
 		<string id="pregnancyplus" text="Pregnancy+" />
 		<string id="pregnancyplus_desc" text="Changes pregnancy behavior to allow pregnancy with multiple spouses. Keep disabled if you are using another pregnancy mod." />
   </strings>
