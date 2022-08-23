@@ -22,14 +22,15 @@ namespace MarryAnyone.Actions
             firstHero.Spouse = secondHero;
             secondHero.Spouse = firstHero;
             ChangeRelationAction.ApplyRelationChangeBetweenHeroes(firstHero, secondHero, Campaign.Current.Models.MarriageModel.GetEffectiveRelationIncrease(firstHero, secondHero), false);
-            Clan clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
 
             if (firstHero.Clan == secondHero.Clan)
             {
                 // Ignore clan merge if they are both from the same clan
                 Print("Same clan");
             }
-            else if (firstHero.Clan != clanAfterMarriage)
+
+            Clan clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
+            if (firstHero.Clan != clanAfterMarriage)
             {
                 Clan clan = firstHero.Clan;
                 firstHero.Clan = clanAfterMarriage;
@@ -173,13 +174,30 @@ namespace MarryAnyone.Actions
         {
             // Heroes list
             List<Hero> heroes = new();
-            if (firstHero.Clan is not null)
+            // Still want to prioritize the main hero if at all possible
+            if (firstHero == Hero.MainHero)
             {
-                heroes.Add(firstHero);
+                // Add main hero first
+                if (firstHero.Clan is not null)
+                {
+                    heroes.Add(firstHero);
+                }
+                if (secondHero.Clan is not null)
+                {
+                    heroes.Add(secondHero);
+                }
             }
-            if (secondHero.Clan is not null)
+            else if (secondHero == Hero.MainHero)
             {
-                heroes.Add(secondHero);
+                // Add main hero first
+                if (secondHero.Clan is not null)
+                {
+                    heroes.Add(secondHero);
+                }
+                if (firstHero.Clan is not null)
+                {
+                    heroes.Add(firstHero);
+                }
             }
             // Kingdom Ruling Clan Leader
             foreach (Hero hero in heroes)
