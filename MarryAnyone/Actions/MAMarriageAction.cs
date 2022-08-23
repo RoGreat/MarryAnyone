@@ -3,6 +3,9 @@ using TaleWorlds.CampaignSystem;
 using MarryAnyone.Patches;
 using HarmonyLib.BUTR.Extensions;
 using System.Reflection;
+using System.Collections.Generic;
+using Helpers;
+using static MarryAnyone.Debug;
 
 namespace MarryAnyone.Actions
 {
@@ -15,57 +18,57 @@ namespace MarryAnyone.Actions
             firstHero.Spouse = secondHero;
             secondHero.Spouse = firstHero;
             ChangeRelationAction.ApplyRelationChangeBetweenHeroes(firstHero, secondHero, Campaign.Current.Models.MarriageModel.GetEffectiveRelationIncrease(firstHero, secondHero), false);
+            Clan clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
 
-            // Ignore if they are both from the same clan
             if (firstHero.Clan == secondHero.Clan)
             {
+                // Ignore clan merge if they are both from the same clan
+                Print("Same clan");
             }
-            // Commoners without a clan
-            // Evaluated first before lord
-            else if (firstHero.Clan is null)
+            else if (firstHero.Clan != clanAfterMarriage)
             {
-                firstHero.Clan = secondHero.Clan;
-                firstHero.UpdateHomeSettlement();
-            }
-            else if (secondHero.Clan is null)
-            {
-                secondHero.Clan = firstHero.Clan;
-                secondHero.UpdateHomeSettlement();
-            }
-            // Noble check with the main player
-            // Main player has issues with marrying into kingdoms
-            else if (firstHero == Hero.MainHero)
-            {
-                IFaction kingdom1 = firstHero.Clan?.Kingdom ?? null!;
-                // If player character has no kingdom join other kingdom
-                if (kingdom1 is null)
+                Clan clan = firstHero.Clan;
+                firstHero.Clan = clanAfterMarriage;
+                if (clan is not null)
                 {
-                    firstHero.Clan = secondHero.Clan;
+                    foreach (Hero hero in clan.Heroes)
+                    {
+                        hero.UpdateHomeSettlement();
+                        Print($"Updated settlement of {hero.Name}");
+                    }
+                }
+                if (firstHero == Hero.MainHero)
+                {
                     CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, firstHero.Clan);
-                    firstHero.UpdateHomeSettlement();
+                    Print("Player hero assigned new default clan");
                 }
-                // If player does have a kingdom then spouse joins their kingdom
-                // According to Bannerlord logic
-                else
-                {
-                    secondHero.Clan = firstHero.Clan;
-                    secondHero.UpdateHomeSettlement();
-                }
+                IFaction kingdom = clanAfterMarriage.Kingdom;
+                FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(firstHero, kingdom ?? clanAfterMarriage);
             }
-            else if (secondHero == Hero.MainHero)
+            else if (secondHero.Clan != clanAfterMarriage)
             {
-                IFaction kingdom2 = secondHero.Clan?.Kingdom ?? null!;
-                if (kingdom2 is null)
+                Clan clan = secondHero.Clan;
+                secondHero.Clan = clanAfterMarriage;
+                if (clan is not null)
                 {
-                    secondHero.Clan = firstHero.Clan;
+                    foreach (Hero hero in clan.Heroes)
+                    {
+                        hero.UpdateHomeSettlement();
+                        Print($"Updated settlement of {hero.Name}");
+                    }
+                }
+                if (secondHero == Hero.MainHero)
+                {
                     CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, secondHero.Clan);
-                    secondHero.UpdateHomeSettlement();
+                    Print("Player hero assigned new default clan");
                 }
-                else
-                {
-                    firstHero.Clan = secondHero.Clan;
-                    firstHero.UpdateHomeSettlement();
-                }
+                IFaction kingdom = clanAfterMarriage.Kingdom;
+                FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(secondHero, kingdom ?? clanAfterMarriage);
+            }
+            foreach (Hero hero in clanAfterMarriage.Heroes)
+            {
+                hero.UpdateHomeSettlement();
+                Print($"Updated settlement of {hero.Name}");
             }
 
             // Romance.EndAllCourtships(firstHero);
@@ -79,6 +82,83 @@ namespace MarryAnyone.Actions
         public static void Apply(Hero firstHero, Hero secondHero, bool showNotification = true)
         {
             ApplyInternal(firstHero, secondHero, showNotification);
+        }
+
+        // Borrowed from Family Tree
+        private static Clan GetClanAfterMarriage(Hero firstHero, Hero secondHero)
+        {
+            // Heroes list
+            List<Hero> heroes = new();
+            if (firstHero.Clan is not null)
+            {
+                heroes.Add(firstHero);
+            }
+            if (secondHero.Clan is not null)
+            {
+                heroes.Add(secondHero);
+            }
+            // Kingdom Ruling Clan Leader
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.Kingdom?.Leader == hero)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Kingdom Ruling Clan
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.Kingdom?.RulingClan == hero.Clan)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Kingdom Clan Leader
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.IsKingdomFaction && hero.IsFactionLeader)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Kingdom Clan
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.IsKingdomFaction)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Minor Faction Leader
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.IsMinorFaction && hero.IsFactionLeader)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Minor Faction Clan
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.IsMinorFaction)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Clan Leader
+            foreach (Hero hero in heroes)
+            {
+                if (hero.Clan.Leader == hero)
+                {
+                    return hero.Clan;
+                }
+            }
+            // Other
+            foreach (Hero hero in heroes)
+            {
+                return hero.Clan;
+            }
+            return null!;
         }
     }
 }
