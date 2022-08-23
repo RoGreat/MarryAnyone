@@ -22,15 +22,13 @@ namespace MarryAnyone.Actions
             firstHero.Spouse = secondHero;
             secondHero.Spouse = firstHero;
             ChangeRelationAction.ApplyRelationChangeBetweenHeroes(firstHero, secondHero, Campaign.Current.Models.MarriageModel.GetEffectiveRelationIncrease(firstHero, secondHero), false);
-
+            Clan clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
             if (firstHero.Clan == secondHero.Clan)
             {
                 // Ignore clan merge if they are both from the same clan
                 Print("Same clan");
             }
-
-            Clan clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
-            if (firstHero.Clan != clanAfterMarriage)
+            else if (firstHero.Clan != clanAfterMarriage)
             {
                 Clan clan = firstHero.Clan;
                 firstHero.Clan = clanAfterMarriage;
