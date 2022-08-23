@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Library;
 using static MarryAnyone.Debug;
 
@@ -77,6 +78,8 @@ namespace MarryAnyone
                 RemoveExSpouses(cheatedHero, RemoveExSpousesEnum.All);
                 if (cheatedHero != Hero.MainHero.Spouse)
                 {
+                    // Almost forgot to add in an ended romantic state for cheated heroes!
+                    ChangeRomanticStateAction.Apply(Hero.MainHero, cheatedHero, Romance.RomanceLevelEnum.Ended);
                     Print($"Broke off marriage with {cheatedHero.Name}");
                 }
                 else
