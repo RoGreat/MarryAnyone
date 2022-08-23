@@ -17,7 +17,7 @@ namespace MarryAnyone.Settings
         public override string FolderName => "MarryAnyone";
 
 
-        [SettingPropertyDropdown("{=orientation}Sexual Orientation", Order = 0, RequireRestart = false, HintText = "{=orientation_desc}Player character can choose what gender the player can marry.")]
+        [SettingPropertyDropdown("{=orientation}Sexual Orientation", Order = 0, RequireRestart = false, HintText = "{=orientation_desc}Player character can choose what sex the player can marry.")]
         [SettingPropertyGroup("{=relationship}Relationship", GroupOrder = 0)]
         public DropdownDefault<string> SexualOrientationDropdown { get; set; } = new DropdownDefault<string>(new string[]
         {
@@ -36,7 +36,7 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=relationship}Relationship", GroupOrder = 0)]
         public bool Cheating { get; set; } = false;
 
-        [SettingPropertyBool("{=incest}Incest", Order = 2, RequireRestart = false, HintText = "{=incest_desc}Player character can have incestuous relationships.")]
+        [SettingPropertyBool("{=incest}Incest", Order = 2, RequireRestart = false, HintText = "{=incest_desc}Player character can marry closely related family members.")]
         [SettingPropertyGroup("{=relationship}Relationship", GroupOrder = 0)]
         public bool Incest { get; set; } = false;
 
@@ -45,13 +45,13 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=spouses}Spouses", GroupOrder = 1)]
         public bool Polygamy { get; set; } = false;
 
-        [SettingPropertyBool("{=polyamory}Polyamory", Order = 1, RequireRestart = false, HintText = "{=polyamory_desc}Player character's spouses can have relationships with each other.")]
-        [SettingPropertyGroup("{=spouses}Spouses", GroupOrder = 1)]
-        public bool Polyamory { get; set; } = false;
-
-        [SettingPropertyBool("{=pregnancyplus}Pregnancy+", Order = 2, RequireRestart = false, HintText = "{=pregnancyplus_desc}Changes pregnancy behavior to allow pregnancy with multiple spouses. Keep disabled if you are using another pregnancy mod.")]
-        [SettingPropertyGroup("{=spouses}Spouses", GroupOrder = 1)]
+        [SettingPropertyBool("{=pregnancyplus}Pregnancy+", Order = 1, IsToggle = true, RequireRestart = false, HintText = "{=pregnancyplus_desc}Changes pregnancy behavior to allow pregnancy with multiple spouses. Keep disabled if you are using another pregnancy mod.")]
+        [SettingPropertyGroup("{=spouses}Spouses/{=pregnancyplus}Pregnancy+", GroupOrder = 1)]
         public bool PregnancyPlus { get; set; } = false;
+
+        [SettingPropertyBool("{=polyamory}Polyamory", Order = 2, RequireRestart = false, HintText = "{=polyamory_desc}Player character's spouses can get each other pregnant.")]
+        [SettingPropertyGroup("{=spouses}Spouses/{=pregnancyplus}Pregnancy+", GroupOrder = 1)]
+        public bool Polyamory { get; set; } = false;
 
 
         [SettingPropertyBool("{=skip_courtship}Skip Courtship", Order = 0, RequireRestart = false, HintText = "{=skip_courtship_desc}Player can skip courtship and marry immediately.")]
@@ -63,7 +63,7 @@ namespace MarryAnyone.Settings
         public bool RetryCourtship { get; set; } = false;
 
 
-        [SettingPropertyDropdown("{=templatechar}Template Character", RequireRestart = false, HintText = "{=templatechar_desc}Set the template character that is used to set things like the hero name, skills, and equipment.")]
+        [SettingPropertyDropdown("{=templatechar}Template Character", RequireRestart = false, HintText = "{=templatechar_desc}Set the template character that is used to set the hero name, skills, and equipment for commoners.")]
         [SettingPropertyGroup("{=commoners}Commoners", GroupOrder = 3)]
         public DropdownDefault<string> TemplateCharacterDropdown { get; set; } = new DropdownDefault<string>(new string[]
 {
