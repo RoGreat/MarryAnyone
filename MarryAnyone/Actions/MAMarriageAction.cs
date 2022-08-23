@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Collections.Generic;
 using Helpers;
 using static MarryAnyone.Debug;
+using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.Core;
 
 namespace MarryAnyone.Actions
 {
@@ -14,6 +16,7 @@ namespace MarryAnyone.Actions
         private static readonly PropertyInfo? CampaignPlayerDefaultFaction = AccessTools2.Property(typeof(Campaign), "PlayerDefaultFaction");
 
         // Appears to ultimately avoid disbanding parties and the like...
+        // Never disband party for hero, do for everyone else...
         private static void ApplyInternal(Hero firstHero, Hero secondHero, bool showNotification)
         {
             firstHero.Spouse = secondHero;
@@ -29,11 +32,7 @@ namespace MarryAnyone.Actions
             else if (firstHero.Clan != clanAfterMarriage)
             {
                 Clan clan = firstHero.Clan;
-                if (firstHero.GovernorOf is not null)
-                {
-                    ChangeGovernorAction.RemoveGovernorOf(firstHero);
-                    Print($"{firstHero.Name} removed as governor");
-                }
+                firstHero.Clan = clanAfterMarriage;
                 if (clan is not null)
                 {
                     foreach (Hero hero in clan.Heroes)
@@ -42,11 +41,50 @@ namespace MarryAnyone.Actions
                         Print($"Updated home settlement of {hero.Name}");
                     }
                 }
-                firstHero.Clan = clanAfterMarriage;
                 if (firstHero == Hero.MainHero)
                 {
                     CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, firstHero.Clan);
                     Print("Player hero assigned new default clan");
+                }
+                else
+                {
+                    if (firstHero.GovernorOf is not null)
+                    {
+                        ChangeGovernorAction.RemoveGovernorOf(firstHero);
+                        Print($"{firstHero.Name} removed as governor");
+                    }
+                    if (firstHero.PartyBelongedTo is not null)
+                    {
+                        MobileParty partyBelongedTo = firstHero.PartyBelongedTo;
+                        if (clan is not null)
+                        {
+                            if (clan.Kingdom != clanAfterMarriage.Kingdom)
+                            {
+                                if (firstHero.PartyBelongedTo.Army is not null)
+                                {
+                                    if (firstHero.PartyBelongedTo.Army.LeaderParty == firstHero.PartyBelongedTo)
+                                    {
+                                        firstHero.PartyBelongedTo.Army.DisperseArmy(Army.ArmyDispersionReason.Unknown);
+                                    }
+                                    else
+                                    {
+                                        firstHero.PartyBelongedTo.Army = null;
+                                    }
+                                }
+                            }
+                        }
+                        if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == firstHero)
+                        {
+                            DisbandPartyAction.StartDisband(partyBelongedTo);
+                            partyBelongedTo.Party.SetCustomOwner(null);
+                        }
+                        firstHero.ChangeState(Hero.CharacterStates.Fugitive);
+                        MobileParty partyBelongedTo2 = firstHero.PartyBelongedTo;
+                        if (partyBelongedTo2 is not null)
+                        {
+                            partyBelongedTo2.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                        }
+                    }
                 }
                 IFaction kingdom = clanAfterMarriage.Kingdom;
                 FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(firstHero, kingdom ?? clanAfterMarriage);
@@ -54,11 +92,7 @@ namespace MarryAnyone.Actions
             else if (secondHero.Clan != clanAfterMarriage)
             {
                 Clan clan = secondHero.Clan;
-                if (secondHero.GovernorOf is not null)
-                {
-                    ChangeGovernorAction.RemoveGovernorOf(secondHero);
-                    Print($"{secondHero.Name} removed as governor");
-                }
+                secondHero.Clan = clanAfterMarriage;
                 if (clan is not null)
                 {
                     foreach (Hero hero in clan.Heroes)
@@ -67,11 +101,50 @@ namespace MarryAnyone.Actions
                         Print($"Updated home settlement of {hero.Name}");
                     }
                 }
-                secondHero.Clan = clanAfterMarriage;
                 if (secondHero == Hero.MainHero)
                 {
                     CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, secondHero.Clan);
                     Print("Player hero assigned new default clan");
+                }
+                else
+                {
+                    if (secondHero.GovernorOf is not null)
+                    {
+                        ChangeGovernorAction.RemoveGovernorOf(secondHero);
+                        Print($"{secondHero.Name} removed as governor");
+                    }
+                    if (secondHero.PartyBelongedTo is not null)
+                    {
+                        MobileParty partyBelongedTo = secondHero.PartyBelongedTo;
+                        if (clan is not null)
+                        {
+                            if (clan.Kingdom != clanAfterMarriage.Kingdom)
+                            {
+                                if (secondHero.PartyBelongedTo.Army is not null)
+                                {
+                                    if (secondHero.PartyBelongedTo.Army.LeaderParty == secondHero.PartyBelongedTo)
+                                    {
+                                        secondHero.PartyBelongedTo.Army.DisperseArmy(Army.ArmyDispersionReason.Unknown);
+                                    }
+                                    else
+                                    {
+                                        secondHero.PartyBelongedTo.Army = null;
+                                    }
+                                }
+                            }
+                        }
+                        if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == secondHero)
+                        {
+                            DisbandPartyAction.StartDisband(partyBelongedTo);
+                            partyBelongedTo.Party.SetCustomOwner(null);
+                        }
+                        secondHero.ChangeState(Hero.CharacterStates.Fugitive);
+                        MobileParty partyBelongedTo2 = secondHero.PartyBelongedTo;
+                        if (partyBelongedTo2 is not null)
+                        {
+                            partyBelongedTo2.MemberRoster.RemoveTroop(secondHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                        }
+                    }
                 }
                 IFaction kingdom = clanAfterMarriage.Kingdom;
                 FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(secondHero, kingdom ?? clanAfterMarriage);
