@@ -51,24 +51,10 @@ namespace MarryAnyone.Actions
                 clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
             }
 
-            // Always run through this for the settings, even if part of the same clan
             if (firstHero.Clan != clanAfterMarriage)
             {
                 Clan clan = firstHero.Clan;
-                firstHero.Clan = clanAfterMarriage;
-                if (firstHero == Hero.MainHero)
-                {
-                    CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, firstHero.Clan);
-                    // It was not a bug, it was an not implemented feature! Until now...
-                    Print("Player hero new default clan assigned");
-                    if (((settings.ClanLeader == "Default" && !firstHero.IsFemale) || settings.ClanLeader == "Always")
-                        && clanAfterMarriage.Leader == secondHero)
-                    {
-                        Print("Player hero is the new clan leader");
-                        ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, firstHero);
-                    }
-                }
-                else
+                if (firstHero != Hero.MainHero)
                 {
                     if (firstHero.GovernorOf is not null)
                     {
@@ -110,6 +96,7 @@ namespace MarryAnyone.Actions
                         }
                     }
                 }
+                firstHero.Clan = clanAfterMarriage;
                 if (clan is not null)
                 {
                     foreach (Hero hero in clan.Heroes)
@@ -125,19 +112,7 @@ namespace MarryAnyone.Actions
             else if (secondHero.Clan != clanAfterMarriage)
             {
                 Clan clan = secondHero.Clan;
-                secondHero.Clan = clanAfterMarriage;
-                if (secondHero == Hero.MainHero)
-                {
-                    CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, secondHero.Clan);
-                    Print("Player hero new default clan assigned");
-                    if (((settings.ClanLeader == "Default" && !secondHero.IsFemale) || settings.ClanLeader == "Always")
-                        && clanAfterMarriage.Leader == firstHero)
-                    {
-                        Print("Player hero is the new clan leader");
-                        ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, secondHero);
-                    }
-                }
-                else
+                if (secondHero != Hero.MainHero)
                 {
                     if (secondHero.GovernorOf is not null)
                     {
@@ -179,6 +154,7 @@ namespace MarryAnyone.Actions
                         }
                     }
                 }
+                secondHero.Clan = clanAfterMarriage;
                 if (clan is not null)
                 {
                     foreach (Hero hero in clan.Heroes)
@@ -189,6 +165,30 @@ namespace MarryAnyone.Actions
                 foreach (Hero hero in clanAfterMarriage.Heroes)
                 {
                     hero.UpdateHomeSettlement();
+                }
+            }
+            // For settings
+            if (firstHero == Hero.MainHero)
+            {
+                CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, firstHero.Clan);
+                // It was not a bug, it was an not implemented feature! Until now...
+                Print("Player hero new default clan assigned");
+                if (((settings.ClanLeader == "Default" && !firstHero.IsFemale) || settings.ClanLeader == "Always")
+                    && clanAfterMarriage.Leader == secondHero)
+                {
+                    Print("Player hero is the new clan leader");
+                    ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, firstHero);
+                }
+            }
+            if (secondHero == Hero.MainHero)
+            {
+                CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, secondHero.Clan);
+                Print("Player hero new default clan assigned");
+                if (((settings.ClanLeader == "Default" && !secondHero.IsFemale) || settings.ClanLeader == "Always")
+                    && clanAfterMarriage.Leader == firstHero)
+                {
+                    Print("Player hero is the new clan leader");
+                    ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, secondHero);
                 }
             }
 
