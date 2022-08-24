@@ -15,7 +15,7 @@ namespace MarryAnyone
 
         private static readonly AccessTools.FieldRef<Hero, List<Hero>>? _exSpouses = AccessTools2.FieldRefAccess<Hero, List<Hero>>("_exSpouses");
 
-        public enum RemoveExSpousesEnum
+        public enum RemoveExSpousesMode
         {
             Duplicates,
             Self,
@@ -36,11 +36,11 @@ namespace MarryAnyone
             }
         }
 
-        public static void RemoveExSpouses(Hero hero, RemoveExSpousesEnum removalMode = RemoveExSpousesEnum.Duplicates)
+        public static void RemoveExSpouses(Hero hero, RemoveExSpousesMode removalMode = RemoveExSpousesMode.Duplicates)
         {
             List<Hero> _exSpousesList = _exSpouses!(hero);
 
-            if (removalMode == RemoveExSpousesEnum.Duplicates)
+            if (removalMode == RemoveExSpousesMode.Duplicates)
             {
                 // Standard remove duplicates spouse
                 // Get exspouse list without duplicates
@@ -59,12 +59,12 @@ namespace MarryAnyone
                 List<Hero> exSpouses = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).ToList();
                 foreach (Hero exSpouse in exSpouses)
                 {
-                    if (removalMode == RemoveExSpousesEnum.Self || removalMode == RemoveExSpousesEnum.All)
+                    if (removalMode == RemoveExSpousesMode.Self || removalMode == RemoveExSpousesMode.All)
                     {
                         // Remove exspouse from list
                         _exSpousesList.Remove(exSpouse);
                     }
-                    if (removalMode == RemoveExSpousesEnum.All)
+                    if (removalMode == RemoveExSpousesMode.All)
                     {
                         // Look into your exspouse's exspouse to remove yourself
                         List<Hero> _exSpousesList2 = _exSpouses!(hero);
@@ -89,7 +89,7 @@ namespace MarryAnyone
 
             foreach (Hero cheatedHero in cheatedHeroes)
             {
-                RemoveExSpouses(cheatedHero, RemoveExSpousesEnum.All);
+                RemoveExSpouses(cheatedHero, RemoveExSpousesMode.All);
                 if (cheatedHero != Hero.MainHero.Spouse)
                 {
                     // Almost forgot to add in an ended romantic state for cheated heroes!
