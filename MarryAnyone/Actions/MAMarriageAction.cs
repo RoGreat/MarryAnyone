@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Collections.Generic;
 using Helpers;
 using TaleWorlds.CampaignSystem.Party;
-using TaleWorlds.Core;
 using static MarryAnyone.Debug;
 
 namespace MarryAnyone.Actions
@@ -19,10 +18,37 @@ namespace MarryAnyone.Actions
         // Never disband party for hero, do for everyone else...
         private static void ApplyInternal(Hero firstHero, Hero secondHero, bool showNotification)
         {
+            MASettings settings = new();
             firstHero.Spouse = secondHero;
             secondHero.Spouse = firstHero;
             ChangeRelationAction.ApplyRelationChangeBetweenHeroes(firstHero, secondHero, Campaign.Current.Models.MarriageModel.GetEffectiveRelationIncrease(firstHero, secondHero), false);
-            Clan clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
+            Clan clanAfterMarriage;
+            if (settings.PlayerClan == "Always")
+            {
+                if (firstHero == Hero.MainHero)
+                {
+                    clanAfterMarriage = firstHero.Clan;
+                }
+                else
+                {
+                    clanAfterMarriage = secondHero.Clan;
+                }
+            }
+            else if (settings.PlayerClan == "Never")
+            {
+                if (firstHero == Hero.MainHero)
+                {
+                    clanAfterMarriage = secondHero.Clan;
+                }
+                else
+                {
+                    clanAfterMarriage = firstHero.Clan;
+                }
+            }
+            else
+            {
+                clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
+            }
             if (firstHero.Clan == secondHero.Clan)
             {
                 // Ignore clan merge if they are both from the same clan
@@ -37,13 +63,18 @@ namespace MarryAnyone.Actions
                     foreach (Hero hero in clan.Heroes)
                     {
                         hero.UpdateHomeSettlement();
-                        Print($"Updated home settlement of {hero.Name}");
                     }
                 }
                 if (firstHero == Hero.MainHero)
                 {
                     CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, firstHero.Clan);
-                    Print("Player hero assigned new default clan");
+                    // It was not a bug, it was an not implemented feature! Until now...
+                    Print("Player hero new default clan assigned");
+                    if ((settings.BecomeRuler == "Default" && !firstHero.IsFemale) || settings.BecomeRuler == "Always")
+                    {
+                        Print("Player hero is the new clan leader");
+                        ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, firstHero);
+                    }
                 }
                 else
                 {
@@ -81,12 +112,16 @@ namespace MarryAnyone.Actions
                         MobileParty partyBelongedTo2 = firstHero.PartyBelongedTo;
                         if (partyBelongedTo2 is not null)
                         {
-                            partyBelongedTo2.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                            partyBelongedTo2.MemberRoster.RemoveTroop(firstHero.CharacterObject, 1, default, 0);
                         }
                     }
                 }
                 IFaction kingdom = clanAfterMarriage.Kingdom;
                 FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(firstHero, kingdom ?? clanAfterMarriage);
+                foreach (Hero hero in clanAfterMarriage.Heroes)
+                {
+                    hero.UpdateHomeSettlement();
+                }
             }
             else if (secondHero.Clan != clanAfterMarriage)
             {
@@ -103,8 +138,13 @@ namespace MarryAnyone.Actions
                 if (secondHero == Hero.MainHero)
                 {
                     CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, secondHero.Clan);
-                    Print("Player hero assigned new default clan");
-                }
+                    Print("Player hero new default clan assigned");
+                    if ((settings.BecomeRuler == "Default" && !secondHero.IsFemale) || settings.BecomeRuler == "Always")
+                    {
+                        Print("Player hero is the new clan leader");
+                        ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, secondHero);
+                    }
+                } 
                 else
                 {
                     if (secondHero.GovernorOf is not null)
@@ -141,17 +181,17 @@ namespace MarryAnyone.Actions
                         MobileParty partyBelongedTo2 = secondHero.PartyBelongedTo;
                         if (partyBelongedTo2 is not null)
                         {
-                            partyBelongedTo2.MemberRoster.RemoveTroop(secondHero.CharacterObject, 1, default(UniqueTroopDescriptor), 0);
+                            partyBelongedTo2.MemberRoster.RemoveTroop(secondHero.CharacterObject, 1, default, 0);
                         }
                     }
                 }
                 IFaction kingdom = clanAfterMarriage.Kingdom;
                 FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(secondHero, kingdom ?? clanAfterMarriage);
-            }
-            foreach (Hero hero in clanAfterMarriage.Heroes)
-            {
-                hero.UpdateHomeSettlement();
-                Print($"Updated home settlement of {hero.Name}");
+                foreach (Hero hero in clanAfterMarriage.Heroes)
+                {
+                    hero.UpdateHomeSettlement();
+                    Print($"Updated home settlement of {hero.Name}");
+                }
             }
 
             // Romance.EndAllCourtships(firstHero);
@@ -172,10 +212,13 @@ namespace MarryAnyone.Actions
         {
             // Heroes list
             List<Hero> heroes = new();
+            // Should be male inheritance by default
             // Still want to prioritize the main hero if at all possible
-            if (firstHero == Hero.MainHero)
+            // So !IsFemale > MainHero when the clan exists
+            int rank1 = ClanOrder(firstHero);
+            int rank2 = ClanOrder(secondHero);
+            if (rank1 >= rank2)
             {
-                // Add main hero first
                 if (firstHero.Clan is not null)
                 {
                     heroes.Add(firstHero);
@@ -185,9 +228,8 @@ namespace MarryAnyone.Actions
                     heroes.Add(secondHero);
                 }
             }
-            else if (secondHero == Hero.MainHero)
+            else
             {
-                // Add main hero first
                 if (secondHero.Clan is not null)
                 {
                     heroes.Add(secondHero);
@@ -259,6 +301,32 @@ namespace MarryAnyone.Actions
                 return hero.Clan;
             }
             return null!;
+        }
+
+        private static int ClanOrder(Hero hero)
+        {
+            // Male hero
+            if (!hero.IsFemale)
+            {
+                // Main hero 1st priority
+                if (hero == Hero.MainHero)
+                {
+                    return 3;
+                }
+                // NPC 2nd priority
+                return 2;
+            }
+            // Female hero
+            else
+            {
+                // Main hero 3rd priority
+                if (hero == Hero.MainHero)
+                {
+                    return 1;
+                }
+                // NPC 4th priority
+                return 0;
+            }
         }
     }
 }

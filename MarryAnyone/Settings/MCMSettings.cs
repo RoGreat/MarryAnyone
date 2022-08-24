@@ -63,13 +63,43 @@ namespace MarryAnyone.Settings
         public bool RetryCourtship { get; set; } = false;
 
 
+        [SettingPropertyDropdown("{=playerclan}Player Clan", Order = 0, RequireRestart = false, HintText = "{=playerclan_desc}Player clan persists on marriage.")]
+        [SettingPropertyGroup("{=marriage}Marriage", GroupOrder = 3)]
+        public DropdownDefault<string> PlayerClanDropdown { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "Default",
+            "Always",
+            "Never"
+        }, 0);
+
+        public string PlayerClan
+        {
+            get => PlayerClanDropdown.SelectedValue;
+            set => PlayerClanDropdown.SelectedValue = value;
+        }
+
+        [SettingPropertyDropdown("{=becomeruler}Become Ruler", Order = 1, RequireRestart = false, HintText = "{=becomeruler_desc}Player becomes ruler of married into faction.")]
+        [SettingPropertyGroup("{=marriage}Marriage", GroupOrder = 3)]
+        public DropdownDefault<string> BecomeRulerDropdown { get; set; } = new DropdownDefault<string>(new string[]
+        {
+            "Default",
+            "Always",
+            "Never"
+        }, 0);
+
+        public string BecomeRuler
+        {
+            get => BecomeRulerDropdown.SelectedValue;
+            set => BecomeRulerDropdown.SelectedValue = value;
+        }
+
         [SettingPropertyDropdown("{=templatechar}Template Character", RequireRestart = false, HintText = "{=templatechar_desc}Set the template character that is used to set the hero name, skills, and equipment for commoners.")]
-        [SettingPropertyGroup("{=commoners}Commoners", GroupOrder = 3)]
+        [SettingPropertyGroup("{=commoners}Commoners", GroupOrder = 4)]
         public DropdownDefault<string> TemplateCharacterDropdown { get; set; } = new DropdownDefault<string>(new string[]
-{
+        {
             "Default",
             "Wanderer"
-}, 0);
+        }, 0);
 
         public string TemplateCharacter
         {

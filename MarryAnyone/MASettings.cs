@@ -74,6 +74,18 @@ namespace MarryAnyone
             set => _provider.RetryCourtship = value;
         }
 
+        public string PlayerClan
+        {
+            get => _provider.PlayerClan;
+            set => _provider.PlayerClan = value;
+        }
+
+        public string BecomeRuler
+        {
+            get => _provider.BecomeRuler;
+            set => _provider.BecomeRuler = value;
+        }
+
         public bool Debug
         {
             get => _provider.Debug;
