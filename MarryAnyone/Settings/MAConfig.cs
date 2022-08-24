@@ -17,7 +17,7 @@ namespace MarryAnyone.Settings
         public bool SkipCourtship { get; set; }
         public bool RetryCourtship { get; set; }
         public string? PlayerClan { get; set; }
-        public string? BecomeRuler { get; set; }
+        public string? ClanLeader { get; set; }
         public bool Debug { get; set; }
     }
 
@@ -52,7 +52,7 @@ namespace MarryAnyone.Settings
 
         private string _playerClan = "Default";
 
-        private string _becomeRuler = "Default";
+        private string _clanLeader = "Default";
 
         private string _sexualOrientation = "Heterosexual";
 
@@ -74,7 +74,7 @@ namespace MarryAnyone.Settings
                     RetryCourtship = _retryCourtship,
                     TemplateCharacter = _templateCharacter,
                     PlayerClan = _playerClan,
-                    BecomeRuler = _becomeRuler,
+                    ClanLeader = _clanLeader,
                     Debug = _debug
                 };
                 string jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
@@ -110,8 +110,8 @@ namespace MarryAnyone.Settings
                 _retryCourtship = config.RetryCourtship;
                 _skipCourtship = config.SkipCourtship;
                 _templateCharacter = config.TemplateCharacter!;
-                _playerClan = config.PlayerClan;
-                _becomeRuler = config.BecomeRuler;
+                _playerClan = config.PlayerClan!;
+                _clanLeader = config.ClanLeader!;
                 _debug = config.Debug;
             }
             catch (Exception e)
@@ -307,18 +307,18 @@ namespace MarryAnyone.Settings
             }
         }
 
-        public string BecomeRuler
+        public string ClanLeader
         {
             get
             {
                 ReadConfig();
-                return _becomeRuler;
+                return _clanLeader;
             }
             set
             {
-                if (_becomeRuler != value)
+                if (_clanLeader != value)
                 {
-                    _becomeRuler = value;
+                    _clanLeader = value;
                     WriteConfig();
                 }
             }

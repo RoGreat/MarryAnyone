@@ -1,7 +1,7 @@
-﻿using HarmonyLib.BUTR.Extensions;
+﻿using HarmonyLib;
+using HarmonyLib.BUTR.Extensions;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.Library;
@@ -11,9 +11,9 @@ namespace MarryAnyone
 {
     internal static class Helpers
     {
-        private static readonly FieldInfo? ExSpouses = AccessTools2.Field(typeof(Hero), "ExSpouses");
+        private static readonly AccessTools.FieldRef<Hero, MBReadOnlyList<Hero>>? ExSpouses = AccessTools2.FieldRefAccess<Hero, MBReadOnlyList<Hero>>("ExSpouses");
 
-        private static readonly FieldInfo? _exSpouses = AccessTools2.Field(typeof(Hero), "_exSpouses");
+        private static readonly AccessTools.FieldRef<Hero, List<Hero>>? _exSpouses = AccessTools2.FieldRefAccess<Hero, List<Hero>>("_exSpouses");
 
         public enum RemoveExSpousesEnum
         {
@@ -22,9 +22,23 @@ namespace MarryAnyone
             All
         }
 
+        public static void ResetEndedCourtships()
+        {
+            foreach (Romance.RomanticState romanticState in Romance.RomanticStateList.ToList())
+            {
+                if (romanticState.Person1 == Hero.MainHero || romanticState.Person2 == Hero.MainHero)
+                {
+                    if (romanticState.Level == Romance.RomanceLevelEnum.Ended)
+                    {
+                        romanticState.Level = Romance.RomanceLevelEnum.Untested;
+                    }
+                }
+            }
+        }
+
         public static void RemoveExSpouses(Hero hero, RemoveExSpousesEnum removalMode = RemoveExSpousesEnum.Duplicates)
         {
-            List<Hero> _exSpousesList = (List<Hero>)_exSpouses!.GetValue(hero);
+            List<Hero> _exSpousesList = _exSpouses!(hero);
 
             if (removalMode == RemoveExSpousesEnum.Duplicates)
             {
@@ -53,24 +67,24 @@ namespace MarryAnyone
                     if (removalMode == RemoveExSpousesEnum.All)
                     {
                         // Look into your exspouse's exspouse to remove yourself
-                        List<Hero> _exSpousesList2 = (List<Hero>)_exSpouses.GetValue(exSpouse);
+                        List<Hero> _exSpousesList2 = _exSpouses!(hero);
                         _exSpousesList2.Remove(hero);
 
                         MBReadOnlyList<Hero> ExSpousesReadOnlyList2 = new(_exSpousesList2);
-                        _exSpouses.SetValue(exSpouse, _exSpousesList2);
-                        ExSpouses!.SetValue(exSpouse, ExSpousesReadOnlyList2);
+                        _exSpouses(exSpouse) = _exSpousesList2;
+                        ExSpouses!(exSpouse) = ExSpousesReadOnlyList2;
                     }
                 }
             }
 
             MBReadOnlyList<Hero> ExSpousesReadOnlyList = new(_exSpousesList);
-            _exSpouses.SetValue(hero, _exSpousesList);
-            ExSpouses!.SetValue(hero, ExSpousesReadOnlyList);
+            _exSpouses(hero) = _exSpousesList;
+            ExSpouses!(hero) = ExSpousesReadOnlyList;
         }
 
         public static void CheatOnSpouse()
         {
-            List<Hero> _exSpousesList = (List<Hero>)_exSpouses!.GetValue(Hero.MainHero);
+            List<Hero> _exSpousesList = _exSpouses!(Hero.MainHero);
             List<Hero> cheatedHeroes = _exSpousesList.Where(exSpouse => exSpouse.IsAlive).ToList();
 
             foreach (Hero cheatedHero in cheatedHeroes)

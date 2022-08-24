@@ -2,12 +2,10 @@
 using MCM.Abstractions.Attributes.v2;
 using MCM.Abstractions.Dropdown;
 using MCM.Abstractions.Settings.Base.PerSave;
+using System;
 
 namespace MarryAnyone.Settings
 {
-    // Instance is null for some reason...
-    // Seems to be that setting fields are null on new game creation
-    // Have to reload save in order for it to work.
     internal sealed class MCMSettings : AttributePerSaveSettings<MCMSettings>, ISettingsProvider
     {
         public override string Id => "MASettings";
@@ -45,12 +43,12 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=spouses}Spouses", GroupOrder = 1)]
         public bool Polygamy { get; set; } = false;
 
-        [SettingPropertyBool("{=pregnancyplus}Pregnancy+", Order = 1, IsToggle = true, RequireRestart = false, HintText = "{=pregnancyplus_desc}Changes pregnancy behavior to allow pregnancy with multiple spouses. Keep disabled if you are using another pregnancy mod.")]
-        [SettingPropertyGroup("{=spouses}Spouses/{=pregnancyplus}Pregnancy+", GroupOrder = 1)]
+        [SettingPropertyBool("{=pregnancyplus}Pregnancy+", Order = 1, RequireRestart = false, HintText = "{=pregnancyplus_desc}Changes pregnancy behavior to allow pregnancy with multiple spouses. Keep disabled if you are using another pregnancy mod.")]
+        [SettingPropertyGroup("{=spouses}Spouses", GroupOrder = 1)]
         public bool PregnancyPlus { get; set; } = false;
 
         [SettingPropertyBool("{=polyamory}Polyamory", Order = 2, RequireRestart = false, HintText = "{=polyamory_desc}Player character's spouses can get each other pregnant.")]
-        [SettingPropertyGroup("{=spouses}Spouses/{=pregnancyplus}Pregnancy+", GroupOrder = 1)]
+        [SettingPropertyGroup("{=spouses}Spouses", GroupOrder = 1)]
         public bool Polyamory { get; set; } = false;
 
 
@@ -62,8 +60,12 @@ namespace MarryAnyone.Settings
         [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 2)]
         public bool RetryCourtship { get; set; } = false;
 
+        [SettingPropertyButton("{=reset_courtships}Reset Courtships", Content = "Press Me", Order = 2, RequireRestart = false, HintText = "{=reset_courtships_desc}Reset ended courtships with a press of a button!")]
+        [SettingPropertyGroup("{=courtship}Courtship", GroupOrder = 2)]
+        public Action ResetEndedCourtships { get; set; } = () => Helpers.ResetEndedCourtships();
 
-        [SettingPropertyDropdown("{=playerclan}Player Clan", Order = 0, RequireRestart = false, HintText = "{=playerclan_desc}Player clan persists on marriage.")]
+
+        [SettingPropertyDropdown("{=playerclan}Player Clan", Order = 0, RequireRestart = false, HintText = "{=playerclan_desc}Player clan persists after marriage. By default the clan only persists if playing as a male.")]
         [SettingPropertyGroup("{=marriage}Marriage", GroupOrder = 3)]
         public DropdownDefault<string> PlayerClanDropdown { get; set; } = new DropdownDefault<string>(new string[]
         {
@@ -78,19 +80,19 @@ namespace MarryAnyone.Settings
             set => PlayerClanDropdown.SelectedValue = value;
         }
 
-        [SettingPropertyDropdown("{=becomeruler}Become Ruler", Order = 1, RequireRestart = false, HintText = "{=becomeruler_desc}Player becomes ruler of married into faction.")]
+        [SettingPropertyDropdown("{=clanleader}Clan Leader", Order = 1, RequireRestart = false, HintText = "{=clanleader_desc}Player replaces clan leader after marriage. By default the a male player can replace a female leader.")]
         [SettingPropertyGroup("{=marriage}Marriage", GroupOrder = 3)]
-        public DropdownDefault<string> BecomeRulerDropdown { get; set; } = new DropdownDefault<string>(new string[]
+        public DropdownDefault<string> ClanLeaderDropdown { get; set; } = new DropdownDefault<string>(new string[]
         {
             "Default",
             "Always",
             "Never"
         }, 0);
 
-        public string BecomeRuler
+        public string ClanLeader
         {
-            get => BecomeRulerDropdown.SelectedValue;
-            set => BecomeRulerDropdown.SelectedValue = value;
+            get => ClanLeaderDropdown.SelectedValue;
+            set => ClanLeaderDropdown.SelectedValue = value;
         }
 
         [SettingPropertyDropdown("{=templatechar}Template Character", RequireRestart = false, HintText = "{=templatechar_desc}Set the template character that is used to set the hero name, skills, and equipment for commoners.")]

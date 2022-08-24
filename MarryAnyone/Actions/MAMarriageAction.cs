@@ -22,6 +22,7 @@ namespace MarryAnyone.Actions
             firstHero.Spouse = secondHero;
             secondHero.Spouse = firstHero;
             ChangeRelationAction.ApplyRelationChangeBetweenHeroes(firstHero, secondHero, Campaign.Current.Models.MarriageModel.GetEffectiveRelationIncrease(firstHero, secondHero), false);
+
             Clan clanAfterMarriage;
             if (settings.PlayerClan == "Always")
             {
@@ -49,28 +50,19 @@ namespace MarryAnyone.Actions
             {
                 clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
             }
-            if (firstHero.Clan == secondHero.Clan)
-            {
-                // Ignore clan merge if they are both from the same clan
-                Print("Same clan");
-            }
-            else if (firstHero.Clan != clanAfterMarriage)
+
+            // Always run through this for the settings, even if part of the same clan
+            if (firstHero.Clan != clanAfterMarriage)
             {
                 Clan clan = firstHero.Clan;
                 firstHero.Clan = clanAfterMarriage;
-                if (clan is not null)
-                {
-                    foreach (Hero hero in clan.Heroes)
-                    {
-                        hero.UpdateHomeSettlement();
-                    }
-                }
                 if (firstHero == Hero.MainHero)
                 {
                     CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, firstHero.Clan);
                     // It was not a bug, it was an not implemented feature! Until now...
                     Print("Player hero new default clan assigned");
-                    if ((settings.BecomeRuler == "Default" && !firstHero.IsFemale) || settings.BecomeRuler == "Always")
+                    if (((settings.ClanLeader == "Default" && !firstHero.IsFemale) || settings.ClanLeader == "Always")
+                        && clanAfterMarriage.Leader == secondHero)
                     {
                         Print("Player hero is the new clan leader");
                         ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, firstHero);
@@ -101,6 +93,8 @@ namespace MarryAnyone.Actions
                                         firstHero.PartyBelongedTo.Army = null;
                                     }
                                 }
+                                IFaction kingdom = clanAfterMarriage.Kingdom;
+                                FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(firstHero, kingdom ?? clanAfterMarriage);
                             }
                         }
                         if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == firstHero)
@@ -116,8 +110,13 @@ namespace MarryAnyone.Actions
                         }
                     }
                 }
-                IFaction kingdom = clanAfterMarriage.Kingdom;
-                FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(firstHero, kingdom ?? clanAfterMarriage);
+                if (clan is not null)
+                {
+                    foreach (Hero hero in clan.Heroes)
+                    {
+                        hero.UpdateHomeSettlement();
+                    }
+                }
                 foreach (Hero hero in clanAfterMarriage.Heroes)
                 {
                     hero.UpdateHomeSettlement();
@@ -127,24 +126,17 @@ namespace MarryAnyone.Actions
             {
                 Clan clan = secondHero.Clan;
                 secondHero.Clan = clanAfterMarriage;
-                if (clan is not null)
-                {
-                    foreach (Hero hero in clan.Heroes)
-                    {
-                        hero.UpdateHomeSettlement();
-                        Print($"Updated home settlement of {hero.Name}");
-                    }
-                }
                 if (secondHero == Hero.MainHero)
                 {
                     CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, secondHero.Clan);
                     Print("Player hero new default clan assigned");
-                    if ((settings.BecomeRuler == "Default" && !secondHero.IsFemale) || settings.BecomeRuler == "Always")
+                    if (((settings.ClanLeader == "Default" && !secondHero.IsFemale) || settings.ClanLeader == "Always")
+                        && clanAfterMarriage.Leader == firstHero)
                     {
                         Print("Player hero is the new clan leader");
                         ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, secondHero);
                     }
-                } 
+                }
                 else
                 {
                     if (secondHero.GovernorOf is not null)
@@ -170,6 +162,8 @@ namespace MarryAnyone.Actions
                                         secondHero.PartyBelongedTo.Army = null;
                                     }
                                 }
+                                IFaction kingdom = clanAfterMarriage.Kingdom;
+                                FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(secondHero, kingdom ?? clanAfterMarriage);
                             }
                         }
                         if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == secondHero)
@@ -185,12 +179,16 @@ namespace MarryAnyone.Actions
                         }
                     }
                 }
-                IFaction kingdom = clanAfterMarriage.Kingdom;
-                FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(secondHero, kingdom ?? clanAfterMarriage);
+                if (clan is not null)
+                {
+                    foreach (Hero hero in clan.Heroes)
+                    {
+                        hero.UpdateHomeSettlement();
+                    }
+                }
                 foreach (Hero hero in clanAfterMarriage.Heroes)
                 {
                     hero.UpdateHomeSettlement();
-                    Print($"Updated home settlement of {hero.Name}");
                 }
             }
 

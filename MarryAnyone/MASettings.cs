@@ -80,10 +80,10 @@ namespace MarryAnyone
             set => _provider.PlayerClan = value;
         }
 
-        public string BecomeRuler
+        public string ClanLeader
         {
-            get => _provider.BecomeRuler;
-            set => _provider.BecomeRuler = value;
+            get => _provider.ClanLeader;
+            set => _provider.ClanLeader = value;
         }
 
         public bool Debug
