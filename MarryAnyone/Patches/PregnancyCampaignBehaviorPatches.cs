@@ -172,7 +172,7 @@ namespace MarryAnyone.Patches
                         if (!settings.Polyamory)
                         {
                             // Remove all exspouses from self
-                            RemoveExSpouses(hero, RemoveExSpousesEnum.Self);
+                            RemoveExSpouses(hero, RemoveExSpousesMode.Self);
                         }
                         hero.Spouse = Hero.MainHero;
                     }

@@ -61,7 +61,6 @@ namespace MarryAnyone.Actions
                     if (firstHero.GovernorOf is not null)
                     {
                         ChangeGovernorAction.RemoveGovernorOf(firstHero);
-                        Print($"{firstHero.Name} removed as governor");
                     }
                     if (firstHero.PartyBelongedTo is not null)
                     {
@@ -119,7 +118,6 @@ namespace MarryAnyone.Actions
                     if (secondHero.GovernorOf is not null)
                     {
                         ChangeGovernorAction.RemoveGovernorOf(secondHero);
-                        Print($"{secondHero.Name} removed as governor");
                     }
                     if (secondHero.PartyBelongedTo is not null)
                     {
