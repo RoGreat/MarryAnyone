@@ -2,7 +2,6 @@
 using TaleWorlds.CampaignSystem;
 using MarryAnyone.Patches;
 using HarmonyLib.BUTR.Extensions;
-using System.Reflection;
 using System.Collections.Generic;
 using Helpers;
 using TaleWorlds.CampaignSystem.Party;
@@ -12,7 +11,8 @@ namespace MarryAnyone.Actions
 {
     internal static class MAMarriageAction
     {
-        private static readonly PropertyInfo? CampaignPlayerDefaultFaction = AccessTools2.Property(typeof(Campaign), "PlayerDefaultFaction");
+        private delegate void PlayerDefaultFactionDelegate(Campaign instance, Clan @value);
+        private static readonly PlayerDefaultFactionDelegate? PlayerDefaultFaction = AccessTools2.GetPropertySetterDelegate<PlayerDefaultFactionDelegate>(typeof(Campaign), "PlayerDefaultFaction");
 
         // Appears to ultimately avoid disbanding parties and the like...
         // Never disband party for hero, do for everyone else...
@@ -23,6 +23,7 @@ namespace MarryAnyone.Actions
             secondHero.Spouse = firstHero;
             ChangeRelationAction.ApplyRelationChangeBetweenHeroes(firstHero, secondHero, Campaign.Current.Models.MarriageModel.GetEffectiveRelationIncrease(firstHero, secondHero), false);
 
+            // Many ways to get what clan to marry now
             Clan clanAfterMarriage;
             if (settings.PlayerClan == "Always")
             {
@@ -51,6 +52,7 @@ namespace MarryAnyone.Actions
                 clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
             }
 
+            // Cautious marriage action
             if (firstHero.Clan != clanAfterMarriage)
             {
                 Clan clan = firstHero.Clan;
@@ -170,9 +172,9 @@ namespace MarryAnyone.Actions
             // For settings
             if (firstHero == Hero.MainHero)
             {
-                CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, firstHero.Clan);
+                PlayerDefaultFaction!(Campaign.Current, firstHero.Clan);
                 // It was not a bug, it was an not implemented feature! Until now...
-                Print("Player hero new default clan assigned");
+                Print("Player hero's default clan reassigned");
                 if (((settings.ClanLeader == "Default" && !firstHero.IsFemale) || settings.ClanLeader == "Always")
                     && clanAfterMarriage.Leader == secondHero)
                 {
@@ -182,8 +184,8 @@ namespace MarryAnyone.Actions
             }
             if (secondHero == Hero.MainHero)
             {
-                CampaignPlayerDefaultFaction!.SetValue(Campaign.Current, secondHero.Clan);
-                Print("Player hero new default clan assigned");
+                PlayerDefaultFaction!(Campaign.Current, secondHero.Clan);
+                Print("Player hero's default clan reassigned");
                 if (((settings.ClanLeader == "Default" && !secondHero.IsFemale) || settings.ClanLeader == "Always")
                     && clanAfterMarriage.Leader == firstHero)
                 {
