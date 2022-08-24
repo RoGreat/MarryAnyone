@@ -101,6 +101,14 @@ namespace MarryAnyone.Settings
                 {
                     throw new Exception($"{config.TemplateCharacter} is not a valid TemplateCharacter. Valid options: \"Default\" or \"Wanderer\"");
                 }
+                if (config.PlayerClan != "Default" && config.PlayerClan != "Always" && config.PlayerClan != "Never")
+                {
+                    throw new Exception($"{config.PlayerClan} is not a valid PlayerClan. Valid options: \"Default\", \"Always\", or \"Never\"");
+                }
+                if (config.ClanLeader != "Default" && config.ClanLeader != "Always" && config.ClanLeader != "Never")
+                {
+                    throw new Exception($"{config.ClanLeader} is not a valid ClanLeader. Valid options: \"Default\", \"Always\", or \"Never\"");
+                }
                 _sexualOrientation = config.SexualOrientation!;
                 _polygamy = config.Polygamy;
                 _polyamory = config.Polyamory;
@@ -117,6 +125,7 @@ namespace MarryAnyone.Settings
             catch (Exception e)
             {
                 Error(e);
+                WriteConfig();
             }
         }
 
