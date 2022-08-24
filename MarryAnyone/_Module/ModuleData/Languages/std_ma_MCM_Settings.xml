@@ -27,6 +27,13 @@
 		<string id="templatechar" text="Template Character" />
 		<string id="templatechar_desc" text="Set the template character that is used to set the hero name, skills, and equipment for commoners." />
 		<string id="pregnancyplus" text="Pregnancy+" />
-		<string id="pregnancyplus_desc" text="Changes pregnancy behavior to allow pregnancy with multiple spouses. Keep disabled if you are using another pregnancy mod." />
+		<string id="pregnancyplus_desc" text="Changes pregnancy behavior to allow pregnancy with multiple spouses." />
+		<string id="reset_courtships" text="Reset Courtships" />
+		<string id="reset_courtships_desc" text="Reset ended courtships with a press of a button!" />
+    <string id="marriage" text="Marriage" />
+    <string id="playerclan" text="Player Clan" />
+		<string id="playerclan_desc" text="Player clan persists after marriage. By default the clan only persists if playing as a male." />
+    <string id="clanleader" text="Clan Leader" />
+		<string id="clanleader_desc" text="Player replaces clan leader after marriage. By default the a male player can replace a female leader." />
   </strings>
 </base>

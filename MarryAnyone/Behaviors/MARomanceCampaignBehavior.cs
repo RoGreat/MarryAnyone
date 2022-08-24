@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using HarmonyLib.BUTR.Extensions;
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
@@ -31,51 +30,54 @@ namespace MarryAnyone.Behaviors
             _heroes = new();
         }
 
-        /* Patching private methods and fields in RomanceCampaignBehavior using Delegates */
-        // https://butr.github.io/documentation/advanced/switching-from-membertinfo-to-accesstools2/
+        /* Patching private methods and fields in RomanceCampaignBehavior using Delegates 
+         * https://butr.github.io/documentation/advanced/switching-from-membertinfo-to-accesstools2/
+         */ 
 
-        // private List<PersuasionTask> _allReservations
+        /* RomanceCampaignBehavior */
+        /* Fields */
         private static readonly AccessTools.FieldRef<RomanceCampaignBehavior, List<PersuasionTask>>? _allReservations = AccessTools2.FieldRefAccess<RomanceCampaignBehavior, List<PersuasionTask>>("_allReservations");
 
         private static readonly AccessTools.FieldRef<RomanceCampaignBehavior, Hero>? _playerProposalHero = AccessTools2.FieldRefAccess<RomanceCampaignBehavior, Hero>("_playerProposalHero");
 
         private static readonly AccessTools.FieldRef<RomanceCampaignBehavior, Hero>? _proposedSpouseForPlayerRelative = AccessTools2.FieldRefAccess<RomanceCampaignBehavior, Hero>("_proposedSpouseForPlayerRelative");
 
-        // private bool MarriageCourtshipPossibility(Hero person1, Hero person2)
+        /* Methods */
         private delegate bool MarriageCourtshipPossibilityDelegate(RomanceCampaignBehavior instance, Hero person1, Hero person2);
         private static readonly MarriageCourtshipPossibilityDelegate? MarriageCourtshipPossibility = AccessTools2.GetDelegate<MarriageCourtshipPossibilityDelegate>(typeof(RomanceCampaignBehavior), "MarriageCourtshipPossibility", new Type[] { typeof(Hero), typeof(Hero) });
 
         /* Conditions */
-        // private bool conversation_courtship_decline_reaction_to_player_on_condition()
         private delegate bool conversation_courtship_decline_reaction_to_player_on_condition_delegate(RomanceCampaignBehavior instance);
         private static readonly conversation_courtship_decline_reaction_to_player_on_condition_delegate? conversation_courtship_decline_reaction_to_player_on_condition = AccessTools2.GetDelegate<conversation_courtship_decline_reaction_to_player_on_condition_delegate>(typeof(RomanceCampaignBehavior), "conversation_courtship_decline_reaction_to_player_on_condition");
 
-        // private void conversation_player_eligible_for_marriage_with_conversation_hero_on_condition()
         private delegate bool conversation_player_eligible_for_marriage_with_conversation_hero_on_condition_delegate(RomanceCampaignBehavior instance);
         private static readonly conversation_player_eligible_for_marriage_with_conversation_hero_on_condition_delegate? conversation_player_eligible_for_marriage_with_conversation_hero_on_condition = AccessTools2.GetDelegate<conversation_player_eligible_for_marriage_with_conversation_hero_on_condition_delegate>(typeof(RomanceCampaignBehavior), "conversation_player_eligible_for_marriage_with_conversation_hero_on_condition");
 
-        // private void conversation_courtship_reaction_to_player_on_condition()
         private delegate bool conversation_courtship_reaction_to_player_on_condition_delegate(RomanceCampaignBehavior instance);
         private static readonly conversation_courtship_reaction_to_player_on_condition_delegate? conversation_courtship_reaction_to_player_on_condition = AccessTools2.GetDelegate<conversation_courtship_reaction_to_player_on_condition_delegate>(typeof(RomanceCampaignBehavior), "conversation_courtship_reaction_to_player_on_condition");
 
         /* Consequences */
-        // private void courtship_conversation_leave_on_consequence()
         private delegate void courtship_conversation_leave_on_consequence_delegate(RomanceCampaignBehavior instance);
         private static readonly courtship_conversation_leave_on_consequence_delegate? courtship_conversation_leave_on_consequence = AccessTools2.GetDelegate<courtship_conversation_leave_on_consequence_delegate>(typeof(RomanceCampaignBehavior), "courtship_conversation_leave_on_consequence");
 
-        // private void conversation_player_opens_courtship_on_consequence()
         private delegate void conversation_player_opens_courtship_on_consequence_delegate(RomanceCampaignBehavior instance);
         private static readonly conversation_player_opens_courtship_on_consequence_delegate? conversation_player_opens_courtship_on_consequence = AccessTools2.GetDelegate<conversation_player_opens_courtship_on_consequence_delegate>(typeof(RomanceCampaignBehavior), "conversation_player_opens_courtship_on_consequence");
 
 
-        /* MemberInfo caching */
-        private static readonly FieldInfo? AgentName = AccessTools2.Field(typeof(Agent), "_name");
+        /* Outside */
+        /* Fields */
+        private static readonly AccessTools.FieldRef<Agent, TextObject>? AgentName = AccessTools2.FieldRefAccess<Agent, TextObject>("_name");
 
-        private static readonly PropertyInfo? CharacterHeroObject = AccessTools2.Property(typeof(CharacterObject), "HeroObject");
+        /* Property Setters */
+        private delegate void SetHeroObjectDelegate(CharacterObject instance, Hero @value);
+        private static readonly SetHeroObjectDelegate? SetHeroObject = AccessTools2.GetPropertySetterDelegate<SetHeroObjectDelegate>(typeof(CharacterObject), "HeroObject");
 
-        private static readonly PropertyInfo? HeroStaticBodyProperties = AccessTools2.Property(typeof(Hero), "StaticBodyProperties");
+        private delegate void SetHeroStaticBodyPropertiesDelegate(Hero instance, StaticBodyProperties @value);
+        private static readonly SetHeroStaticBodyPropertiesDelegate? SetHeroStaticBodyProperties = AccessTools2.GetPropertySetterDelegate<SetHeroStaticBodyPropertiesDelegate>(typeof(Hero), "StaticBodyProperties");
 
-        private static readonly MethodInfo? CompanionAdjustEquipment = AccessTools2.Method(typeof(CompanionsCampaignBehavior), "AdjustEquipment");
+        /* Methods */
+        private delegate void CompanionAdjustEquipmentDelegate(CompanionsCampaignBehavior instance, Hero companion);
+        private static readonly CompanionAdjustEquipmentDelegate? CompanionAdjustEquipment = AccessTools2.GetDelegate<CompanionAdjustEquipmentDelegate>(typeof(CompanionsCampaignBehavior), "AdjustEquipment");
 
 
         protected void AddDialogs(CampaignGameStarter starter)
@@ -425,7 +427,8 @@ namespace MarryAnyone.Behaviors
             // Remove hero association from character
             if (conversationCharacter.HeroObject is not null)
             {
-                CharacterHeroObject!.SetValue(conversationCharacter, null);
+                //SetHeroObject!.SetValue(conversationCharacter, null);
+                SetHeroObject!(conversationCharacter, null!);
             }
         }
 
@@ -481,7 +484,8 @@ namespace MarryAnyone.Behaviors
             {
                 // Use existing hero
                 _heroes.TryGetValue(conversationAgent, out _companionHero);
-                CharacterHeroObject!.SetValue(conversationCharacter, _companionHero);
+                // SetHeroObject!.SetValue(conversationCharacter, _companionHero);
+                SetHeroObject!(conversationCharacter, _companionHero);
                 return;
             }
 
@@ -502,7 +506,8 @@ namespace MarryAnyone.Behaviors
             _companionHero = HeroCreator.CreateSpecialHero(template, Hero.MainHero.CurrentSettlement, null, null, (int)conversationAgent.Age);
 
             // Name permanence from the adoption module of old
-            AgentName!.SetValue(conversationAgent, _companionHero.Name);
+            //AgentName!.SetValue(conversationAgent, _companionHero.Name);
+            AgentName!(conversationAgent) = _companionHero.Name;
 
             // Meet character for first time
             _companionHero.HasMet = true;
@@ -511,7 +516,8 @@ namespace MarryAnyone.Behaviors
             _heroes.Add(conversationAgent, _companionHero);
 
             // Give hero the agent's appearance
-            HeroStaticBodyProperties!.SetValue(_companionHero, conversationAgent.BodyPropertiesValue.StaticProperties);
+            //SetHeroStaticBodyProperties!.SetValue(_companionHero, conversationAgent.BodyPropertiesValue.StaticProperties);
+            SetHeroStaticBodyProperties!(_companionHero, conversationAgent.BodyPropertiesValue.StaticProperties);
 
             // Give hero agent's equipment
             Equipment civilianEquipment = conversationAgent.SpawnEquipment.Clone();
@@ -522,7 +528,8 @@ namespace MarryAnyone.Behaviors
 
             // Adjust Equipment like the wanderer do
             CompanionsCampaignBehavior companionsCampaignBehaviorInstance = Campaign.Current.CampaignBehaviorManager.GetBehavior<CompanionsCampaignBehavior>();
-            CompanionAdjustEquipment!.Invoke(companionsCampaignBehaviorInstance, new object[] { _companionHero });
+            //CompanionAdjustEquipment!.Invoke(companionsCampaignBehaviorInstance, new object[] { _companionHero });
+            CompanionAdjustEquipment!(companionsCampaignBehaviorInstance, _companionHero);
 
             HeroHelper.DetermineInitialLevel(_companionHero);
 
@@ -530,7 +537,8 @@ namespace MarryAnyone.Behaviors
             characterDevelopmentCampaignBehaviorInstance.DevelopCharacterStats(_companionHero);
 
             //character.HeroObject = _companionHero;
-            CharacterHeroObject!.SetValue(conversationCharacter, _companionHero);
+            //SetHeroObject!.SetValue(conversationCharacter, _companionHero);
+            SetHeroObject!(conversationCharacter, _companionHero);
         }
 
         // Need to clean out agents that cannot be found anymore...
@@ -556,7 +564,7 @@ namespace MarryAnyone.Behaviors
 
         private bool conversation_hero_main_options_discussions()
         {
-            // Clear previous companion heroes before starting
+            // Clear cached companion hero when starting a new conversation
             _companionHero = null;
             // Leave patch accounts for agents that are temporary heroes
             MASettings settings = new();
