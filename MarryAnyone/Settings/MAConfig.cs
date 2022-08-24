@@ -16,6 +16,8 @@ namespace MarryAnyone.Settings
         public bool Incest { get; set; }
         public bool SkipCourtship { get; set; }
         public bool RetryCourtship { get; set; }
+        public string? PlayerClan { get; set; }
+        public string? BecomeRuler { get; set; }
         public bool Debug { get; set; }
     }
 
@@ -48,6 +50,10 @@ namespace MarryAnyone.Settings
 
         private bool _debug = false;
 
+        private string _playerClan = "Default";
+
+        private string _becomeRuler = "Default";
+
         private string _sexualOrientation = "Heterosexual";
 
         private string _templateCharacter = "Default";
@@ -67,6 +73,8 @@ namespace MarryAnyone.Settings
                     SkipCourtship = _skipCourtship,
                     RetryCourtship = _retryCourtship,
                     TemplateCharacter = _templateCharacter,
+                    PlayerClan = _playerClan,
+                    BecomeRuler = _becomeRuler,
                     Debug = _debug
                 };
                 string jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
@@ -102,6 +110,8 @@ namespace MarryAnyone.Settings
                 _retryCourtship = config.RetryCourtship;
                 _skipCourtship = config.SkipCourtship;
                 _templateCharacter = config.TemplateCharacter!;
+                _playerClan = config.PlayerClan;
+                _becomeRuler = config.BecomeRuler;
                 _debug = config.Debug;
             }
             catch (Exception e)
@@ -275,6 +285,40 @@ namespace MarryAnyone.Settings
                 if (_templateCharacter != value)
                 {
                     _templateCharacter = value;
+                    WriteConfig();
+                }
+            }
+        }
+
+        public string PlayerClan
+        {
+            get
+            {
+                ReadConfig();
+                return _playerClan;
+            }
+            set
+            {
+                if (_playerClan != value)
+                {
+                    _playerClan = value;
+                    WriteConfig();
+                }
+            }
+        }
+
+        public string BecomeRuler
+        {
+            get
+            {
+                ReadConfig();
+                return _becomeRuler;
+            }
+            set
+            {
+                if (_becomeRuler != value)
+                {
+                    _becomeRuler = value;
                     WriteConfig();
                 }
             }
