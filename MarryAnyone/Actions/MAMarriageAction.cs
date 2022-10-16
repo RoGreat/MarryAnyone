@@ -53,9 +53,10 @@ namespace MarryAnyone.Actions
             }
 
             // Cautious marriage action
+            Clan clan1 = firstHero.Clan;
+            Clan clan2 = secondHero.Clan;
             if (firstHero.Clan != clanAfterMarriage)
             {
-                Clan clan = firstHero.Clan;
                 if (firstHero != Hero.MainHero)
                 {
                     if (firstHero.GovernorOf is not null)
@@ -65,9 +66,9 @@ namespace MarryAnyone.Actions
                     if (firstHero.PartyBelongedTo is not null)
                     {
                         MobileParty partyBelongedTo = firstHero.PartyBelongedTo;
-                        if (clan is not null)
+                        if (clan1 is not null)
                         {
-                            if (clan.Kingdom != clanAfterMarriage.Kingdom)
+                            if (clan1.Kingdom != clanAfterMarriage.Kingdom)
                             {
                                 if (firstHero.PartyBelongedTo.Army is not null)
                                 {
@@ -98,9 +99,9 @@ namespace MarryAnyone.Actions
                     }
                 }
                 firstHero.Clan = clanAfterMarriage;
-                if (clan is not null)
+                if (clan1 is not null)
                 {
-                    foreach (Hero hero in clan.Heroes)
+                    foreach (Hero hero in clan1.Heroes)
                     {
                         hero.UpdateHomeSettlement();
                     }
@@ -112,7 +113,6 @@ namespace MarryAnyone.Actions
             }
             else if (secondHero.Clan != clanAfterMarriage)
             {
-                Clan clan = secondHero.Clan;
                 if (secondHero != Hero.MainHero)
                 {
                     if (secondHero.GovernorOf is not null)
@@ -122,9 +122,9 @@ namespace MarryAnyone.Actions
                     if (secondHero.PartyBelongedTo is not null)
                     {
                         MobileParty partyBelongedTo = secondHero.PartyBelongedTo;
-                        if (clan is not null)
+                        if (clan2 is not null)
                         {
-                            if (clan.Kingdom != clanAfterMarriage.Kingdom)
+                            if (clan2.Kingdom != clanAfterMarriage.Kingdom)
                             {
                                 if (secondHero.PartyBelongedTo.Army is not null)
                                 {
@@ -155,9 +155,9 @@ namespace MarryAnyone.Actions
                     }
                 }
                 secondHero.Clan = clanAfterMarriage;
-                if (clan is not null)
+                if (clan2 is not null)
                 {
-                    foreach (Hero hero in clan.Heroes)
+                    foreach (Hero hero in clan2.Heroes)
                     {
                         hero.UpdateHomeSettlement();
                     }
@@ -167,7 +167,7 @@ namespace MarryAnyone.Actions
                     hero.UpdateHomeSettlement();
                 }
             }
-            // For settings
+            // Player decisions
             if (firstHero == Hero.MainHero)
             {
                 PlayerDefaultFaction!(Campaign.Current, firstHero.Clan);
@@ -176,6 +176,8 @@ namespace MarryAnyone.Actions
                 if (((settings.ClanLeader == "Default" && !firstHero.IsFemale) || settings.ClanLeader == "Always")
                     && clanAfterMarriage.Leader == secondHero)
                 {
+                    Print("Player hero's former clan has new clan leader");
+                    ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(clan1);
                     Print("Player hero is the new clan leader");
                     ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, firstHero);
                 }
@@ -187,6 +189,8 @@ namespace MarryAnyone.Actions
                 if (((settings.ClanLeader == "Default" && !secondHero.IsFemale) || settings.ClanLeader == "Always")
                     && clanAfterMarriage.Leader == firstHero)
                 {
+                    Print("Player hero's former clan has new clan leader");
+                    ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(clan2);
                     Print("Player hero is the new clan leader");
                     ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, secondHero);
                 }
