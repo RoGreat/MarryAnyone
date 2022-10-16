@@ -8,6 +8,7 @@ namespace MarryAnyone.CampaignSystem
     /* Reference CampaignCheats */
     public static class MACommands
     {
+        /* Actions */
         [CommandLineFunctionality.CommandLineArgumentFunction("reset_courtships", "marry_anyone")]
         public static string ResetCourtships(List<string> strings)
         {
@@ -19,13 +20,56 @@ namespace MarryAnyone.CampaignSystem
             return "Format is \"marry_anyone.reset_courtships\"";
         }
 
+        [CommandLineFunctionality.CommandLineArgumentFunction("set_main_hero_primary_spouse", "marry_anyone")]
+        public static string SetPrimarySpouse(List<string> strings)
+        {
+            if (CampaignCheats.CheckHelp(strings))
+            {
+                return "Format is \"marry_anyone.set_main_hero_primary_spouse [HeroName]\".";
+            }
+            string text = CampaignCheats.ConcatenateString(strings);
+            Hero hero = CampaignCheats.GetHero(text);
+            if (hero is not null) 
+            {
+                if (Hero.MainHero.ExSpouses.Contains(hero)) 
+                {
+                    string result = "Success";
+                    Hero.MainHero.Spouse = hero;
+                    hero.Spouse = Hero.MainHero;
+                    Helpers.RemoveExSpouses(hero);
+                    Helpers.RemoveExSpouses(Hero.MainHero);
+                    MASettings settings = new();
+                    if (settings.PregnancyPlus)
+                    {
+                        settings.PregnancyPlus = false;
+                        result += "\nPregnancy+ disabled to prevent primary spouse from changing.";
+                    }
+                    return result;
+                }
+                else if (Hero.MainHero.Spouse == hero)
+                {
+                    return "Hero is already the Primary Spouse";
+                }
+                else if (!hero.IsAlive)
+                {
+                    return "Hero " + text + " is dead.";
+                }
+                else
+                {
+                    return "Hero is not married to the Main Hero";
+                }
+            }
+            return "Hero is not Found.\nFormat is \"marry_anyone.set_main_hero_primary_spouse [HeroName]\".";
+        }
+
+        /* Settings */
         [CommandLineFunctionality.CommandLineArgumentFunction("set_polygamy_is_enabled", "marry_anyone")]
         public static string SetPolygamyIsEnabled(List<string> strings)
         {
             MASettings settings = new();
             if (strings.Count != 1 || (strings[0] != "0" && strings[0] != "1"))
             {
-                return "Input is incorrect.";
+                return "Input is incorrect [0/1].";
             }
             bool flag = strings[0] == "1";
             settings.Polygamy = flag;
@@ -38,7 +82,7 @@ namespace MarryAnyone.CampaignSystem
             MASettings settings = new();
             if (strings.Count != 1 || (strings[0] != "0" && strings[0] != "1"))
             {
-                return "Input is incorrect.";
+                return "Input is incorrect [0/1].";
             }
             bool flag = strings[0] == "1";
             settings.Polyamory = flag;
@@ -51,7 +95,7 @@ namespace MarryAnyone.CampaignSystem
             MASettings settings = new();
             if (strings.Count != 1 || (strings[0] != "0" && strings[0] != "1"))
             {
-                return "Input is incorrect.";
+                return "Input is incorrect [0/1].";
             }
             bool flag = strings[0] == "1";
             settings.PregnancyPlus = flag;
@@ -64,7 +108,7 @@ namespace MarryAnyone.CampaignSystem
             MASettings settings = new();
             if (strings.Count != 1 || (strings[0] != "0" && strings[0] != "1"))
             {
-                return "Input is incorrect.";
+                return "Input is incorrect [0/1].";
             }
             bool flag = strings[0] == "1";
             settings.PregnancyPlus = flag;
@@ -77,7 +121,7 @@ namespace MarryAnyone.CampaignSystem
             MASettings settings = new();
             if (strings.Count != 1 || (strings[0] != "0" && strings[0] != "1"))
             {
-                return "Input is incorrect.";
+                return "Input is incorrect [0/1].";
             }
             bool flag = strings[0] == "1";
             settings.SkipCourtship = flag;
@@ -90,7 +134,7 @@ namespace MarryAnyone.CampaignSystem
             MASettings settings = new();
             if (strings.Count != 1 || (strings[0] != "0" && strings[0] != "1"))
             {
-                return "Input is incorrect.";
+                return "Input is incorrect [0/1].";
             }
             bool flag = strings[0] == "1";
             settings.RetryCourtship = flag;

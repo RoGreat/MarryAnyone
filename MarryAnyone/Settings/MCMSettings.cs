@@ -80,7 +80,7 @@ namespace MarryAnyone.Settings
             set => PlayerClanDropdown.SelectedValue = value;
         }
 
-        [SettingPropertyDropdown("{=clanleader}Clan Leader", Order = 1, RequireRestart = false, HintText = "{=clanleader_desc}Player replaces clan leader after marriage. By default the a male player can replace a female leader.")]
+        [SettingPropertyDropdown("{=clanleader}Clan Leader", Order = 1, RequireRestart = false, HintText = "{=clanleader_desc}Player becomes clan leader after marriage. By default the male player can replace a female leader.")]
         [SettingPropertyGroup("{=marriage}Marriage", GroupOrder = 3)]
         public DropdownDefault<string> ClanLeaderDropdown { get; set; } = new DropdownDefault<string>(new string[]
         {
