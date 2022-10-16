@@ -171,7 +171,7 @@ namespace MarryAnyone.Actions
             if (firstHero == Hero.MainHero)
             {
                 PlayerDefaultFaction!(Campaign.Current, firstHero.Clan);
-                // It was not a bug, it was an not implemented feature! Until now...
+                // It was not a bug, it was an unimplemented feature! Until now...
                 Print("Player hero's default clan reassigned");
                 if (((settings.ClanLeader == "Default" && !firstHero.IsFemale) || settings.ClanLeader == "Always")
                     && clanAfterMarriage.Leader == secondHero)
