@@ -7,7 +7,7 @@
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
     <ModuleId>$(MSBuildProjectName)</ModuleId>
-    <ModuleName>$(MSBuildProjectName)</ModuleName>
+    <ModuleName>Marry Anyone</ModuleName>
     <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
     <GameVersion>1.9.0</GameVersion>
   </PropertyGroup>
