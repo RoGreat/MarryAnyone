@@ -9,13 +9,13 @@
     <ModuleId>$(MSBuildProjectName)</ModuleId>
     <ModuleName>$(MSBuildProjectName)</ModuleName>
     <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
-    <GameVersion>1.8.0</GameVersion>
+    <GameVersion>1.9.0</GameVersion>
   </PropertyGroup>
   
   <!-- Development Variables -->
   <PropertyGroup>
     <HarmonyVersion>2.2.2</HarmonyVersion>
-    <MCMVersion>4.7.7</MCMVersion>
+    <MCMVersion>4.7.9</MCMVersion>
   </PropertyGroup>
 
   <!-- Assembly Reference -->
@@ -29,7 +29,7 @@
   <ItemGroup>
     <!-- Dependencies -->
     <PackageReference Include="Lib.Harmony" Version="$(HarmonyVersion)" />
-    <PackageReference Include="Bannerlord.MCM" Version="4.7.9" />
+    <PackageReference Include="Bannerlord.MCM" Version="$(MCMVersion)" />
     <!-- BUTR Libraries and other Development Dependencies -->
     <PackageReference Include="Nullable" Version="1.3.1" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
@@ -37,8 +37,8 @@
     <PackageReference Include="Harmony.Extensions" Version="3.1.0.61" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="BUTR.Harmony.Analyzer" Version="1.0.1.44" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <!-- Assembly Reference Metadata -->
-    <PackageReference Include="Bannerlord.ReferenceAssemblies.Core.EarlyAccess" Version="1.9.0.2331" PrivateAssets="All" />
-    <PackageReference Include="Bannerlord.ReferenceAssemblies.SandBox.EarlyAccess" Version="1.9.0.2331" PrivateAssets="All" />
+    <PackageReference Include="Bannerlord.ReferenceAssemblies.Core.EarlyAccess" Version="$(GameVersion).*" PrivateAssets="All" />
+    <PackageReference Include="Bannerlord.ReferenceAssemblies.SandBox.EarlyAccess" Version="$(GameVersion).*" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
