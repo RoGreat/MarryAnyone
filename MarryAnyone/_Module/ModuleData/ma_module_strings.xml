@@ -14,4 +14,5 @@
 		<string id="str_husbands_husband" text="{=husbands_husband}Husband's husband"/>
 		<string id="str_wifes_husband" text="{=wifes_husband}Wife's husband"/>
 		<string id="str_wifes_wife" text="{=wifes_wife}Wife's wife"/>
+		<string id="str_you" text="{=you}You"/>
 	</strings>

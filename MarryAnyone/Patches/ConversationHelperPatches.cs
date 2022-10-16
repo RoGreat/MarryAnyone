@@ -27,7 +27,11 @@ namespace MarryAnyone.Patches
         private static string GetHeroRelationToHeroTextShort(Hero queriedHero, Hero baseHero, bool uppercaseFirst)
         {
             TextObject? textObject = null;
-            if (baseHero.Father == queriedHero
+            if (queriedHero == baseHero)
+            {
+                textObject = GameTexts.FindText("str_you");
+            }
+            else if (baseHero.Father == queriedHero
                 && (baseHero.Spouse == queriedHero || queriedHero.ExSpouses.Contains(baseHero) || baseHero.ExSpouses.Contains(queriedHero)))
             {
                 textObject = GameTexts.FindText("str_fatherhusband");

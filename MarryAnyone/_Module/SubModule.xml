@@ -8,7 +8,6 @@
 	<DefaultModule value="false" />
 	<ModuleCategory value="Singleplayer"/>
 	<Url value="https://www.nexusmods.com/mountandblade2bannerlord/mods/1483" />
-  <!-- e1.8.0 -->
   <DependedModules>
     <DependedModule Id="Native" DependentVersion="e$gameversion$" />
     <DependedModule Id="SandBoxCore" DependentVersion="e$gameversion$" />
