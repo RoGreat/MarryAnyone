@@ -257,6 +257,8 @@ namespace MarryAnyone.Behaviors
             }
             // Change to Lord
             ActivateHero(Occupation.Lord);
+            // Need to remove companion from companion list
+            _companionHero.CompanionOf = null;
             // Apply marriage action
             MAMarriageAction.Apply(Hero.MainHero, spouseHero, true);
             // Do NOT break off marriages if polygamy is on...
