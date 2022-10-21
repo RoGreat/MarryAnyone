@@ -168,34 +168,40 @@ namespace MarryAnyone.Actions
                 }
             }
             // Player decisions
-            if (firstHero == Hero.MainHero)
+            if (clan1 != clanAfterMarriage && clan1 is not null)
             {
-                PlayerDefaultFaction!(Campaign.Current, firstHero.Clan);
-                // It was not a bug, it was an unimplemented feature! Until now...
-                Print("Player hero's default clan reassigned");
-                if (((settings.ClanLeader == "Default" && !firstHero.IsFemale) || settings.ClanLeader == "Always")
-                    && clanAfterMarriage.Leader == secondHero)
+                // ClanVariablesCampaignBehavior -> OnSessionLaunched
+                Print("Clan 1");
+                Print("Former clan has new clan leader");
+                ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(clan1);
+                if (firstHero == Hero.MainHero)
                 {
-                    Print("Player hero's former clan has new clan leader");
-                    ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(clan1);
-                    Print("Player hero is the new clan leader");
+                    Print("Player hero's default clan reassigned");
+                    PlayerDefaultFaction!(Campaign.Current, clanAfterMarriage);
                     ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, firstHero);
                 }
-            }
-            if (secondHero == Hero.MainHero)
-            {
-                PlayerDefaultFaction!(Campaign.Current, secondHero.Clan);
-                Print("Player hero's default clan reassigned");
-                if (((settings.ClanLeader == "Default" && !secondHero.IsFemale) || settings.ClanLeader == "Always")
-                    && clanAfterMarriage.Leader == firstHero)
+                else
                 {
-                    Print("Player hero's former clan has new clan leader");
-                    ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(clan2);
-                    Print("Player hero is the new clan leader");
                     ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, secondHero);
                 }
             }
-
+            if (clan2 != clanAfterMarriage && clan2 is not null)
+            {
+                // ClanVariablesCampaignBehavior -> OnSessionLaunched
+                Print("Clan 2");
+                Print("Former clan has new clan leader");
+                ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(clan2);
+                if (secondHero == Hero.MainHero)
+                {
+                    Print("Player hero's default clan reassigned");
+                    PlayerDefaultFaction!(Campaign.Current, clanAfterMarriage);
+                    ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, secondHero);
+                }
+                else
+                {
+                    ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, firstHero);
+                }
+            }
             // Romance.EndAllCourtships(firstHero);
             EndAllCourtshipsPatch.EndAllCourtships(firstHero);
             // Romance.EndAllCourtships(secondHero);

@@ -17,7 +17,6 @@ namespace MarryAnyone.Settings
         public bool SkipCourtship { get; set; }
         public bool RetryCourtship { get; set; }
         public string? PlayerClan { get; set; }
-        public string? ClanLeader { get; set; }
         public bool Debug { get; set; }
     }
 
@@ -74,7 +73,6 @@ namespace MarryAnyone.Settings
                     RetryCourtship = _retryCourtship,
                     TemplateCharacter = _templateCharacter,
                     PlayerClan = _playerClan,
-                    ClanLeader = _clanLeader,
                     Debug = _debug
                 };
                 string jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
@@ -105,10 +103,6 @@ namespace MarryAnyone.Settings
                 {
                     throw new Exception($"{config.PlayerClan} is not a valid PlayerClan. Valid options: \"Default\", \"Always\", or \"Never\"");
                 }
-                if (config.ClanLeader != "Default" && config.ClanLeader != "Always" && config.ClanLeader != "Never")
-                {
-                    throw new Exception($"{config.ClanLeader} is not a valid ClanLeader. Valid options: \"Default\", \"Always\", or \"Never\"");
-                }
                 _sexualOrientation = config.SexualOrientation!;
                 _polygamy = config.Polygamy;
                 _polyamory = config.Polyamory;
@@ -119,7 +113,6 @@ namespace MarryAnyone.Settings
                 _skipCourtship = config.SkipCourtship;
                 _templateCharacter = config.TemplateCharacter!;
                 _playerClan = config.PlayerClan!;
-                _clanLeader = config.ClanLeader!;
                 _debug = config.Debug;
             }
             catch (Exception e)
