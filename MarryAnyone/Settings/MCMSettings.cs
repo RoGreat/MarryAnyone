@@ -1,7 +1,7 @@
 ﻿using MCM.Abstractions.Attributes;
 using MCM.Abstractions.Attributes.v2;
-using MCM.Abstractions.Dropdown;
-using MCM.Abstractions.Settings.Base.PerSave;
+using MCM.Abstractions.Base.PerSave;
+using MCM.Common;
 using System;
 
 namespace MarryAnyone.Settings
@@ -17,7 +17,7 @@ namespace MarryAnyone.Settings
 
         [SettingPropertyDropdown("{=orientation}Sexual Orientation", Order = 0, RequireRestart = false, HintText = "{=orientation_desc}Player character can choose what sex the player can marry.")]
         [SettingPropertyGroup("{=relationship}Relationship", GroupOrder = 0)]
-        public DropdownDefault<string> SexualOrientationDropdown { get; set; } = new DropdownDefault<string>(new string[]
+        public Dropdown<string> SexualOrientationDropdown { get; set; } = new Dropdown<string>(new string[]
         {
             "Heterosexual",
             "Homosexual",
@@ -67,7 +67,7 @@ namespace MarryAnyone.Settings
 
         [SettingPropertyDropdown("{=playerclan}Player Clan", Order = 0, RequireRestart = false, HintText = "{=playerclan_desc}Player clan persists after marriage. By default the clan only persists if playing as a male.")]
         [SettingPropertyGroup("{=marriage}Marriage", GroupOrder = 3)]
-        public DropdownDefault<string> PlayerClanDropdown { get; set; } = new DropdownDefault<string>(new string[]
+        public Dropdown<string> PlayerClanDropdown { get; set; } = new Dropdown<string>(new string[]
         {
             "Default",
             "Always",
@@ -83,7 +83,7 @@ namespace MarryAnyone.Settings
 
         [SettingPropertyDropdown("{=templatechar}Template Character", RequireRestart = false, HintText = "{=templatechar_desc}Set the template character that is used to set the hero name, skills, and equipment for commoners.")]
         [SettingPropertyGroup("{=commoners}Commoners", GroupOrder = 4)]
-        public DropdownDefault<string> TemplateCharacterDropdown { get; set; } = new DropdownDefault<string>(new string[]
+        public Dropdown<string> TemplateCharacterDropdown { get; set; } = new Dropdown<string>(new string[]
         {
             "Default",
             "Wanderer"
