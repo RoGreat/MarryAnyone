@@ -9,18 +9,18 @@
 	<ModuleCategory value="Singleplayer"/>
 	<Url value="https://www.nexusmods.com/mountandblade2bannerlord/mods/1483" />
   <DependedModules>
-    <DependedModule Id="Native" DependentVersion="e$gameversion$" />
-    <DependedModule Id="SandBoxCore" DependentVersion="e$gameversion$" />
-    <DependedModule Id="Sandbox" DependentVersion="e$gameversion$" />
+    <DependedModule Id="Native" DependentVersion="v$gameversion$" />
+    <DependedModule Id="SandBoxCore" DependentVersion="v$gameversion$" />
+    <DependedModule Id="Sandbox" DependentVersion="v$gameversion$" />
   </DependedModules>
   <!-- Community Dependency Metadata -->
   <!-- https://github.com/BUTR/Bannerlord.BUTRLoader#for-modders -->
   <DependedModuleMetadatas>
-    <DependedModuleMetadata id="Native" order="LoadBeforeThis" version="e$gameversion$.*" />
-    <DependedModuleMetadata id="SandBoxCore" order="LoadBeforeThis" version="e$gameversion$.*" />
-    <DependedModuleMetadata id="Sandbox" order="LoadBeforeThis" version="e$gameversion$.*" />
-    <DependedModuleMetadata id="StoryMode" order="LoadBeforeThis" version="e$gameversion$.*" optional="true" />
-    <DependedModuleMetadata id="CustomBattle" order="LoadBeforeThis" version="e$gameversion$.*" optional="true" />
+    <DependedModuleMetadata id="Native" order="LoadBeforeThis" version="v$gameversion$.*" />
+    <DependedModuleMetadata id="SandBoxCore" order="LoadBeforeThis" version="v$gameversion$.*" />
+    <DependedModuleMetadata id="Sandbox" order="LoadBeforeThis" version="v$gameversion$.*" />
+    <DependedModuleMetadata id="StoryMode" order="LoadBeforeThis" version="v$gameversion$.*" optional="true" />
+    <DependedModuleMetadata id="CustomBattle" order="LoadBeforeThis" version="v$gameversion$.*" optional="true" />
   </DependedModuleMetadatas>
   <SubModules>
     <SubModule>

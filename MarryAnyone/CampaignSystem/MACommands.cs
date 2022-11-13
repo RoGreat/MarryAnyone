@@ -172,8 +172,8 @@ namespace MarryAnyone.CampaignSystem
             return "Please enter \"heterosexual\", \"homosexual\", or \"bisexual\"";
         }
 
-        [CommandLineFunctionality.CommandLineArgumentFunction("set_player_clan", "marry_anyone")]
-        public static string SetPlayerClan(List<string> strings)
+        [CommandLineFunctionality.CommandLineArgumentFunction("set_clan_after_marriage", "marry_anyone")]
+        public static string SetClanAfterMarriage(List<string> strings)
         {
             MASettings settings = new();
             if (!CampaignCheats.CheckParameters(strings, 1) || CampaignCheats.CheckHelp(strings))
@@ -187,20 +187,15 @@ namespace MarryAnyone.CampaignSystem
             }
             else if (string.Equals(template, "default", StringComparison.OrdinalIgnoreCase))
             {
-                settings.PlayerClan = "Default";
+                settings.ClanAfterMarriage = "Default";
                 return "Success";
             }
             else if (string.Equals(template, "always", StringComparison.OrdinalIgnoreCase))
             {
-                settings.PlayerClan = "Always";
+                settings.ClanAfterMarriage = "Always";
                 return "Success";
             }
-            else if (string.Equals(template, "never", StringComparison.OrdinalIgnoreCase))
-            {
-                settings.PlayerClan = "Never";
-                return "Success";
-            }
-            return "Please enter \"default\", \"always\", or \"never\"";
+            return "Please enter \"player\" or \"spouse\"";
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("set_character_template", "marry_anyone")]

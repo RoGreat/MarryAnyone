@@ -13,11 +13,12 @@ namespace MarryAnyone
                 _provider = MCMSettings.Instance;
                 return;
             }
-            else if (MAConfig.Instance is null)
+            else if (MASettingsConfig.Instance is null)
             {
-                new MAConfig();
+                new MASettingsConfig();
             }
-            _provider = MAConfig.Instance!;
+            _provider = MASettingsConfig.Instance!;
+            MAConfig.Initialize();
         }
 
         public string SexualOrientation
@@ -56,6 +57,12 @@ namespace MarryAnyone
             set => _provider.Incest = value;
         }
 
+        public string ClanAfterMarriage
+        {
+            get => _provider.ClanAfterMarriage;
+            set => _provider.ClanAfterMarriage = value;
+        }
+
         public bool Cheating
         {
             get => _provider.Cheating;
@@ -72,12 +79,6 @@ namespace MarryAnyone
         {
             get => _provider.RetryCourtship;
             set => _provider.RetryCourtship = value;
-        }
-
-        public string PlayerClan
-        {
-            get => _provider.PlayerClan;
-            set => _provider.PlayerClan = value;
         }
 
         public bool Debug

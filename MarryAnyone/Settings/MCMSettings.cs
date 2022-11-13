@@ -65,19 +65,18 @@ namespace MarryAnyone.Settings
         public Action ResetEndedCourtships { get; set; } = () => Helpers.ResetEndedCourtships();
 
 
-        [SettingPropertyDropdown("{=playerclan}Player Clan", Order = 0, RequireRestart = false, HintText = "{=playerclan_desc}Player clan persists after marriage. By default the clan only persists if playing as a male.")]
+        [SettingPropertyDropdown("{=clan_after_marriage}Clan After Marriage", Order = 0, RequireRestart = false, HintText = "{=clan_after_marriage_desc}Defaults to Player if the spouse does not have a clan.")]
         [SettingPropertyGroup("{=marriage}Marriage", GroupOrder = 3)]
-        public Dropdown<string> PlayerClanDropdown { get; set; } = new Dropdown<string>(new string[]
+        public Dropdown<string> ClanAfterMarriageDropdown { get; set; } = new Dropdown<string>(new string[]
         {
-            "Default",
-            "Always",
-            "Never"
+            "Player",
+            "Spouse"
         }, 0);
 
-        public string PlayerClan
+        public string ClanAfterMarriage
         {
-            get => PlayerClanDropdown.SelectedValue;
-            set => PlayerClanDropdown.SelectedValue = value;
+            get => ClanAfterMarriageDropdown.SelectedValue;
+            set => ClanAfterMarriageDropdown.SelectedValue = value;
         }
 
 

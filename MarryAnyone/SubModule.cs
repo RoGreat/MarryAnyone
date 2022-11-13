@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using MarryAnyone.Behaviors;
 using MarryAnyone.Models;
+using MarryAnyone.Settings;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
@@ -13,6 +14,7 @@ namespace MarryAnyone
         {
             base.OnSubModuleLoad();
             new Harmony("mod.bannerlord.anyone.marry").PatchAll();
+            MAConfig.Initialize();
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarterObject)

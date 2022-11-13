@@ -2,15 +2,15 @@
 using TaleWorlds.CampaignSystem;
 using MarryAnyone.Patches;
 using HarmonyLib.BUTR.Extensions;
-using System.Collections.Generic;
 using Helpers;
 using TaleWorlds.CampaignSystem.Party;
-using static MarryAnyone.Debug;
+using System;
 
 namespace MarryAnyone.Actions
 {
     internal static class MAMarriageAction
     {
+        /* Properties */
         private delegate void PlayerDefaultFactionDelegate(Campaign instance, Clan @value);
         private static readonly PlayerDefaultFactionDelegate? PlayerDefaultFaction = AccessTools2.GetPropertySetterDelegate<PlayerDefaultFactionDelegate>(typeof(Campaign), "PlayerDefaultFaction");
 
@@ -23,11 +23,19 @@ namespace MarryAnyone.Actions
             secondHero.Spouse = firstHero;
             ChangeRelationAction.ApplyRelationChangeBetweenHeroes(firstHero, secondHero, Campaign.Current.Models.MarriageModel.GetEffectiveRelationIncrease(firstHero, secondHero), false);
 
-            // Many ways to get what clan to marry now
-            Clan clanAfterMarriage;
-            if (settings.PlayerClan == "Always")
+            Clan clanAfterMarriage = Hero.MainHero.Clan;
+
+            // Need to lay down the law on marrying into clans:
+            // - Player needs to stay in the default clan
+            //   - Player should always be the default clan leader
+            //     (current approach leads to instability)
+            // - Can join a kingdom after marriage
+            // - Can leave a kingdom after marriage
+
+            if (settings.ClanAfterMarriage == "Spouse")
             {
-                if (firstHero == Hero.MainHero)
+                // Only time it is OK for the player to stay in clan
+                if (firstHero == Hero.MainHero && secondHero.Clan is null)
                 {
                     clanAfterMarriage = firstHero.Clan;
                 }
@@ -35,21 +43,6 @@ namespace MarryAnyone.Actions
                 {
                     clanAfterMarriage = secondHero.Clan;
                 }
-            }
-            else if (settings.PlayerClan == "Never")
-            {
-                if (firstHero == Hero.MainHero)
-                {
-                    clanAfterMarriage = secondHero.Clan;
-                }
-                else
-                {
-                    clanAfterMarriage = firstHero.Clan;
-                }
-            }
-            else
-            {
-                clanAfterMarriage = GetClanAfterMarriage(firstHero, secondHero);
             }
 
             // Cautious marriage action
@@ -167,41 +160,24 @@ namespace MarryAnyone.Actions
                     hero.UpdateHomeSettlement();
                 }
             }
-            // Player decisions
-            if (clan1 != clanAfterMarriage && clan1 is not null)
-            {
-                // ClanVariablesCampaignBehavior -> OnSessionLaunched
-                Print("Clan 1");
-                Print("Former clan has new clan leader");
-                ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(clan1);
-                if (firstHero == Hero.MainHero)
-                {
-                    Print("Player hero's default clan reassigned");
-                    PlayerDefaultFaction!(Campaign.Current, clanAfterMarriage);
-                    ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, firstHero);
-                }
-                else
-                {
-                    ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, secondHero);
-                }
-            }
-            if (clan2 != clanAfterMarriage && clan2 is not null)
-            {
-                // ClanVariablesCampaignBehavior -> OnSessionLaunched
-                Print("Clan 2");
-                Print("Former clan has new clan leader");
-                ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(clan2);
-                if (secondHero == Hero.MainHero)
-                {
-                    Print("Player hero's default clan reassigned");
-                    PlayerDefaultFaction!(Campaign.Current, clanAfterMarriage);
-                    ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, secondHero);
-                }
-                else
-                {
-                    ChangeClanLeaderAction.ApplyWithSelectedNewLeader(clanAfterMarriage, firstHero);
-                }
-            }
+            // CampaignCheats -> lead_your_faction
+            //if (Hero.MainHero.MapFaction.Leader != Hero.MainHero)
+            //{
+            //    if (Hero.MainHero.MapFaction.IsKingdomFaction)
+            //    {
+            //        // ChangeRulingClanAction.Apply(Hero.MainHero.MapFaction as Kingdom, Clan.PlayerClan);
+            //        // Breaking it down:
+            //        // 	    kingdom.RulingClan = clan;
+            //        //      CampaignEventDispatcher.Instance.OnRulingClanChanged(kingdom, clan);
+            //        var clan = Clan.PlayerClan;
+            //        (Hero.MainHero.MapFaction as Kingdom).RulingClan = clan;
+            //        CampaignEventDispatcher.Instance.OnRulingClanChanged(Hero.MainHero.MapFaction as Kingdom, clan);
+            //    }
+            //    else
+            //    {
+            //        (Hero.MainHero.MapFaction as Clan).SetLeader(Hero.MainHero);
+            //    }
+            //}
             // Romance.EndAllCourtships(firstHero);
             EndAllCourtshipsPatch.EndAllCourtships(firstHero);
             // Romance.EndAllCourtships(secondHero);
@@ -213,128 +189,6 @@ namespace MarryAnyone.Actions
         public static void Apply(Hero firstHero, Hero secondHero, bool showNotification = true)
         {
             ApplyInternal(firstHero, secondHero, showNotification);
-        }
-
-        // Borrowed from Family Tree
-        private static Clan GetClanAfterMarriage(Hero firstHero, Hero secondHero)
-        {
-            // Heroes list
-            List<Hero> heroes = new();
-            // Should be male inheritance by default
-            // Still want to prioritize the main hero if at all possible
-            // So !IsFemale > MainHero when the clan exists
-            int rank1 = ClanOrder(firstHero);
-            int rank2 = ClanOrder(secondHero);
-            if (rank1 >= rank2)
-            {
-                if (firstHero.Clan is not null)
-                {
-                    heroes.Add(firstHero);
-                }
-                if (secondHero.Clan is not null)
-                {
-                    heroes.Add(secondHero);
-                }
-            }
-            else
-            {
-                if (secondHero.Clan is not null)
-                {
-                    heroes.Add(secondHero);
-                }
-                if (firstHero.Clan is not null)
-                {
-                    heroes.Add(firstHero);
-                }
-            }
-            // Kingdom Ruling Clan Leader
-            foreach (Hero hero in heroes)
-            {
-                if (hero.Clan.Kingdom?.Leader == hero)
-                {
-                    return hero.Clan;
-                }
-            }
-            // Kingdom Ruling Clan
-            foreach (Hero hero in heroes)
-            {
-                if (hero.Clan.Kingdom?.RulingClan == hero.Clan)
-                {
-                    return hero.Clan;
-                }
-            }
-            // Kingdom Clan Leader
-            foreach (Hero hero in heroes)
-            {
-                if (hero.Clan.IsKingdomFaction && hero.IsFactionLeader)
-                {
-                    return hero.Clan;
-                }
-            }
-            // Kingdom Clan
-            foreach (Hero hero in heroes)
-            {
-                if (hero.Clan.IsKingdomFaction)
-                {
-                    return hero.Clan;
-                }
-            }
-            // Minor Faction Leader
-            foreach (Hero hero in heroes)
-            {
-                if (hero.Clan.IsMinorFaction && hero.IsFactionLeader)
-                {
-                    return hero.Clan;
-                }
-            }
-            // Minor Faction Clan
-            foreach (Hero hero in heroes)
-            {
-                if (hero.Clan.IsMinorFaction)
-                {
-                    return hero.Clan;
-                }
-            }
-            // Clan Leader
-            foreach (Hero hero in heroes)
-            {
-                if (hero.Clan.Leader == hero)
-                {
-                    return hero.Clan;
-                }
-            }
-            // Other
-            foreach (Hero hero in heroes)
-            {
-                return hero.Clan;
-            }
-            return null!;
-        }
-
-        private static int ClanOrder(Hero hero)
-        {
-            // Male hero
-            if (!hero.IsFemale)
-            {
-                // Main hero 1st priority
-                if (hero == Hero.MainHero)
-                {
-                    return 3;
-                }
-                // NPC 2nd priority
-                return 2;
-            }
-            // Female hero
-            else
-            {
-                // Main hero 3rd priority
-                if (hero == Hero.MainHero)
-                {
-                    return 1;
-                }
-                // NPC 4th priority
-                return 0;
-            }
         }
     }
 }

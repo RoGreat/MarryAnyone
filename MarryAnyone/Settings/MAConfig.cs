@@ -1,166 +1,196 @@
 ﻿using System;
-using System.IO;
-using Newtonsoft.Json;
-using static MarryAnyone.Debug;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using TaleWorlds.Library;
+using RecruitEveryone.Settings;
 
 namespace MarryAnyone.Settings
 {
-    internal sealed class Config
+    internal sealed class MASettingsConfig : ISettingsProvider
     {
-        public string? SexualOrientation { get; set; }
-        public string? TemplateCharacter { get; set; }
-        public bool Polygamy { get; set; }
-        public bool Polyamory { get; set; }
-        public bool PregnancyPlus { get; set; }
-        public bool Cheating { get; set; }
-        public bool Incest { get; set; }
-        public bool SkipCourtship { get; set; }
-        public bool RetryCourtship { get; set; }
-        public string? PlayerClan { get; set; }
-        public bool Debug { get; set; }
-    }
+        public static MASettingsConfig? Instance { get; private set; }
 
-    internal sealed class MAConfig : ISettingsProvider
-    {
-        public static MAConfig? Instance { get; private set; }
-
-        private readonly string _filePath = "..\\..\\Modules\\MarryAnyone\\Config.json";
-
-        public MAConfig()
+        public MASettingsConfig()
         {
             Instance = this;
-            ReadConfig();
-            WriteConfig();
         }
 
-        private bool _polyamory = false;
+        public string SexualOrientation 
+        { 
+            get { return MAConfig.SexualOrientation; }
+            set { MAConfig.SexualOrientation = value; }
+        }
 
-        private bool _polygamy = false;
-
-        private bool _pregnancyPlus = false;
-
-        private bool _incest = false;
-
-        private bool _cheating = false;
-
-        private bool _skipCourtship = false;
-
-        private bool _retryCourtship = false;
-
-        private bool _debug = false;
-
-        private string _playerClan = "Default";
-
-        private string _clanLeader = "Default";
-
-        private string _sexualOrientation = "Heterosexual";
-
-        private string _templateCharacter = "Default";
-
-        public void WriteConfig()
+        public string TemplateCharacter
         {
-            try
-            {
-                var config = new Config
-                {
-                    SexualOrientation = _sexualOrientation,
-                    Polygamy = _polygamy,
-                    Polyamory = _polyamory,
-                    PregnancyPlus = _pregnancyPlus,
-                    Incest = _incest,
-                    Cheating = _cheating,
-                    SkipCourtship = _skipCourtship,
-                    RetryCourtship = _retryCourtship,
-                    TemplateCharacter = _templateCharacter,
-                    PlayerClan = _playerClan,
-                    Debug = _debug
-                };
-                string jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
-                File.WriteAllText(_filePath, jsonString);
-            }
-            catch (Exception e)
-            {
-                Error(e);
-            }
+            get { return MAConfig.TemplateCharacter; }
+            set { MAConfig.TemplateCharacter = value; }
         }
 
-        public void ReadConfig()
+        public bool Polygamy
         {
-            try
-            {
-                string jsonString = File.ReadAllText(_filePath);
-                var config = JsonConvert.DeserializeObject<Config>(jsonString);
-                // Added error handling!
-                if (config.SexualOrientation != "Heterosexual" && config.SexualOrientation != "Homosexual" && config.SexualOrientation != "Bisexual")
-                {
-                    throw new Exception($"{config.SexualOrientation} is not a valid SexualOrientation. Valid options: \"Heterosexual\", \"Homosexual\", or \"Bisexual\"");
-                }
-                if (config.TemplateCharacter != "Default" && config.TemplateCharacter != "Wanderer")
-                {
-                    throw new Exception($"{config.TemplateCharacter} is not a valid TemplateCharacter. Valid options: \"Default\" or \"Wanderer\"");
-                }
-                if (config.PlayerClan != "Default" && config.PlayerClan != "Always" && config.PlayerClan != "Never")
-                {
-                    throw new Exception($"{config.PlayerClan} is not a valid PlayerClan. Valid options: \"Default\", \"Always\", or \"Never\"");
-                }
-                _sexualOrientation = config.SexualOrientation!;
-                _polygamy = config.Polygamy;
-                _polyamory = config.Polyamory;
-                _pregnancyPlus = config.PregnancyPlus;
-                _incest = config.Incest;
-                _cheating = config.Cheating;
-                _retryCourtship = config.RetryCourtship;
-                _skipCourtship = config.SkipCourtship;
-                _templateCharacter = config.TemplateCharacter!;
-                _playerClan = config.PlayerClan!;
-                _debug = config.Debug;
-            }
-            catch (Exception e)
-            {
-                Error(e);
-                WriteConfig();
-            }
+            get { return MAConfig.Polygamy; }
+            set { MAConfig.Polygamy = value; }
         }
 
-        public string SexualOrientation
+        public bool Polyamory
+        {
+            get { return MAConfig.Polyamory; }
+            set { MAConfig.Polyamory = value; }
+        }
+
+        public bool PregnancyPlus
+        {
+            get { return MAConfig.PregnancyPlus; }
+            set { MAConfig.PregnancyPlus = value; }
+        }
+
+        public bool Cheating
+        {
+            get { return MAConfig.Cheating; }
+            set { MAConfig.Cheating = value; }
+        }
+
+        public bool Incest
+        {
+            get { return MAConfig.Incest; }
+            set { MAConfig.Incest = value; }
+        }
+
+        public bool SkipCourtship
+        {
+            get { return MAConfig.SkipCourtship; }
+            set { MAConfig.SkipCourtship = value; }
+        }
+
+        public string ClanAfterMarriage
+        {
+            get { return MAConfig.ClanAfterMarriage; }
+            set { MAConfig.ClanAfterMarriage = value; }
+        }
+
+        public bool RetryCourtship
+        {
+            get { return MAConfig.RetryCourtship; }
+            set { MAConfig.RetryCourtship = value; }
+        }
+
+        public bool Debug
+        {
+            get { return MAConfig.Debug; }
+            set { MAConfig.Debug = value; }
+        }
+    }
+
+    internal static class MAConfig
+    {
+        private static bool _polyamory = false;
+
+        private static bool _polygamy = false;
+
+        private static bool _pregnancyPlus = false;
+
+        private static bool _incest = false;
+
+        private static bool _cheating = false;
+
+        private static bool _skipCourtship = false;
+
+        private static bool _retryCourtship = false;
+
+        private static bool _debug = false;
+
+        private static string _sexualOrientation = "Heterosexual";
+
+        private static string _clanAfterMarriage = "Player";
+
+        private static string _templateCharacter = "Default";
+
+
+        [ConfigPropertyUnbounded]
+        public static string TemplateCharacter
         {
             get
             {
-                ReadConfig();
+                return _templateCharacter;
+            }
+            set
+            {
+                if (_templateCharacter != value)
+                {
+                    switch (_templateCharacter)
+                    {
+                        case "Default":
+                            _templateCharacter = value;
+                            break;
+                        case "Wanderer":
+                            _templateCharacter = value;
+                            break;
+                    }
+                    Save();
+                }
+            }
+        }
+
+        [ConfigPropertyUnbounded]
+        public static string SexualOrientation
+        {
+            get
+            {
                 return _sexualOrientation;
             }
             set
             {
                 if (_sexualOrientation != value)
                 {
-                    _sexualOrientation = value;
-                    WriteConfig();
+                    switch (_sexualOrientation)
+                    {
+                        case "Heterosexual":
+                            _sexualOrientation = value;
+                            break;
+                        case "Homosexual":
+                            _sexualOrientation = value;
+                            break;
+                        case "Bisexual":
+                            _sexualOrientation = value;
+                            break;
+                    }
+                    Save();
                 }
             }
         }
 
-        public bool RetryCourtship
+        [ConfigPropertyUnbounded]
+        public static string ClanAfterMarriage
         {
             get
             {
-                ReadConfig();
-                return _retryCourtship;
+                return _clanAfterMarriage;
             }
             set
             {
-                if (_retryCourtship != value)
+                if (_clanAfterMarriage != value)
                 {
-                    _retryCourtship = value;
-                    WriteConfig();
+                    switch (_clanAfterMarriage)
+                    {
+                        case "Player":
+                            _clanAfterMarriage = value;
+                            break;
+                        case "Spouse":
+                            _clanAfterMarriage = value;
+                            break;
+                    }
+                    Save();
                 }
             }
         }
 
-        public bool Polygamy
+        [ConfigPropertyUnbounded]
+        public static bool Polygamy
         {
             get
             {
-                ReadConfig();
                 return _polygamy;
             }
             set
@@ -168,16 +198,16 @@ namespace MarryAnyone.Settings
                 if (_polygamy != value)
                 {
                     _polygamy = value;
-                    WriteConfig();
+                    Save();
                 }
             }
         }
 
-        public bool Polyamory
+        [ConfigPropertyUnbounded]
+        public static bool Polyamory
         {
             get
             {
-                ReadConfig();
                 return _polyamory;
             }
             set
@@ -185,16 +215,16 @@ namespace MarryAnyone.Settings
                 if (_polyamory != value)
                 {
                     _polyamory = value;
-                    WriteConfig();
+                    Save();
                 }
             }
         }
 
-        public bool PregnancyPlus
+        [ConfigPropertyUnbounded]
+        public static bool PregnancyPlus
         {
             get
             {
-                ReadConfig();
                 return _pregnancyPlus;
             }
             set
@@ -202,16 +232,16 @@ namespace MarryAnyone.Settings
                 if (_pregnancyPlus != value)
                 {
                     _pregnancyPlus = value;
-                    WriteConfig();
+                    Save();
                 }
             }
         }
 
-        public bool Incest
+        [ConfigPropertyUnbounded]
+        public static bool Incest
         {
             get
             {
-                ReadConfig();
                 return _incest;
             }
             set
@@ -219,16 +249,16 @@ namespace MarryAnyone.Settings
                 if (_incest != value)
                 {
                     _incest = value;
-                    WriteConfig();
+                    Save();
                 }
             }
         }
 
-        public bool Cheating
+        [ConfigPropertyUnbounded]
+        public static bool Cheating
         {
             get
             {
-                ReadConfig();
                 return _cheating;
             }
             set
@@ -236,16 +266,16 @@ namespace MarryAnyone.Settings
                 if (_cheating != value)
                 {
                     _cheating = value;
-                    WriteConfig();
+                    Save();
                 }
             }
         }
 
-        public bool SkipCourtship
+        [ConfigPropertyUnbounded]
+        public static bool SkipCourtship
         {
             get
             {
-                ReadConfig();
                 return _skipCourtship;
             }
             set
@@ -253,16 +283,33 @@ namespace MarryAnyone.Settings
                 if (_skipCourtship != value)
                 {
                     _skipCourtship = value;
-                    WriteConfig();
+                    Save();
                 }
             }
         }
 
-        public bool Debug
+        [ConfigPropertyUnbounded]
+        public static bool RetryCourtship
         {
             get
             {
-                ReadConfig();
+                return _retryCourtship;
+            }
+            set
+            {
+                if (_retryCourtship != value)
+                {
+                    _retryCourtship = value;
+                    Save();
+                }
+            }
+        }
+
+        [ConfigPropertyUnbounded]
+        public static bool Debug
+        {
+            get
+            {
                 return _debug;
             }
             set
@@ -270,60 +317,172 @@ namespace MarryAnyone.Settings
                 if (_debug != value)
                 {
                     _debug = value;
-                    WriteConfig();
+                    Save();
                 }
             }
         }
 
-        public string TemplateCharacter
+        public static void Initialize()
         {
-            get
+            string text = MAUtilities.LoadConfigFile();
+            if (string.IsNullOrEmpty(text))
             {
-                ReadConfig();
-                return _templateCharacter;
+                Save();
             }
-            set
+            else
             {
-                if (_templateCharacter != value)
+                bool flag = false;
+                string[] array = text.Split(new char[]
                 {
-                    _templateCharacter = value;
-                    WriteConfig();
+                    '\n'
+                });
+                for (int i = 0; i < array.Length; i++)
+                {
+                    string[] array2 = array[i].Split(new char[]
+                    {
+                        '='
+                    });
+                    PropertyInfo property = typeof(MAConfig).GetProperty(array2[0]);
+                    if (property is null)
+                    {
+                        flag = true;
+                    }
+                    else
+                    {
+                        string text2 = array2[1];
+                        try
+                        {
+                            if (property.PropertyType == typeof(string))
+                            {
+                                string value = Regex.Replace(text2, "\\r", "");
+                                property.SetValue(null, value);
+                            }
+                            else if (property.PropertyType == typeof(float))
+                            {
+                                if (float.TryParse(text2, out float num))
+                                {
+                                    property.SetValue(null, num);
+                                }
+                                else
+                                {
+                                    flag = true;
+                                }
+                            }
+                            else if (property.PropertyType == typeof(int))
+                            {
+                                if (int.TryParse(text2, out int num2))
+                                {
+                                    ConfigPropertyInt customAttribute = property.GetCustomAttribute<ConfigPropertyInt>();
+                                    if (customAttribute is null || customAttribute.IsValidValue(num2))
+                                    {
+                                        property.SetValue(null, num2);
+                                    }
+                                    else
+                                    {
+                                        flag = true;
+                                    }
+                                }
+                                else
+                                {
+                                    flag = true;
+                                }
+                            }
+                            else if (property.PropertyType == typeof(bool))
+                            {
+                                if (bool.TryParse(text2, out bool flag2))
+                                {
+                                    property.SetValue(null, flag2);
+                                }
+                                else
+                                {
+                                    flag = true;
+                                }
+                            }
+                            else
+                            {
+                                flag = true;
+                            }
+                        }
+                        catch
+                        {
+                            flag = true;
+                        }
+                    }
+                }
+                if (flag)
+                {
+                    Save();
                 }
             }
         }
 
-        public string PlayerClan
+        public static SaveResult Save()
         {
-            get
+            Dictionary<PropertyInfo, object> dictionary = new();
+            foreach (PropertyInfo propertyInfo in typeof(MAConfig).GetProperties())
             {
-                ReadConfig();
-                return _playerClan;
-            }
-            set
-            {
-                if (_playerClan != value)
+                if (propertyInfo.GetCustomAttribute<ConfigProperty>() is not null)
                 {
-                    _playerClan = value;
-                    WriteConfig();
+                    dictionary.Add(propertyInfo, propertyInfo.GetValue(null, null));
                 }
             }
+            string text = "";
+            foreach (KeyValuePair<PropertyInfo, object> keyValuePair in dictionary)
+            {
+                text = string.Concat(new string[]
+                {
+                    text,
+                    keyValuePair.Key.Name,
+                    "=",
+                    keyValuePair.Value.ToString(),
+                    "\n"
+                });
+            }
+            SaveResult result = MAUtilities.SaveConfigFile(text);
+            return result;
         }
 
-        public string ClanLeader
+        private interface IConfigPropertyBoundChecker<T>
         {
-            get
+        }
+
+        private abstract class ConfigProperty : Attribute
+        {
+        }
+
+        private sealed class ConfigPropertyInt : ConfigProperty
+        {
+            public ConfigPropertyInt(int[] possibleValues, bool isRange = false)
             {
-                ReadConfig();
-                return _clanLeader;
+                _possibleValues = possibleValues;
+                _isRange = isRange;
+                bool isRange2 = _isRange;
             }
-            set
+
+            public bool IsValidValue(int value)
             {
-                if (_clanLeader != value)
+                if (_isRange)
                 {
-                    _clanLeader = value;
-                    WriteConfig();
+                    return value >= _possibleValues[0] && value <= _possibleValues[1];
                 }
+                int[] possibleValues = _possibleValues;
+                for (int i = 0; i < possibleValues.Length; i++)
+                {
+                    if (possibleValues[i] == value)
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
+
+            private int[] _possibleValues;
+
+            private bool _isRange;
+        }
+
+        private sealed class ConfigPropertyUnbounded : ConfigProperty
+        {
         }
     }
 }
