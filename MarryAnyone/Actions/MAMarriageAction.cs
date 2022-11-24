@@ -43,20 +43,26 @@ namespace MarryAnyone.Actions
             var spouseKingdom = spouse.MapFaction as Kingdom;
             if (playerKingdom is null)
             {
-                if (Hero.MainHero.MapFaction as Kingdom != spouseKingdom)
+                if (spouseKingdom is not null)
                 {
-                    ChangeKingdomAction.ApplyByJoinToKingdom(clanAfterMarriage, spouseKingdom, true);
-                }
-                if ((settings.FactionLeader == "Default" && !Hero.MainHero.IsFemale)
-                        || settings.FactionLeader == "Player")
-                {
-                    spouseKingdom!.RulingClan = clanAfterMarriage;
-                    CampaignEventDispatcher.Instance.OnRulingClanChanged(spouseKingdom, clanAfterMarriage);
+                    if (Hero.MainHero.MapFaction as Kingdom != spouseKingdom)
+                    {
+                        ChangeKingdomAction.ApplyByJoinToKingdom(clanAfterMarriage, spouseKingdom, true);
+                    }
+                    if ((settings.FactionLeader == "Default" && !Hero.MainHero.IsFemale)
+                            || settings.FactionLeader == "Player")
+                    {
+                        spouseKingdom!.RulingClan = clanAfterMarriage;
+                        CampaignEventDispatcher.Instance.OnRulingClanChanged(spouseKingdom, clanAfterMarriage);
+                    }
                 }
             }
             else
             {
-                ChangeKingdomAction.ApplyByJoinToKingdom(spouseClan, playerKingdom, true);
+                if (spouseClan is not null)
+                {
+                    ChangeKingdomAction.ApplyByJoinToKingdom(spouseClan, playerKingdom, true);
+                }
             }
 
             // Cautious marriage action
