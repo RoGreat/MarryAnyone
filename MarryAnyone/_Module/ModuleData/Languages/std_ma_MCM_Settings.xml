@@ -31,9 +31,7 @@
 		<string id="reset_courtships" text="Reset Courtships" />
 		<string id="reset_courtships_desc" text="Reset ended courtships with a press of a button!" />
     <string id="marriage" text="Marriage" />
-    <string id="playerclan" text="Player Clan" />
-		<string id="playerclan_desc" text="Player clan persists after marriage. By default the clan only persists if playing as a male." />
-    <string id="clanleader" text="Clan Leader" />
-		<string id="clanleader_desc" text="Player replaces clan leader after marriage. By default the a male player can replace a female leader." />
+    <string id="faction_leader" text="Faction Leader" />
+		<string id="faction_leader_desc" text="Become/stay faction leader after marriage." />
   </strings>
 </base>

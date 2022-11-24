@@ -1,18 +1,16 @@
 ﻿using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem;
 using MarryAnyone.Patches;
-using HarmonyLib.BUTR.Extensions;
 using Helpers;
 using TaleWorlds.CampaignSystem.Party;
-using System;
 
 namespace MarryAnyone.Actions
 {
     internal static class MAMarriageAction
     {
         /* Properties */
-        private delegate void PlayerDefaultFactionDelegate(Campaign instance, Clan @value);
-        private static readonly PlayerDefaultFactionDelegate? PlayerDefaultFaction = AccessTools2.GetPropertySetterDelegate<PlayerDefaultFactionDelegate>(typeof(Campaign), "PlayerDefaultFaction");
+        //private delegate void PlayerDefaultFactionDelegate(Campaign instance, Clan @value);
+        //private static readonly PlayerDefaultFactionDelegate? PlayerDefaultFaction = AccessTools2.GetPropertySetterDelegate<PlayerDefaultFactionDelegate>(typeof(Campaign), "PlayerDefaultFaction");
 
         // Appears to ultimately avoid disbanding parties and the like...
         // Never disband party for hero, do for everyone else...
