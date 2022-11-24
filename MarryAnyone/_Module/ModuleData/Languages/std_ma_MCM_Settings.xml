@@ -32,6 +32,6 @@
 		<string id="reset_courtships_desc" text="Reset ended courtships with a press of a button!" />
     <string id="marriage" text="Marriage" />
     <string id="faction_leader" text="Faction Leader" />
-		<string id="faction_leader_desc" text="Become/stay faction leader after marriage." />
+		<string id="faction_leader_desc" text="Usurp faction leader or maintain faction leader status after marriage." />
   </strings>
 </base>

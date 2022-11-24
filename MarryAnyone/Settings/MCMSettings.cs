@@ -65,7 +65,7 @@ namespace MarryAnyone.Settings
         public Action ResetEndedCourtships { get; set; } = () => Helpers.ResetEndedCourtships();
 
 
-        [SettingPropertyDropdown("{=faction_leader}Faction Leader", Order = 0, RequireRestart = false, HintText = "{=faction_leader_desc}Become/stay faction leader after marriage.")]
+        [SettingPropertyDropdown("{=faction_leader}Faction Leader", Order = 0, RequireRestart = false, HintText = "{=faction_leader_desc}Usurp faction leader or maintain faction leader status after marriage.")]
         [SettingPropertyGroup("{=marriage}Marriage", GroupOrder = 3)]
         public Dropdown<string> FactionLeaderDropdown { get; set; } = new Dropdown<string>(new string[]
         {

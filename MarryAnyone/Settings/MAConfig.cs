@@ -103,7 +103,7 @@ namespace MarryAnyone.Settings
 
         private static string _sexualOrientation = "Heterosexual";
 
-        private static string _factionLeader = "Player";
+        private static string _factionLeader = "Default";
 
         private static string _templateCharacter = "Default";
 
@@ -174,6 +174,9 @@ namespace MarryAnyone.Settings
                 {
                     switch (_factionLeader)
                     {
+                        case "Default":
+                            _factionLeader = value;
+                            break;
                         case "Player":
                             _factionLeader = value;
                             break;

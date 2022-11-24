@@ -34,39 +34,110 @@ namespace MarryAnyone.Actions
 
             Hero spouse = !firstHero.IsHumanPlayerCharacter ? firstHero : secondHero;
             Clan spouseClan = spouse.Clan;
-            Clan clanAfterMarriage = Clan.PlayerClan;
+            Clan playerClan = Clan.PlayerClan;
 
             // CampaignCheats -> lead_your_faction
             // CampaignCheats -> join_kingdom
             // ChangeOwnerOfSettlementAction -> ApplyByDefault
-            var playerKingdom = Hero.MainHero.MapFaction as Kingdom;
-            var spouseKingdom = spouse.MapFaction as Kingdom;
-            if (playerKingdom is null)
+            Kingdom? playerKingdom = Hero.MainHero.MapFaction as Kingdom;
+            Kingdom? spouseKingdom = spouse.MapFaction as Kingdom;
+
+            // Only applies to spouses that are in a kingdom
+            if (spouseKingdom is not null)
             {
-                if (spouseKingdom is not null)
+                // Not already in the same kingdom
+                if (playerKingdom != spouseKingdom)
                 {
-                    if (Hero.MainHero.MapFaction as Kingdom != spouseKingdom)
+                    if (spouseKingdom.RulingClan is not null)
                     {
-                        ChangeKingdomAction.ApplyByJoinToKingdom(clanAfterMarriage, spouseKingdom, true);
+                        // If spouse is the kingdom ruler 
+                        if (spouseKingdom.RulingClan.Leader == spouse)
+                        {
+                            // Become or stay as kingdom ruler if these settings are true
+                            if ((settings.FactionLeader == "Default" && !Hero.MainHero.IsFemale) || settings.FactionLeader == "Player")
+                            {
+                                // Spouse should always abdicate the throne in this situation
+                                Campaign.Current.KingdomManager.AbdicateTheThrone(spouseKingdom);
+                                if (playerKingdom is null)
+                                {
+                                    // When there is no player kingdom
+                                    // Player joins spouse's kingdom and takes the throne
+                                    ChangeKingdomAction.ApplyByJoinToKingdom(playerClan, spouseKingdom);
+                                    spouseKingdom!.RulingClan = playerClan;
+                                    CampaignEventDispatcher.Instance.OnRulingClanChanged(spouseKingdom, playerClan);
+                                }
+                                else if (spouseClan is not null)
+                                {
+                                    // When there is a player kingdom
+                                    // Spouse joins player kingdom
+                                    ChangeKingdomAction.ApplyByJoinToKingdom(spouseClan, playerKingdom);
+                                }
+                            }
+                            else
+                            {
+                                // Player does not stay kingdom ruler
+                                if (playerKingdom is not null)
+                                {
+                                    if (playerKingdom.RulingClan is not null)
+                                    {
+                                        // Abdicate throne and join spouse's kingdom if player clan is the ruling clan leader
+                                        if (playerKingdom.RulingClan.Leader == Hero.MainHero)
+                                        {
+                                            Campaign.Current.KingdomManager.AbdicateTheThrone(playerKingdom);
+                                        }
+                                    }
+                                }
+                                ChangeKingdomAction.ApplyByJoinToKingdom(playerClan, spouseKingdom);
+                            }
+                        }
+                        // For regular clan leaders. Solving the kingdom issue.
+                        else if (spouseClan is not null)
+                        {
+                            // If talking to a clan leader
+                            if (spouseClan.Leader == spouse)
+                            {
+                                // If there is a player kingdom
+                                if (playerKingdom is not null)
+                                {
+                                    // Determines whether to join kingdom or stay in your kingdom and take spouse with you
+                                    if ((settings.FactionLeader == "Default" && !Hero.MainHero.IsFemale) || settings.FactionLeader == "Player")
+                                    {
+                                        ChangeKingdomAction.ApplyByJoinToKingdom(spouseClan, playerKingdom);
+                                    }
+                                    else
+                                    {
+                                        if (playerKingdom.RulingClan is not null)
+                                        {
+                                            // Abdicate throne and join spouse's kingdom if player clan is the ruling clan leader
+                                            if (playerKingdom.RulingClan.Leader == Hero.MainHero)
+                                            {
+                                                Campaign.Current.KingdomManager.AbdicateTheThrone(playerKingdom);
+                                            }
+                                        }
+                                        ChangeKingdomAction.ApplyByJoinToKingdom(playerClan, spouseKingdom);
+                                    }
+                                }
+                                else
+                                {
+                                    // If player does not have a kingdom, create one or not
+                                    if ((settings.FactionLeader == "Default" && !Hero.MainHero.IsFemale) || settings.FactionLeader == "Player")
+                                    {
+                                        Campaign.Current.KingdomManager.CreateKingdom(Clan.PlayerClan.Name, Clan.PlayerClan.InformalName, Clan.PlayerClan.Culture, Clan.PlayerClan);
+                                        ChangeKingdomAction.ApplyByJoinToKingdom(spouseClan, Hero.MainHero.MapFaction as Kingdom);
+                                    }
+                                    else
+                                    {
+                                        ChangeKingdomAction.ApplyByJoinToKingdom(playerClan, spouseKingdom);
+                                    }
+                                }
+                            }
+                        }
                     }
-                    if ((settings.FactionLeader == "Default" && !Hero.MainHero.IsFemale)
-                            || settings.FactionLeader == "Player")
-                    {
-                        spouseKingdom!.RulingClan = clanAfterMarriage;
-                        CampaignEventDispatcher.Instance.OnRulingClanChanged(spouseKingdom, clanAfterMarriage);
-                    }
-                }
-            }
-            else
-            {
-                if (spouseClan is not null)
-                {
-                    ChangeKingdomAction.ApplyByJoinToKingdom(spouseClan, playerKingdom, true);
                 }
             }
 
             // Cautious marriage action
-            if (spouse.Clan != clanAfterMarriage)
+            if (spouse.Clan != playerClan)
             {
                 if (spouse.GovernorOf is not null)
                 {
@@ -77,7 +148,7 @@ namespace MarryAnyone.Actions
                     MobileParty partyBelongedTo = spouse.PartyBelongedTo;
                     if (spouseClan is not null)
                     {
-                        if (spouseClan.Kingdom != clanAfterMarriage.Kingdom)
+                        if (spouseClan.Kingdom != playerClan.Kingdom)
                         {
                             if (spouse.PartyBelongedTo.Army is not null)
                             {
@@ -90,8 +161,8 @@ namespace MarryAnyone.Actions
                                     spouse.PartyBelongedTo.Army = null;
                                 }
                             }
-                            IFaction kingdom = clanAfterMarriage.Kingdom;
-                            FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(spouse, kingdom ?? clanAfterMarriage);
+                            IFaction kingdom = playerClan.Kingdom;
+                            FactionHelper.FinishAllRelatedHostileActionsOfNobleToFaction(spouse, kingdom ?? playerClan);
                         }
                     }
                     if (partyBelongedTo.Party.IsActive && partyBelongedTo.Party.Owner == spouse)
@@ -106,7 +177,7 @@ namespace MarryAnyone.Actions
                         partyBelongedTo2.MemberRoster.RemoveTroop(spouse.CharacterObject, 1, default, 0);
                     }
                 }
-                spouse.Clan = clanAfterMarriage;
+                spouse.Clan = playerClan;
                 if (spouseClan is not null)
                 {
                     foreach (Hero hero in spouseClan.Heroes)
@@ -114,7 +185,7 @@ namespace MarryAnyone.Actions
                         hero.UpdateHomeSettlement();
                     }
                 }
-                foreach (Hero hero in clanAfterMarriage.Heroes)
+                foreach (Hero hero in playerClan.Heroes)
                 {
                     hero.UpdateHomeSettlement();
                 }

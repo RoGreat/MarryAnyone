@@ -172,30 +172,35 @@ namespace MarryAnyone.CampaignSystem
             return "Please enter \"heterosexual\", \"homosexual\", or \"bisexual\"";
         }
 
-        [CommandLineFunctionality.CommandLineArgumentFunction("set_clan_after_marriage", "marry_anyone")]
-        public static string SetClanAfterMarriage(List<string> strings)
+        [CommandLineFunctionality.CommandLineArgumentFunction("set_faction_leader", "marry_anyone")]
+        public static string SetFactionLeader(List<string> strings)
         {
             MASettings settings = new();
             if (!CampaignCheats.CheckParameters(strings, 1) || CampaignCheats.CheckHelp(strings))
             {
-                return "Format is \"marry_anyone.set_player_clan [\"default\"/\"always\"/\"never\"].";
+                return "Format is \"marry_anyone.set_faction_leader [\"default\"/\"player\"/\"spouse\"].";
             }
             string template = CampaignCheats.ConcatenateString(strings);
             if (template == null)
             {
-                return "Please enter \"default\", \"always\", or \"never\"";
+                return "Please enter \"default\", \"player\", or \"spouse\"";
             }
             else if (string.Equals(template, "default", StringComparison.OrdinalIgnoreCase))
             {
                 settings.FactionLeader = "Default";
                 return "Success";
             }
-            else if (string.Equals(template, "always", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(template, "player", StringComparison.OrdinalIgnoreCase))
             {
-                settings.FactionLeader = "Always";
+                settings.FactionLeader = "Player";
                 return "Success";
             }
-            return "Please enter \"player\" or \"spouse\"";
+            else if (string.Equals(template, "spouse", StringComparison.OrdinalIgnoreCase))
+            {
+                settings.FactionLeader = "Spouse";
+                return "Success";
+            }
+            return "Please enter \"default\", \"player\", or \"spouse\"";
         }
 
         [CommandLineFunctionality.CommandLineArgumentFunction("set_character_template", "marry_anyone")]
