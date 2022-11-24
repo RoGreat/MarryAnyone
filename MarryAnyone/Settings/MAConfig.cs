@@ -64,10 +64,10 @@ namespace MarryAnyone.Settings
             set { MAConfig.SkipCourtship = value; }
         }
 
-        public string ClanAfterMarriage
+        public string FactionLeader
         {
-            get { return MAConfig.ClanAfterMarriage; }
-            set { MAConfig.ClanAfterMarriage = value; }
+            get { return MAConfig.FactionLeader; }
+            set { MAConfig.FactionLeader = value; }
         }
 
         public bool RetryCourtship
@@ -103,7 +103,7 @@ namespace MarryAnyone.Settings
 
         private static string _sexualOrientation = "Heterosexual";
 
-        private static string _clanAfterMarriage = "Player";
+        private static string _factionLeader = "Player";
 
         private static string _templateCharacter = "Default";
 
@@ -162,23 +162,23 @@ namespace MarryAnyone.Settings
         }
 
         [ConfigPropertyUnbounded]
-        public static string ClanAfterMarriage
+        public static string FactionLeader
         {
             get
             {
-                return _clanAfterMarriage;
+                return _factionLeader;
             }
             set
             {
-                if (_clanAfterMarriage != value)
+                if (_factionLeader != value)
                 {
-                    switch (_clanAfterMarriage)
+                    switch (_factionLeader)
                     {
                         case "Player":
-                            _clanAfterMarriage = value;
+                            _factionLeader = value;
                             break;
                         case "Spouse":
-                            _clanAfterMarriage = value;
+                            _factionLeader = value;
                             break;
                     }
                     Save();

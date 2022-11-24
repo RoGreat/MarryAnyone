@@ -187,12 +187,12 @@ namespace MarryAnyone.CampaignSystem
             }
             else if (string.Equals(template, "default", StringComparison.OrdinalIgnoreCase))
             {
-                settings.ClanAfterMarriage = "Default";
+                settings.FactionLeader = "Default";
                 return "Success";
             }
             else if (string.Equals(template, "always", StringComparison.OrdinalIgnoreCase))
             {
-                settings.ClanAfterMarriage = "Always";
+                settings.FactionLeader = "Always";
                 return "Success";
             }
             return "Please enter \"player\" or \"spouse\"";

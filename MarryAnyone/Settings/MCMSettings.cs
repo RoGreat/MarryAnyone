@@ -65,18 +65,19 @@ namespace MarryAnyone.Settings
         public Action ResetEndedCourtships { get; set; } = () => Helpers.ResetEndedCourtships();
 
 
-        [SettingPropertyDropdown("{=clan_after_marriage}Clan After Marriage", Order = 0, RequireRestart = false, HintText = "{=clan_after_marriage_desc}Defaults to Player if the spouse does not have a clan.")]
+        [SettingPropertyDropdown("{=faction_leader}Faction Leader", Order = 0, RequireRestart = false, HintText = "{=faction_leader_desc}Become faction leader of spouse's clan.")]
         [SettingPropertyGroup("{=marriage}Marriage", GroupOrder = 3)]
-        public Dropdown<string> ClanAfterMarriageDropdown { get; set; } = new Dropdown<string>(new string[]
+        public Dropdown<string> FactionLeaderDropdown { get; set; } = new Dropdown<string>(new string[]
         {
+            "Default",
             "Player",
             "Spouse"
         }, 0);
 
-        public string ClanAfterMarriage
+        public string FactionLeader
         {
-            get => ClanAfterMarriageDropdown.SelectedValue;
-            set => ClanAfterMarriageDropdown.SelectedValue = value;
+            get => FactionLeaderDropdown.SelectedValue;
+            set => FactionLeaderDropdown.SelectedValue = value;
         }
 
 

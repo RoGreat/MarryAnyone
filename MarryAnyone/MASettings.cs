@@ -57,10 +57,10 @@ namespace MarryAnyone
             set => _provider.Incest = value;
         }
 
-        public string ClanAfterMarriage
+        public string FactionLeader
         {
-            get => _provider.ClanAfterMarriage;
-            set => _provider.ClanAfterMarriage = value;
+            get => _provider.FactionLeader;
+            set => _provider.FactionLeader = value;
         }
 
         public bool Cheating
