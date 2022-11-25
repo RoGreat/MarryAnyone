@@ -42,7 +42,7 @@ namespace MarryAnyone.Actions
             Kingdom? playerKingdom = Hero.MainHero.MapFaction as Kingdom;
             Kingdom? spouseKingdom = spouse.MapFaction as Kingdom;
 
-            // Only applies to spouses that are in a kingdom
+            // If spouse is in a kingdom
             if (spouseKingdom is not null)
             {
                 // Not already in the same kingdom
@@ -58,6 +58,7 @@ namespace MarryAnyone.Actions
                             {
                                 // Spouse should always abdicate the throne in this situation
                                 Campaign.Current.KingdomManager.AbdicateTheThrone(spouseKingdom);
+
                                 if (playerKingdom is null)
                                 {
                                     // When there is no player kingdom
@@ -119,20 +120,30 @@ namespace MarryAnyone.Actions
                                 }
                                 else
                                 {
-                                    // If player does not have a kingdom, create one or not
                                     if ((settings.FactionLeader == "Default" && !Hero.MainHero.IsFemale) || settings.FactionLeader == "Player")
                                     {
-                                        Campaign.Current.KingdomManager.CreateKingdom(Clan.PlayerClan.Name, Clan.PlayerClan.InformalName, Clan.PlayerClan.Culture, Clan.PlayerClan);
-                                        ChangeKingdomAction.ApplyByJoinToKingdom(spouseClan, Hero.MainHero.MapFaction as Kingdom);
+                                        // "Elope"
                                     }
                                     else
                                     {
+                                        // "JOIN US!"
                                         ChangeKingdomAction.ApplyByJoinToKingdom(playerClan, spouseKingdom);
                                     }
                                 }
                             }
                         }
                     }
+                }
+            }
+
+            // Necessary to prevent you from getting kicked out kingdoms and breaking the game
+            if (spouseClan is not null)
+            {
+                if (spouseClan.Leader == spouse)
+                {
+                    // Spouse clan must choose a new clan leader or there is a 40% chance on daily tick that you get removed from the kingdom...
+                    // Referring to DiplomaticBartersBehavior -> ConsiderClanLeaveKingdom
+                    ChangeClanLeaderAction.ApplyWithoutSelectedNewLeader(spouseClan);
                 }
             }
 
