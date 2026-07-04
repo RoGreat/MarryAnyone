@@ -1,0 +1,14 @@
+[
+  {
+    "label": "Build Debug",
+    "command": "dotnet build",
+  },
+  {
+    "label": "Build Release",
+    "command": "dotnet build -c Release",
+  },
+  {
+    "label": "Run Bannerlord",
+    "command": "steam steam://rungameid/261550",
+  },
+]

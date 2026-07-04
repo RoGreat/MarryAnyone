@@ -30,18 +30,6 @@
   </DependedModuleMetadatas>
   <SubModules>
     <SubModule>
-      <Name value="MCMv5" />
-      <DLLName value="MCMv5.dll" />
-      <SubModuleClassType value="MCM.MCMSubModule" />
-      <Tags />
-    </SubModule>
-    <SubModule>
-      <Name value="MCMv5 Basic Implementation" />
-      <DLLName value="MCMv5.dll" />
-      <SubModuleClassType value="MCM.Internal.MCMImplementationSubModule" />
-      <Tags />
-    </SubModule>
-    <SubModule>
       <Name value="$modulename$" />
       <DLLName value="$moduleid$.$gameversion$.dll" />
       <SubModuleClassType value="$moduleid$.SubModule" />

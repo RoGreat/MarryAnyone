@@ -10,7 +10,6 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.MountAndBlade;
 
-
 namespace MarryAnyone
 {
     public class SubModule : MBSubModuleBase
@@ -19,7 +18,7 @@ namespace MarryAnyone
         {
             base.OnSubModuleLoad();
 
-            Harmony harmony = new Harmony("mod.bannerlord.anyone.marry");
+            Harmony harmony = new("mod.bannerlord.anyone.marry");
             harmony.PatchAll();
         }
 
@@ -29,29 +28,24 @@ namespace MarryAnyone
 
             if (game.GameType is Campaign)
             {
-                var gameStarter = (CampaignGameStarter)gameStarterObject;
+                CampaignGameStarter gameStarter = (CampaignGameStarter)gameStarterObject;
 
-                var currentMarriageModel = GetGameModel<MarriageModel>(gameStarter);
-                if (currentMarriageModel is null)
-                {
-                    Log.Warning("DefaultMarriageModel not found");
-                }
+                MarriageModel? currentMarriageModel = GetGameModel<MarriageModel>(gameStarter);
+                gameStarter.AddModel(new MarryAnyoneMarriageModel(currentMarriageModel));
 
                 if (Settings.Instance!.EnableVillagerRomance)
                 {
-                    gameStarter.AddBehavior(new VillagerRomanceCampaignBehavior());
-                    gameStarter.AddModel(new VillagerMarriageModel(currentMarriageModel));
+                    gameStarter.AddBehavior(new CommonerRomanceCampaignBehavior());
                 }
 
                 if (Settings.Instance!.EnableLeaderRomance)
                 {
                     gameStarter.AddBehavior(new LeaderRomanceCampaignBehavior());
-                    gameStarter.AddModel(new LeaderMarriageModel(currentMarriageModel));
                 }
             }
         }
 
-        private T? GetGameModel<T>(IGameStarter gameStarterObject) where T : GameModel
+        private static T? GetGameModel<T>(IGameStarter gameStarterObject) where T : GameModel
         {
             var models = gameStarterObject.Models.ToArray();
 
