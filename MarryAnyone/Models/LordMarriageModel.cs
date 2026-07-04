@@ -13,19 +13,19 @@ namespace MarryAnyone.Models
             _previousModel = previousModel;
         }
 
-        public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero) => _previousModel?.IsCoupleSuitableForMarriage(firstHero, secondHero) ?? true;
+        public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero) => _previousModel?.IsCoupleSuitableForMarriage(firstHero, secondHero) ?? default;
 
-        public override int GetEffectiveRelationIncrease(Hero firstHero, Hero secondHero) => _previousModel?.GetEffectiveRelationIncrease(firstHero, secondHero) ?? 0;
+        public override int GetEffectiveRelationIncrease(Hero firstHero, Hero secondHero) => _previousModel?.GetEffectiveRelationIncrease(firstHero, secondHero) ?? default;
 
         public override Clan GetClanAfterMarriage(Hero firstHero, Hero secondHero) => _previousModel?.GetClanAfterMarriage(firstHero, secondHero) ?? Clan.PlayerClan;
 
-        public override bool IsSuitableForMarriage(Hero hero) => _previousModel?.IsSuitableForMarriage(hero) ?? true;
+        public override bool IsSuitableForMarriage(Hero hero) => _previousModel?.IsSuitableForMarriage(hero) ?? default;
 
-        public override bool IsClanSuitableForMarriage(Clan clan) => _previousModel?.IsClanSuitableForMarriage(clan) ?? true;
+        public override bool IsClanSuitableForMarriage(Clan clan) => _previousModel?.IsClanSuitableForMarriage(clan) ?? default;
 
         public override float NpcCoupleMarriageChance(Hero firstHero, Hero secondHero) => _previousModel?.NpcCoupleMarriageChance(firstHero, secondHero) ?? 0f;
 
-        public override bool ShouldNpcMarriageBetweenClansBeAllowed(Clan consideringClan, Clan targetClan) => _previousModel?.ShouldNpcMarriageBetweenClansBeAllowed(consideringClan, targetClan) ?? true;
+        public override bool ShouldNpcMarriageBetweenClansBeAllowed(Clan consideringClan, Clan targetClan) => _previousModel?.ShouldNpcMarriageBetweenClansBeAllowed(consideringClan, targetClan) ?? default;
 
         public override List<Hero> GetAdultChildrenSuitableForMarriage(Hero hero) => _previousModel?.GetAdultChildrenSuitableForMarriage(hero) ?? new List<Hero>();
 

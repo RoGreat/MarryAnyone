@@ -8,7 +8,6 @@ using System.Linq;
 using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
-using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
 
 
@@ -35,7 +34,7 @@ namespace MarryAnyone
                 var currentMarriageModel = GetGameModel<MarriageModel>(gameStarter);
                 if (currentMarriageModel is null)
                 {
-                    Debug.Print("DefaultMarriageModel not found");
+                    Log.Warning("DefaultMarriageModel not found");
                 }
 
                 if (Settings.Instance!.EnableCommonerRomance)
