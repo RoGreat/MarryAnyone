@@ -1,31 +1,67 @@
 ﻿using HarmonyLib;
-using MarryAnyone.Behaviors;
+
+using MarryAnyone.CampaignBehaviors;
 using MarryAnyone.Models;
-using MarryAnyone.Settings;
+
+using System.Linq;
+
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
+using TaleWorlds.Library;
 using TaleWorlds.MountAndBlade;
+
 
 namespace MarryAnyone
 {
-    internal sealed class SubModule : MBSubModuleBase
+    public class SubModule : MBSubModuleBase
     {
         protected override void OnSubModuleLoad()
         {
             base.OnSubModuleLoad();
-            new Harmony("mod.bannerlord.anyone.marry").PatchAll();
-            MAConfig.Initialize();
+
+            Harmony harmony = new Harmony("mod.bannerlord.anyone.marry");
+            harmony.PatchAll();
         }
 
         protected override void OnGameStart(Game game, IGameStarter gameStarterObject)
         {
             base.OnGameStart(game, gameStarterObject);
+
             if (game.GameType is Campaign)
             {
-                CampaignGameStarter campaignGameStarter = (CampaignGameStarter)gameStarterObject;
-                campaignGameStarter.AddBehavior(new MARomanceCampaignBehavior());
-                campaignGameStarter.AddModel(new MAMarriageModel());
+                var gameStarter = (CampaignGameStarter)gameStarterObject;
+
+                var currentMarriageModel = GetGameModel<MarriageModel>(gameStarter);
+                if (currentMarriageModel is null)
+                {
+                    Debug.Print("DefaultMarriageModel not found");
+                }
+
+                if (Settings.Instance!.EnableCommonerRomance)
+                {
+                    gameStarter.AddBehavior(new CommonerRomanceCampaignBehavior());
+                    gameStarter.AddModel(new CommonerMarriageModel(currentMarriageModel));
+                }
+
+                if (Settings.Instance!.EnableLordRomance)
+                {
+                    gameStarter.AddBehavior(new LordRomanceCampaignBehavior());
+                    gameStarter.AddModel(new LordMarriageModel(currentMarriageModel));
+                }
             }
+        }
+
+        private T? GetGameModel<T>(IGameStarter gameStarterObject) where T : GameModel
+        {
+            var models = gameStarterObject.Models.ToArray();
+
+            for (int index = models.Length - 1; index >= 0; --index)
+            {
+                if (models[index] is T gameModel1)
+                    return gameModel1;
+            }
+            return default;
         }
     }
 }

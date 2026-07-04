@@ -1,36 +1,49 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Bannerlord.BUTRModule.Sdk/1.1.0.124">
 
   <PropertyGroup>
-    <Version>3.0.4</Version>
-    <TargetFramework>net472</TargetFramework>
+    <Version>0.0.1</Version>
+    <TargetFrameworks>net472;net6</TargetFrameworks>
     <Platforms>x64</Platforms>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
+
+    <BuildForWindows>false</BuildForWindows>
+    <BuildForWindowsStore>false</BuildForWindowsStore>
+
     <ModuleId>$(MSBuildProjectName)</ModuleId>
-    <ModuleName>Marry Anyone</ModuleName>
+    <ModuleName>$(MSBuildProjectName)</ModuleName>
+    <ModuleUrl>https://www.nexusmods.com/mountandblade2bannerlord/mods/1483</ModuleUrl>
     <GameFolder>$(BANNERLORD_GAME_DIR)</GameFolder>
-    <GameVersion>1.0.1</GameVersion>
+    <!-- Module manually override GameVersion -->
+    <!-- <OverrideGameVersion>v1.0.0</OverrideGameVersion> -->
   </PropertyGroup>
-  
+
+  <PropertyGroup Condition="$(TargetFramework) == 'net472'">
+    <!-- Steam/GOG/Epic versions of the game -->
+    <BuildForWindows>true</BuildForWindows>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(TargetFramework) == 'net6'">
+    <!-- Xbox Game Pass PC version of the game -->
+    <BuildForWindowsStore>true</BuildForWindowsStore>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
   <!-- Development Variables -->
   <PropertyGroup>
     <HarmonyVersion>2.2.2</HarmonyVersion>
-    <MCMVersion>5.3.2</MCMVersion>
+    <MCMVersion>5.9.1</MCMVersion>
+    <HarmonyExtensionsVersion>3.2.0.77</HarmonyExtensionsVersion>
+    <!--
+    <BUTRSharedVersion>3.0.0.135</BUTRSharedVersion>
+    <BUTRModuleManagerVersion>5.0.198</BUTRModuleManagerVersion>
+    -->
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <!-- Dependencies -->
-    <PackageReference Include="Lib.Harmony" Version="$(HarmonyVersion)" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" PrivateAssets="all" IncludeAssets="compile" />
+    <PackageReference Include="BUTR.Harmony.Analyzer" Version="1.0.1.50" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="Bannerlord.MCM" Version="$(MCMVersion)" />
-    <!-- BUTR Libraries and other Development Dependencies -->
-    <PackageReference Include="Nullable" Version="1.3.1" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
-    <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
-    <PackageReference Include="Bannerlord.BuildResources" Version="1.0.1.80" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
-    <PackageReference Include="Harmony.Extensions" Version="3.1.0.68" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
-    <PackageReference Include="BUTR.Harmony.Analyzer" Version="1.0.1.44" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
-    <!-- Assembly Reference Metadata -->
-    <PackageReference Include="Bannerlord.ReferenceAssemblies.Core" Version="$(GameVersion).*" PrivateAssets="All" />
-    <PackageReference Include="Bannerlord.ReferenceAssemblies.SandBox" Version="$(GameVersion).*" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
