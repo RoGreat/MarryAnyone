@@ -4,11 +4,11 @@ using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone.Models
 {
-    public class LordMarriageModel : MarriageModel
+    public class LeaderMarriageModel : MarriageModel
     {
         private readonly MarriageModel? _previousModel;
 
-        public LordMarriageModel(MarriageModel? previousModel)
+        public LeaderMarriageModel(MarriageModel? previousModel)
         {
             _previousModel = previousModel;
         }
@@ -23,7 +23,7 @@ namespace MarryAnyone.Models
 
         public override bool IsClanSuitableForMarriage(Clan clan) => _previousModel?.IsClanSuitableForMarriage(clan) ?? default;
 
-        public override float NpcCoupleMarriageChance(Hero firstHero, Hero secondHero) => _previousModel?.NpcCoupleMarriageChance(firstHero, secondHero) ?? 0f;
+        public override float NpcCoupleMarriageChance(Hero firstHero, Hero secondHero) => _previousModel?.NpcCoupleMarriageChance(firstHero, secondHero) ?? default;
 
         public override bool ShouldNpcMarriageBetweenClansBeAllowed(Clan consideringClan, Clan targetClan) => _previousModel?.ShouldNpcMarriageBetweenClansBeAllowed(consideringClan, targetClan) ?? default;
 

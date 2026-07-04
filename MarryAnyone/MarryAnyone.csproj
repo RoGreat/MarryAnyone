@@ -31,8 +31,8 @@
 
   <!-- Development Variables -->
   <PropertyGroup>
-    <HarmonyVersion>2.2.2</HarmonyVersion>
-    <MCMVersion>5.9.1</MCMVersion>
+    <HarmonyVersion>2.4.2</HarmonyVersion>
+    <MCMVersion>5.12.1</MCMVersion>
     <HarmonyExtensionsVersion>3.2.0.77</HarmonyExtensionsVersion>
     <!--
     <BUTRSharedVersion>3.0.0.135</BUTRSharedVersion>
@@ -43,7 +43,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" PrivateAssets="all" IncludeAssets="compile" />
     <PackageReference Include="BUTR.Harmony.Analyzer" Version="1.0.1.50" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
-    <PackageReference Include="Bannerlord.MCM" Version="$(MCMVersion)" />
+    <!-- <PackageReference Include="Bannerlord.MCM" Version="$(MCMVersion)" /> -->
   </ItemGroup>
 
 </Project>

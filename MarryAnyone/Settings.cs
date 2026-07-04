@@ -14,9 +14,9 @@ namespace MarryAnyone
         public override string FormatType => "json2";
 
         [SettingPropertyBool(displayName: "{=bbbbbbb}commoner", Order = 0, RequireRestart = true, HintText = "{=cccccc}")]
-        public bool EnableCommonerRomance { get; set; } = true;
+        public bool EnableVillagerRomance { get; set; } = true;
 
         [SettingPropertyBool(displayName: "{=ddddddd}lord", Order = 10, RequireRestart = true, HintText = "{=eeeeee}")]
-        public bool EnableLordRomance { get; set; } = true;
+        public bool EnableLeaderRomance { get; set; } = true;
     }
 }

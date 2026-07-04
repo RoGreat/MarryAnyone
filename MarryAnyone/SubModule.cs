@@ -37,16 +37,16 @@ namespace MarryAnyone
                     Log.Warning("DefaultMarriageModel not found");
                 }
 
-                if (Settings.Instance!.EnableCommonerRomance)
+                if (Settings.Instance!.EnableVillagerRomance)
                 {
-                    gameStarter.AddBehavior(new CommonerRomanceCampaignBehavior());
-                    gameStarter.AddModel(new CommonerMarriageModel(currentMarriageModel));
+                    gameStarter.AddBehavior(new VillagerRomanceCampaignBehavior());
+                    gameStarter.AddModel(new VillagerMarriageModel(currentMarriageModel));
                 }
 
-                if (Settings.Instance!.EnableLordRomance)
+                if (Settings.Instance!.EnableLeaderRomance)
                 {
-                    gameStarter.AddBehavior(new LordRomanceCampaignBehavior());
-                    gameStarter.AddModel(new LordMarriageModel(currentMarriageModel));
+                    gameStarter.AddBehavior(new LeaderRomanceCampaignBehavior());
+                    gameStarter.AddModel(new LeaderMarriageModel(currentMarriageModel));
                 }
             }
         }
