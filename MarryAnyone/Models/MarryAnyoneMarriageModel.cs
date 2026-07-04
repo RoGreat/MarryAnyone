@@ -4,11 +4,11 @@ using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone.Models
 {
-    public class LeaderMarriageModel : MarriageModel
+    public class MarryAnyoneMarriageModel : MarriageModel
     {
         private readonly MarriageModel? _previousModel;
 
-        public LeaderMarriageModel(MarriageModel? previousModel)
+        public MarryAnyoneMarriageModel(MarriageModel? previousModel)
         {
             _previousModel = previousModel;
         }
