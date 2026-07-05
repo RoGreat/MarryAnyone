@@ -13,7 +13,7 @@ namespace MarryAnyone
         public override string FormatType => "json2";
 
         [SettingPropertyBool(displayName: "{=bbbbbbb}commoner", Order = 0, RequireRestart = true, HintText = "{=cccccc}")]
-        public bool EnableVillagerRomance { get; set; } = true;
+        public bool EnableCommonerRomance { get; set; } = true;
 
         [SettingPropertyBool(displayName: "{=ddddddd}lord", Order = 10, RequireRestart = true, HintText = "{=eeeeee}")]
         public bool EnableLeaderRomance { get; set; } = true;

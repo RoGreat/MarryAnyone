@@ -33,7 +33,7 @@ namespace MarryAnyone
                 MarriageModel? currentMarriageModel = GetGameModel<MarriageModel>(gameStarter);
                 gameStarter.AddModel(new MarryAnyoneMarriageModel(currentMarriageModel));
 
-                if (Settings.Instance!.EnableVillagerRomance)
+                if (Settings.Instance!.EnableCommonerRomance)
                 {
                     gameStarter.AddBehavior(new CommonerRomanceCampaignBehavior());
                 }
