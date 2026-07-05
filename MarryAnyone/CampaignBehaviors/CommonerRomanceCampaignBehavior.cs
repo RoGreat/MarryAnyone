@@ -118,40 +118,67 @@ namespace MarryAnyone.CampaignBehaviors
 
         private Hero? GetConversationHero()
         {
-            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
-            _createdHeroes.TryGetValue((Agent)conversationAgent, out Hero? conversationHero);
+            Agent conversationAgent;
+            try
+            {
+                conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            }
+            catch
+            {
+                Log.Warning("Failed to cast IAgent to Agent");
+                return null!;
+            }
+            _createdHeroes.TryGetValue(conversationAgent, out Hero? conversationHero);
             return conversationHero;
         }
 
         private bool conversation_player_can_open_courtship_on_condition()
         {
             // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignCheats.CreateRandomClan
-            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            Agent conversationAgent;
+            try
+            {
+                conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            }
+            catch
+            {
+                Log.Warning("Failed to cast IAgent to Agent");
+                return false;
+            }
             if (conversationAgent is null || _courtedAgents.Contains(conversationAgent))
             {
                 return false;
             }
 
-            Hero? conversationHero = null;
-            if (conversationHero is null && !_createdHeroes.ContainsKey((Agent)conversationAgent))
+            Hero? hero = null;
+            if (hero is null && !_createdHeroes.ContainsKey(conversationAgent))
             {
                 Log.Debug("Create Hero");
                 Settlement settlement = Hero.MainHero.CurrentSettlement;
-                conversationHero = HeroCreator.CreateSpecialHero((CharacterObject)((Agent)conversationAgent).Character, settlement, null, null, (int)conversationAgent.Age);
-                conversationHero.StaticBodyProperties = ((Agent)conversationAgent).BodyPropertiesValue.StaticProperties;
-                conversationHero.Weight = ((Agent)conversationAgent).BodyPropertiesValue.DynamicProperties.Weight;
-                conversationHero.Build = ((Agent)conversationAgent).BodyPropertiesValue.DynamicProperties.Build;
-                conversationHero.SetHasMet();
-                _createdHeroes.Add((Agent)conversationAgent, conversationHero);
+                TextObject textObject = NameGenerator.Current.GenerateClanName(settlement.Culture, settlement);
+                Clan clan = Clan.CreateClan("test_clan_" + Clan.All.Count);
+                clan.ChangeClanName(textObject, textObject);
+                hero = HeroCreator.CreateSpecialHero((CharacterObject)conversationAgent.Character, settlement, clan, null, (int)conversationAgent.Age);
+                hero.StaticBodyProperties = conversationAgent.BodyPropertiesValue.StaticProperties;
+                hero.Weight = conversationAgent.BodyPropertiesValue.DynamicProperties.Weight;
+                hero.Build = conversationAgent.BodyPropertiesValue.DynamicProperties.Build;
+                hero.SetNewOccupation(Occupation.Lord);
+                hero.HeroDeveloper.InitializeHeroDeveloper();
+                hero.ChangeState(Hero.CharacterStates.Active);
+                EnterSettlementAction.ApplyForCharacterOnly(hero, settlement);
+                GiveGoldAction.ApplyBetweenCharacters(null, hero, 15000, false);
+                CampaignEventDispatcher.Instance.OnClanCreated(clan, false);
+                hero.SetHasMet();
+                _createdHeroes.Add(conversationAgent, hero);
             }
             else
             {
-                conversationHero = GetConversationHero();
+                hero = GetConversationHero();
             }
 
-            if (conversationHero is not null)
+            if (hero is not null)
             {
-                if (MarriageCourtshipPossibility(Hero.MainHero, conversationHero) && Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.Untested)
+                if (MarriageCourtshipPossibility(Hero.MainHero, hero) && Romance.GetRomanticLevel(Hero.MainHero, hero) == Romance.RomanceLevelEnum.Untested)
                 {
                     if (Hero.MainHero.IsFemale)
                     {
@@ -163,7 +190,7 @@ namespace MarryAnyone.CampaignBehaviors
                     }
                     return true;
                 }
-                if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility || Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
+                if (Romance.GetRomanticLevel(Hero.MainHero, hero) == Romance.RomanceLevelEnum.FailedInCompatibility || Romance.GetRomanticLevel(Hero.MainHero, hero) == Romance.RomanceLevelEnum.FailedInPracticalities)
                 {
                     if (Hero.MainHero.IsFemale)
                     {
@@ -305,8 +332,16 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void courtship_conversation_leave_on_consequence()
         {
-            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
-            _courtedAgents.Add((Agent)conversationAgent);
+            Agent conversationAgent;
+            try
+            {
+                conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
+                _courtedAgents.Add(conversationAgent);
+            }
+            catch
+            {
+                Log.Warning("Failed to cast IAgent to Agent");
+            }
             if (PlayerEncounter.Current is not null)
             {
                 Log.Debug("Leave Encounter");
@@ -319,6 +354,8 @@ namespace MarryAnyone.CampaignBehaviors
             // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignBehaviors
             // CaravansCampaignBehavior
             CampaignBehaviorRomanceDialog(starter, "caravan_companion_talk_start_reply", "lord_pretalk");
+            // CompanionRolesCampaignBehavior
+            CampaignBehaviorRomanceDialog(starter, "hero_main_options", "companion_okay");
             // CraftingCampaignBehavior
             CampaignBehaviorRomanceDialog(starter, "blacksmith_player", "player_blacksmith_after_craft");
             // WorkshopsCharactersCampaignBehavior
