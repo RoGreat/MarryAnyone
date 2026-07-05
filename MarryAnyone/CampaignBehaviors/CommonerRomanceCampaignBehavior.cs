@@ -1,8 +1,5 @@
-using HarmonyLib.BUTR.Extensions;
-
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System;
 
 using TaleWorlds.CampaignSystem.Actions;
@@ -20,26 +17,9 @@ namespace MarryAnyone.CampaignBehaviors
 {
     internal class CommonerRomanceCampaignBehavior : CampaignBehaviorBase
     {
-        private IAgent? _conversationAgent;
+        private readonly List<Agent> _courtedAgents = new();
 
-        private enum RomanceReservationDescription
-        {
-            CompatibilityINeedSomeoneUpright,
-            CompatibilityNeedSomethingInCommon,
-            CompatibiliyINeedSomeoneDangerous,
-            CompatibilityStrongPoliticalBeliefs,
-            AttractionYoureNotMyType,
-            AttractionYoureGoodEnough,
-            AttractionIAmDrawnToYou,
-            PropertyYouSeemRichEnough,
-            PropertyWeNeedToBeComfortable,
-            PropertyIWantRealWealth,
-            PropertyHowCanIMarryAnAdventuress,
-            FamilyApprovalIAmGladYouAreFriendsWithOurFamily,
-            FamilyApprovalYouNeedToBeFriendsWithOurFamily,
-            FamilyApprovalHowCanYouBeEnemiesWithOurFamily,
-            FamilyApprovalItWouldBeBestToBefriendOurFamily
-        }
+        private readonly Dictionary<Agent, Hero> _createdHeroes = new();
 
         public CommonerRomanceCampaignBehavior() { }
 
@@ -62,13 +42,14 @@ namespace MarryAnyone.CampaignBehaviors
 
         private IEnumerable<RomanceReservationDescription> GetRomanceReservations(Hero wooed, Hero wooer)
         {
+            Hero? conversationHero = GetConversationHero();
             List<RomanceReservationDescription> list = new();
             bool flag = wooed.GetTraitLevel(DefaultTraits.Honor) + wooed.GetTraitLevel(DefaultTraits.Mercy) > 0;
             bool flag2 = wooed.GetTraitLevel(DefaultTraits.Honor) < 1 && wooed.GetTraitLevel(DefaultTraits.Valor) < 1 && wooed.GetTraitLevel(DefaultTraits.Calculating) < 1;
             bool flag3 = wooed.GetTraitLevel(DefaultTraits.Calculating) - wooed.GetTraitLevel(DefaultTraits.Mercy) >= 0;
             bool flag4 = wooed.GetTraitLevel(DefaultTraits.Valor) - wooed.GetTraitLevel(DefaultTraits.Calculating) > 0 && wooed.GetTraitLevel(DefaultTraits.Mercy) <= 0;
 
-            if (Hero.OneToOneConversationHero is null)
+            if (conversationHero is null)
             {
                 return list;
             }
@@ -85,7 +66,7 @@ namespace MarryAnyone.CampaignBehaviors
             {
                 list.Add(RomanceReservationDescription.CompatibilityNeedSomethingInCommon);
             }
-            int attractionValuePercentage = Campaign.Current.Models.RomanceModel.GetAttractionValuePercentage(Hero.OneToOneConversationHero, Hero.MainHero);
+            int attractionValuePercentage = Campaign.Current.Models.RomanceModel.GetAttractionValuePercentage(conversationHero, Hero.MainHero);
             if (attractionValuePercentage > 70)
             {
                 list.Add(RomanceReservationDescription.AttractionIAmDrawnToYou);
@@ -115,7 +96,7 @@ namespace MarryAnyone.CampaignBehaviors
             {
                 list.Add(RomanceReservationDescription.PropertyYouSeemRichEnough);
             }
-            float unmodifiedClanLeaderRelationshipWithPlayer = Hero.OneToOneConversationHero.GetUnmodifiedClanLeaderRelationshipWithPlayer();
+            float unmodifiedClanLeaderRelationshipWithPlayer = conversationHero.GetUnmodifiedClanLeaderRelationshipWithPlayer();
             if (unmodifiedClanLeaderRelationshipWithPlayer < -10f)
             {
                 list.Add(RomanceReservationDescription.FamilyApprovalHowCanYouBeEnemiesWithOurFamily);
@@ -135,38 +116,42 @@ namespace MarryAnyone.CampaignBehaviors
             return list;
         }
 
-
-        // butr.github.io/documentation/advanced/switching-from-membertinfo-to-accesstools2/
-        private delegate void SetHeroObjectDelegate(CharacterObject instance, Hero @value);
-        private static readonly SetHeroObjectDelegate? SetHeroObject = AccessTools2.GetPropertySetterDelegate<SetHeroObjectDelegate>(typeof(CharacterObject), "HeroObject") ?? null;
+        private Hero? GetConversationHero()
+        {
+            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            _createdHeroes.TryGetValue((Agent)conversationAgent, out Hero? conversationHero);
+            return conversationHero;
+        }
 
         private bool conversation_player_can_open_courtship_on_condition()
         {
             // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignCheats.CreateRandomClan
-
-            _conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
-            if (_conversationAgent is not null && Hero.OneToOneConversationHero is null)
+            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            if (conversationAgent is null || _courtedAgents.Contains(conversationAgent))
             {
-                Log.Debug("Create Hero from Agent");
-                Settlement settlement = Hero.MainHero.CurrentSettlement;
-                Hero conversationHero = HeroCreator.CreateSpecialHero((CharacterObject)((Agent)_conversationAgent).Character, settlement, null, null, (int)conversationAgent.Age);
-                conversationHero.StaticBodyProperties = ((Agent)_conversationAgent).BodyPropertiesValue.StaticProperties;
-                conversationHero.Weight = ((Agent)_conversationAgent).BodyPropertiesValue.DynamicProperties.Weight;
-                conversationHero.Build = ((Agent)_conversationAgent).BodyPropertiesValue.DynamicProperties.Build;
-                if (SetHeroObject is not null)
-                {
-                    SetHeroObject((CharacterObject)((Agent)_conversationAgent).Character, conversationHero);
-                }
-                else
-                {
-                    Log.Warning("`HeroObject` not found");
-                }
+                return false;
             }
 
-            if (Hero.OneToOneConversationHero is not null)
+            Hero? conversationHero = null;
+            if (conversationHero is null && !_createdHeroes.ContainsKey((Agent)conversationAgent))
             {
-                Log.Debug(MethodBase.GetCurrentMethod().Name);
-                if (MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero) && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.Untested)
+                Log.Debug("Create Hero");
+                Settlement settlement = Hero.MainHero.CurrentSettlement;
+                conversationHero = HeroCreator.CreateSpecialHero((CharacterObject)((Agent)conversationAgent).Character, settlement, null, null, (int)conversationAgent.Age);
+                conversationHero.StaticBodyProperties = ((Agent)conversationAgent).BodyPropertiesValue.StaticProperties;
+                conversationHero.Weight = ((Agent)conversationAgent).BodyPropertiesValue.DynamicProperties.Weight;
+                conversationHero.Build = ((Agent)conversationAgent).BodyPropertiesValue.DynamicProperties.Build;
+                conversationHero.SetHasMet();
+                _createdHeroes.Add((Agent)conversationAgent, conversationHero);
+            }
+            else
+            {
+                conversationHero = GetConversationHero();
+            }
+
+            if (conversationHero is not null)
+            {
+                if (MarriageCourtshipPossibility(Hero.MainHero, conversationHero) && Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.Untested)
                 {
                     if (Hero.MainHero.IsFemale)
                     {
@@ -178,7 +163,7 @@ namespace MarryAnyone.CampaignBehaviors
                     }
                     return true;
                 }
-                if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility || Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
+                if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility || Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
                 {
                     if (Hero.MainHero.IsFemale)
                     {
@@ -197,20 +182,20 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void conversation_player_opens_courtship_on_consequence()
         {
-            Log.Debug(MethodBase.GetCurrentMethod().Name);
-            if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) != Romance.RomanceLevelEnum.FailedInCompatibility && Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) != Romance.RomanceLevelEnum.FailedInPracticalities)
+            Hero? conversationHero = GetConversationHero();
+            if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) != Romance.RomanceLevelEnum.FailedInCompatibility && Romance.GetRomanticLevel(Hero.MainHero, conversationHero) != Romance.RomanceLevelEnum.FailedInPracticalities)
             {
-                ChangeRomanticStateAction.Apply(Hero.MainHero, Hero.OneToOneConversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
+                ChangeRomanticStateAction.Apply(Hero.MainHero, conversationHero, Romance.RomanceLevelEnum.CourtshipStarted);
             }
         }
 
         private bool conversation_courtship_initial_reaction_on_condition()
         {
-            Log.Debug(MethodBase.GetCurrentMethod().Name);
-            if (Hero.OneToOneConversationHero is not null)
+            Hero? conversationHero = GetConversationHero();
+            if (conversationHero is not null)
             {
-                IEnumerable<RomanceReservationDescription> romanceReservations = GetRomanceReservations(Hero.OneToOneConversationHero, Hero.MainHero);
-                if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities || Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility)
+                IEnumerable<RomanceReservationDescription> romanceReservations = GetRomanceReservations(conversationHero, Hero.MainHero);
+                if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities || Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility)
                 {
                     return false;
                 }
@@ -222,15 +207,15 @@ namespace MarryAnyone.CampaignBehaviors
 
         private bool conversation_courtship_decline_reaction_to_player_on_condition()
         {
-            Log.Debug(MethodBase.GetCurrentMethod().Name);
-            if (Hero.OneToOneConversationHero is not null)
+            Hero? conversationHero = GetConversationHero();
+            if (conversationHero is not null)
             {
-                if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
+                if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
                 {
                     MBTextManager.SetTextVariable("COURTSHIP_DECLINE_REACTION", "{=emLBsWj6}I am terribly sorry. It is practically not possible for us to be married.", false);
                     return true;
                 }
-                if (Romance.GetRomanticLevel(Hero.MainHero, Hero.OneToOneConversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility)
+                if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility)
                 {
                     MBTextManager.SetTextVariable("COURTSHIP_DECLINE_REACTION", "{=s7idfhBO}I am terribly sorry. We are not really compatible with each other.", false);
                     return true;
@@ -242,17 +227,21 @@ namespace MarryAnyone.CampaignBehaviors
 
         private bool conversation_player_eligible_for_marriage_with_conversation_hero_on_condition()
         {
-            Log.Debug(MethodBase.GetCurrentMethod().Name);
-            return Hero.MainHero.Spouse == null && Hero.OneToOneConversationHero != null && MarriageCourtshipPossibility(Hero.MainHero, Hero.OneToOneConversationHero);
+            Hero? conversationHero = GetConversationHero();
+            return Hero.MainHero.Spouse is null && conversationHero is not null && MarriageCourtshipPossibility(Hero.MainHero, conversationHero);
         }
 
         private bool conversation_courtship_reaction_to_player_on_condition()
         {
-            Log.Debug(MethodBase.GetCurrentMethod().Name);
-            IEnumerable<RomanceReservationDescription> romanceReservations = GetRomanceReservations(Hero.OneToOneConversationHero, Hero.MainHero);
-            bool flag = Hero.OneToOneConversationHero.GetTraitLevel(DefaultTraits.Generosity) + Hero.OneToOneConversationHero.GetTraitLevel(DefaultTraits.Mercy) > 0;
-            TraitObject persona = Hero.OneToOneConversationHero.CharacterObject.GetPersona();
-            bool flag2 = ConversationTagHelper.UsesHighRegister(Hero.OneToOneConversationHero.CharacterObject);
+            Hero? conversationHero = GetConversationHero();
+            if (conversationHero is null)
+            {
+                return false;
+            }
+            IEnumerable<RomanceReservationDescription> romanceReservations = GetRomanceReservations(conversationHero, Hero.MainHero);
+            bool flag = conversationHero.GetTraitLevel(DefaultTraits.Generosity) + conversationHero.GetTraitLevel(DefaultTraits.Mercy) > 0;
+            TraitObject persona = conversationHero.CharacterObject.GetPersona();
+            bool flag2 = ConversationTagHelper.UsesHighRegister(conversationHero.CharacterObject);
             if (Enumerable.Any(romanceReservations, x => x == RomanceReservationDescription.AttractionIAmDrawnToYou))
             {
                 if (persona == DefaultTraits.PersonaIronic && flag2)
@@ -316,19 +305,11 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void courtship_conversation_leave_on_consequence()
         {
-            Log.Debug(MethodBase.GetCurrentMethod().Name);
-
-            if (SetHeroObject is not null)
+            IAgent conversationAgent = Campaign.Current.ConversationManager.OneToOneConversationAgent;
+            _courtedAgents.Add((Agent)conversationAgent);
+            if (PlayerEncounter.Current is not null)
             {
-                SetHeroObject(CharacterObject.OneToOneConversationCharacter, null!);
-            }
-            else
-            {
-                Log.Warning("`HeroObject` not found");
-            }
-
-            if (PlayerEncounter.Current != null)
-            {
+                Log.Debug("Leave Encounter");
                 PlayerEncounter.LeaveEncounter = true;
             }
         }
@@ -378,6 +359,25 @@ namespace MarryAnyone.CampaignBehaviors
             starter.AddDialogLine(input + "lord_start_courtship_response_2", input + "lord_start_courtship_response_2", input + "lord_start_courtship_response_3", "{=!}{INITIAL_COURTSHIP_REACTION_TO_PLAYER}", new ConversationSentence.OnConditionDelegate(conversation_courtship_reaction_to_player_on_condition), null, 100, null);
             starter.AddDialogLine(input + "lord_start_courtship_response_3", input + "lord_start_courtship_response_3", "close_window", "{=YHZsHohq}We meet from time to time, as is the custom, to see if we are right for each other. I hope to see you again soon.", null, new ConversationSentence.OnConsequenceDelegate(courtship_conversation_leave_on_consequence), 100, null);
             // Clan
+        }
+
+        private enum RomanceReservationDescription
+        {
+            CompatibilityINeedSomeoneUpright,
+            CompatibilityNeedSomethingInCommon,
+            CompatibiliyINeedSomeoneDangerous,
+            CompatibilityStrongPoliticalBeliefs,
+            AttractionYoureNotMyType,
+            AttractionYoureGoodEnough,
+            AttractionIAmDrawnToYou,
+            PropertyYouSeemRichEnough,
+            PropertyWeNeedToBeComfortable,
+            PropertyIWantRealWealth,
+            PropertyHowCanIMarryAnAdventuress,
+            FamilyApprovalIAmGladYouAreFriendsWithOurFamily,
+            FamilyApprovalYouNeedToBeFriendsWithOurFamily,
+            FamilyApprovalHowCanYouBeEnemiesWithOurFamily,
+            FamilyApprovalItWouldBeBestToBefriendOurFamily
         }
     }
 }
