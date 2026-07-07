@@ -35,7 +35,7 @@ namespace MarryAnyone.CampaignBehaviors
             AddDialogs(campaignGameStarter);
         }
 
-        private bool MarriageCourtshipPossibility(Hero person1, Hero person2)
+        private static bool MarriageCourtshipPossibility(Hero person1, Hero person2)
         {
             return Campaign.Current.Models.MarriageModel.IsCoupleSuitableForMarriage(person1, person2) && !FactionManager.IsAtWarAgainstFaction(person1.MapFaction, person2.MapFaction);
         }
@@ -118,6 +118,31 @@ namespace MarryAnyone.CampaignBehaviors
 
         private Hero? GetConversationHero()
         {
+            Agent? agent = GetConversationAgent();
+            if (agent is null)
+            {
+                return null;
+            }
+            _createdHeroes.TryGetValue(agent, out Hero? conversationHero);
+            return conversationHero;
+        }
+
+        private static bool IsCommoner()
+        {
+            Agent? agent = GetConversationAgent();
+            if (agent is null)
+            {
+                return false;
+            }
+            if (((CharacterObject)agent.Character).Occupation != Occupation.Lord)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private static Agent? GetConversationAgent()
+        {
             Agent conversationAgent;
             try
             {
@@ -125,90 +150,91 @@ namespace MarryAnyone.CampaignBehaviors
             }
             catch
             {
-                Log.Warning("Failed to cast IAgent to Agent");
-                return null!;
+                Log.Warning("Failed to get Agent");
+                return null;
             }
-            _createdHeroes.TryGetValue(conversationAgent, out Hero? conversationHero);
-            return conversationHero;
+            return conversationAgent;
         }
 
         private bool conversation_player_can_open_courtship_on_condition()
         {
             // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignCheats.CreateRandomClan
-            Agent conversationAgent;
-            try
+            Agent? conversationAgent = GetConversationAgent();
+            if (conversationAgent is null || !IsCommoner() || _courtedAgents.Contains(conversationAgent))
             {
-                conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
-            }
-            catch
-            {
-                Log.Warning("Failed to cast IAgent to Agent");
-                return false;
-            }
-            if (conversationAgent is null || _courtedAgents.Contains(conversationAgent))
-            {
+                Log.Debug("conversation_player_can_open_courtship_on_condition -> false");
                 return false;
             }
 
-            Hero? hero = null;
-            if (hero is null && !_createdHeroes.ContainsKey(conversationAgent))
+            Hero? conversationHero = null;
+            if (conversationHero is null && !_createdHeroes.ContainsKey(conversationAgent))
             {
                 Log.Debug("Create Hero");
                 Settlement settlement = Hero.MainHero.CurrentSettlement;
                 TextObject textObject = NameGenerator.Current.GenerateClanName(settlement.Culture, settlement);
                 Clan clan = Clan.CreateClan("test_clan_" + Clan.All.Count);
                 clan.ChangeClanName(textObject, textObject);
-                hero = HeroCreator.CreateSpecialHero((CharacterObject)conversationAgent.Character, settlement, clan, null, (int)conversationAgent.Age);
-                hero.StaticBodyProperties = conversationAgent.BodyPropertiesValue.StaticProperties;
-                hero.Weight = conversationAgent.BodyPropertiesValue.DynamicProperties.Weight;
-                hero.Build = conversationAgent.BodyPropertiesValue.DynamicProperties.Build;
-                hero.SetNewOccupation(Occupation.Lord);
-                hero.HeroDeveloper.InitializeHeroDeveloper();
-                hero.ChangeState(Hero.CharacterStates.Active);
-                EnterSettlementAction.ApplyForCharacterOnly(hero, settlement);
-                GiveGoldAction.ApplyBetweenCharacters(null, hero, 15000, false);
+                clan.Culture = settlement.Culture;
+                clan.Banner = Banner.CreateRandomClanBanner(-1);
+                clan.SetInitialHomeSettlement(settlement);
+                CharacterObject characterObject = (CharacterObject)conversationAgent.Character;
+                conversationHero = HeroCreator.CreateSpecialHero(characterObject, settlement, clan, null, (int)conversationAgent.Age);
+                conversationHero.StaticBodyProperties = conversationAgent.BodyPropertiesValue.StaticProperties;
+                conversationHero.Weight = conversationAgent.BodyPropertiesValue.DynamicProperties.Weight;
+                conversationHero.Build = conversationAgent.BodyPropertiesValue.DynamicProperties.Build;
+                conversationHero.SetNewOccupation(Occupation.Lord);
+                conversationHero.HeroDeveloper.InitializeHeroDeveloper();
+                conversationHero.ChangeState(Hero.CharacterStates.Active);
+                // clan.SetLeader(conversationHero);
+                EnterSettlementAction.ApplyForCharacterOnly(conversationHero, settlement);
+                GiveGoldAction.ApplyBetweenCharacters(null, conversationHero, 15000, false);
                 CampaignEventDispatcher.Instance.OnClanCreated(clan, false);
-                hero.SetHasMet();
-                _createdHeroes.Add(conversationAgent, hero);
+                conversationHero.SetHasMet();
+                _createdHeroes.Add(conversationAgent, conversationHero);
             }
             else
             {
-                hero = GetConversationHero();
+                conversationHero = GetConversationHero();
             }
 
-            if (hero is not null)
+            if (conversationHero is null)
             {
-                if (MarriageCourtshipPossibility(Hero.MainHero, hero) && Romance.GetRomanticLevel(Hero.MainHero, hero) == Romance.RomanceLevelEnum.Untested)
-                {
-                    if (Hero.MainHero.IsFemale)
-                    {
-                        MBTextManager.SetTextVariable("FLIRTATION_LINE", "{=bjJs0eeB}My lord, I note that you have not yet taken a wife.", false);
-                    }
-                    else
-                    {
-                        MBTextManager.SetTextVariable("FLIRTATION_LINE", "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer.", false);
-                    }
-                    return true;
-                }
-                if (Romance.GetRomanticLevel(Hero.MainHero, hero) == Romance.RomanceLevelEnum.FailedInCompatibility || Romance.GetRomanticLevel(Hero.MainHero, hero) == Romance.RomanceLevelEnum.FailedInPracticalities)
-                {
-                    if (Hero.MainHero.IsFemale)
-                    {
-                        MBTextManager.SetTextVariable("FLIRTATION_LINE", "{=2WnhUBMM}My lord, may you give me another chance to prove myself?", false);
-                    }
-                    else
-                    {
-                        MBTextManager.SetTextVariable("FLIRTATION_LINE", "{=4iTaEZKg}My lady, may you give me another chance to prove myself?", false);
-                    }
-                    return true;
-                }
+                Log.Debug("conversation_player_can_open_courtship_on_condition -> false");
                 return false;
             }
+            if (MarriageCourtshipPossibility(Hero.MainHero, conversationHero) && Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.Untested)
+            {
+                if (Hero.MainHero.IsFemale)
+                {
+                    MBTextManager.SetTextVariable("FLIRTATION_LINE", "{=bjJs0eeB}My lord, I note that you have not yet taken a wife.", false);
+                }
+                else
+                {
+                    MBTextManager.SetTextVariable("FLIRTATION_LINE", "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer.", false);
+                }
+                Log.Debug("conversation_player_can_open_courtship_on_condition -> true");
+                return true;
+            }
+            if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility || Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
+            {
+                if (Hero.MainHero.IsFemale)
+                {
+                    MBTextManager.SetTextVariable("FLIRTATION_LINE", "{=2WnhUBMM}My lord, may you give me another chance to prove myself?", false);
+                }
+                else
+                {
+                    MBTextManager.SetTextVariable("FLIRTATION_LINE", "{=4iTaEZKg}My lady, may you give me another chance to prove myself?", false);
+                }
+                Log.Debug("conversation_player_can_open_courtship_on_condition -> true");
+                return true;
+            }
+            Log.Debug("conversation_player_can_open_courtship_on_condition -> false");
             return false;
         }
 
         private void conversation_player_opens_courtship_on_consequence()
         {
+            Log.Debug("conversation_player_opens_courtship_on_consequence");
             Hero? conversationHero = GetConversationHero();
             if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) != Romance.RomanceLevelEnum.FailedInCompatibility && Romance.GetRomanticLevel(Hero.MainHero, conversationHero) != Romance.RomanceLevelEnum.FailedInPracticalities)
             {
@@ -219,50 +245,65 @@ namespace MarryAnyone.CampaignBehaviors
         private bool conversation_courtship_initial_reaction_on_condition()
         {
             Hero? conversationHero = GetConversationHero();
-            if (conversationHero is not null)
+            if (conversationHero is null || !IsCommoner())
             {
-                IEnumerable<RomanceReservationDescription> romanceReservations = GetRomanceReservations(conversationHero, Hero.MainHero);
-                if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities || Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility)
-                {
-                    return false;
-                }
-                MBTextManager.SetTextVariable("INITIAL_COURTSHIP_REACTION", Enumerable.Any(romanceReservations, x => x == RomanceReservationDescription.AttractionIAmDrawnToYou) ? "{=WEkjz9tg}Ah! Yes... We are considering offers... Did you have someone in mind?" : "{=KdhnBhZ1}Yes, we are considering offers. These things are not rushed into.", false);
-                return true;
+                Log.Debug("conversation_courtship_initial_reaction_on_condition -> false");
+                return false;
             }
-            return false;
+            IEnumerable<RomanceReservationDescription> romanceReservations = GetRomanceReservations(conversationHero, Hero.MainHero);
+            if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities || Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility)
+            {
+                Log.Debug("conversation_courtship_initial_reaction_on_condition -> false");
+                return false;
+            }
+            MBTextManager.SetTextVariable("INITIAL_COURTSHIP_REACTION", Enumerable.Any(romanceReservations, x => x == RomanceReservationDescription.AttractionIAmDrawnToYou) ? "{=WEkjz9tg}Ah! Yes... We are considering offers... Did you have someone in mind?" : "{=KdhnBhZ1}Yes, we are considering offers. These things are not rushed into.", false);
+            Log.Debug("conversation_courtship_initial_reaction_on_condition -> true");
+            return true;
         }
 
         private bool conversation_courtship_decline_reaction_to_player_on_condition()
         {
             Hero? conversationHero = GetConversationHero();
-            if (conversationHero is not null)
+            if (conversationHero is null || !IsCommoner())
             {
-                if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
-                {
-                    MBTextManager.SetTextVariable("COURTSHIP_DECLINE_REACTION", "{=emLBsWj6}I am terribly sorry. It is practically not possible for us to be married.", false);
-                    return true;
-                }
-                if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility)
-                {
-                    MBTextManager.SetTextVariable("COURTSHIP_DECLINE_REACTION", "{=s7idfhBO}I am terribly sorry. We are not really compatible with each other.", false);
-                    return true;
-                }
+                Log.Debug("conversation_courtship_decline_reaction_to_player_on_condition -> false");
                 return false;
             }
+            if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
+            {
+                MBTextManager.SetTextVariable("COURTSHIP_DECLINE_REACTION", "{=emLBsWj6}I am terribly sorry. It is practically not possible for us to be married.", false);
+                Log.Debug("conversation_courtship_decline_reaction_to_player_on_condition -> true");
+                return true;
+            }
+            if (Romance.GetRomanticLevel(Hero.MainHero, conversationHero) == Romance.RomanceLevelEnum.FailedInCompatibility)
+            {
+                MBTextManager.SetTextVariable("COURTSHIP_DECLINE_REACTION", "{=s7idfhBO}I am terribly sorry. We are not really compatible with each other.", false);
+                Log.Debug("conversation_courtship_decline_reaction_to_player_on_condition -> true");
+                return true;
+            }
+            Log.Debug("conversation_courtship_decline_reaction_to_player_on_condition -> false");
             return false;
         }
 
         private bool conversation_player_eligible_for_marriage_with_conversation_hero_on_condition()
         {
             Hero? conversationHero = GetConversationHero();
-            return Hero.MainHero.Spouse is null && conversationHero is not null && MarriageCourtshipPossibility(Hero.MainHero, conversationHero);
+            if (conversationHero is null || !IsCommoner())
+            {
+                Log.Debug("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition -> false");
+                return false;
+            }
+            bool result = Hero.MainHero.Spouse is null && conversationHero is not null && MarriageCourtshipPossibility(Hero.MainHero, conversationHero);
+            Log.Debug("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition -> " + result);
+            return result;
         }
 
         private bool conversation_courtship_reaction_to_player_on_condition()
         {
             Hero? conversationHero = GetConversationHero();
-            if (conversationHero is null)
+            if (conversationHero is null || !IsCommoner())
             {
+                Log.Debug("conversation_courtship_reaction_to_player_on_condition -> false");
                 return false;
             }
             IEnumerable<RomanceReservationDescription> romanceReservations = GetRomanceReservations(conversationHero, Hero.MainHero);
@@ -303,6 +344,7 @@ namespace MarryAnyone.CampaignBehaviors
                     if (Enumerable.Any(romanceReservations, x => x == RomanceReservationDescription.PropertyIWantRealWealth || x == RomanceReservationDescription.PropertyWeNeedToBeComfortable))
                     {
                         MBTextManager.SetTextVariable("INITIAL_COURTSHIP_REACTION_TO_PLAYER", "{=P407baEa}I think you would need to rise considerably in the world before I could consider such a thing...", false);
+                        Log.Debug("conversation_courtship_reaction_to_player_on_condition -> true");
                         return true;
                     }
                 }
@@ -311,6 +353,7 @@ namespace MarryAnyone.CampaignBehaviors
                     if (Enumerable.Any(romanceReservations, x => x == RomanceReservationDescription.PropertyIWantRealWealth))
                     {
                         MBTextManager.SetTextVariable("INITIAL_COURTSHIP_REACTION_TO_PLAYER", "{=gS1noLvf}I do not know whether to find that charming or impertinent...", false);
+                        Log.Debug("conversation_courtship_reaction_to_player_on_condition -> true");
                         return true;
                     }
                 }
@@ -327,26 +370,23 @@ namespace MarryAnyone.CampaignBehaviors
                     MBTextManager.SetTextVariable("INITIAL_COURTSHIP_REACTION_TO_PLAYER", "{=VYmQmqIv}We are considering many offers. You may certainly add your name to the list.", false);
                 }
             }
+            Log.Debug("conversation_courtship_reaction_to_player_on_condition -> true");
             return true;
         }
 
         private void courtship_conversation_leave_on_consequence()
         {
-            Agent conversationAgent;
-            try
+            Agent? conversationAgent = GetConversationAgent();
+            if (conversationAgent is not null)
             {
-                conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
                 _courtedAgents.Add(conversationAgent);
-            }
-            catch
-            {
-                Log.Warning("Failed to cast IAgent to Agent");
             }
             if (PlayerEncounter.Current is not null)
             {
                 Log.Debug("Leave Encounter");
                 PlayerEncounter.LeaveEncounter = true;
             }
+            Log.Debug("courtship_conversation_leave_on_consequence");
         }
 
         protected void AddDialogs(CampaignGameStarter starter)
