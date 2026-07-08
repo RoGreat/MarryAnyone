@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+
+using TaleWorlds.CampaignSystem.CampaignBehaviors;
 using TaleWorlds.CampaignSystem.ComponentInterfaces;
+using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone.Models
@@ -15,7 +18,11 @@ namespace MarryAnyone.Models
 
         public override bool IsCoupleSuitableForMarriage(Hero firstHero, Hero secondHero)
         {
-            if (!Settings.Instance!.EnableLeaderRomance && !(firstHero == Hero.MainHero || secondHero == Hero.MainHero))
+            if (firstHero != Hero.MainHero && secondHero != Hero.MainHero)
+            {
+                return _previousModel?.IsCoupleSuitableForMarriage(firstHero, secondHero) ?? default;
+            }
+            if (!Settings.Instance!.EnableLeaderRomance)
             {
                 Clan clan = firstHero.Clan;
                 if (clan?.Leader == firstHero)
@@ -67,7 +74,39 @@ namespace MarryAnyone.Models
 
         public override Clan GetClanAfterMarriage(Hero firstHero, Hero secondHero) => _previousModel?.GetClanAfterMarriage(firstHero, secondHero) ?? Clan.PlayerClan;
 
-        public override bool IsSuitableForMarriage(Hero hero) => _previousModel?.IsSuitableForMarriage(hero) ?? default;
+        public override bool IsSuitableForMarriage(Hero maidenOrSuitor)
+        {
+            if (!maidenOrSuitor.IsActive || maidenOrSuitor.Spouse is not null || maidenOrSuitor.IsTemplate)
+            {
+                return false;
+            }
+            if (!Settings.Instance!.EnableCommonerRomance)
+            {
+                if (!maidenOrSuitor.IsLord || maidenOrSuitor.IsMinorFactionHero || maidenOrSuitor.IsNotable)
+                {
+                    return false;
+                }
+            }
+            MobileParty partyBelongedTo = maidenOrSuitor.PartyBelongedTo;
+            if (partyBelongedTo?.MapEvent is null)
+            {
+                MobileParty partyBelongedTo2 = maidenOrSuitor.PartyBelongedTo;
+                if (partyBelongedTo2?.Army is null)
+                {
+                    IMarriageOfferCampaignBehavior campaignBehavior = Campaign.Current.GetCampaignBehavior<IMarriageOfferCampaignBehavior>();
+                    if (campaignBehavior is not null && campaignBehavior.IsHeroEngaged(maidenOrSuitor))
+                    {
+                        return false;
+                    }
+                    if (maidenOrSuitor.IsFemale)
+                    {
+                        return maidenOrSuitor.CharacterObject.Age >= MinimumMarriageAgeFemale;
+                    }
+                    return maidenOrSuitor.CharacterObject.Age >= MinimumMarriageAgeMale;
+                }
+            }
+            return false;
+        }
 
         public override bool IsClanSuitableForMarriage(Clan clan) => _previousModel?.IsClanSuitableForMarriage(clan) ?? default;
 
