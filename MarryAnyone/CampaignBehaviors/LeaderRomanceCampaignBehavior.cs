@@ -1,10 +1,27 @@
-using TaleWorlds.CampaignSystem.CampaignBehaviors;
+using System;
+using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone.CampaignBehaviors
 {
-    internal class LeaderRomanceCampaignBehavior : RomanceCampaignBehavior
+    internal class LeaderRomanceCampaignBehavior : CampaignBehaviorBase
     {
         public LeaderRomanceCampaignBehavior()
+        {
+        }
+
+        public override void RegisterEvents()
+        {
+            CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, new Action<CampaignGameStarter>(OnSessionLaunched));
+        }
+
+        public override void SyncData(IDataStore dataStore) { }
+
+        public void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
+        {
+            AddDialogs(campaignGameStarter);
+        }
+
+        protected void AddDialogs(CampaignGameStarter starter)
         {
         }
     }
