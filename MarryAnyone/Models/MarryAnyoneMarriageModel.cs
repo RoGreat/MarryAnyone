@@ -22,7 +22,7 @@ namespace MarryAnyone.Models
             {
                 return _previousModel?.IsCoupleSuitableForMarriage(firstHero, secondHero) ?? default;
             }
-            if (!Settings.Instance!.EnableLeaderRomance)
+            if (!Settings.Instance!.EnableLeaderRomance && firstHero.Occupation == Occupation.Lord && secondHero.Occupation == Occupation.Lord)
             {
                 Clan clan = firstHero.Clan;
                 if (clan?.Leader == firstHero)
