@@ -174,7 +174,7 @@ namespace MarryAnyone.CampaignBehaviors
                 createdHero.Weight = conversationAgent.BodyPropertiesValue.DynamicProperties.Weight;
                 createdHero.Build = conversationAgent.BodyPropertiesValue.DynamicProperties.Build;
                 createdHero.HeroDeveloper.InitializeHeroDeveloper();
-                createdHero.SetNewOccupation(Occupation.Special);
+                createdHero.SetNewOccupation(Occupation.Wanderer);
                 createdHero.ChangeState(Hero.CharacterStates.Active);
                 clan.SetLeader(createdHero);
                 EnterSettlementAction.ApplyForCharacterOnly(createdHero, settlement);
