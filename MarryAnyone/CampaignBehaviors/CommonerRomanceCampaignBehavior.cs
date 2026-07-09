@@ -144,17 +144,7 @@ namespace MarryAnyone.CampaignBehaviors
 
         private static Agent? GetConversationAgent()
         {
-            Agent conversationAgent;
-            try
-            {
-                conversationAgent = (Agent)Campaign.Current.ConversationManager.OneToOneConversationAgent;
-            }
-            catch
-            {
-                Log.Warning("Failed to get Agent");
-                return null;
-            }
-            return conversationAgent;
+            return Campaign.Current.ConversationManager.OneToOneConversationAgent as Agent;
         }
 
         private bool conversation_player_can_open_courtship_on_condition()
