@@ -33,6 +33,9 @@ namespace MarryAnyone
                 MarriageModel? currentMarriageModel = GetGameModel<MarriageModel>(gameStarter);
                 gameStarter.AddModel(new MarryAnyoneMarriageModel(currentMarriageModel));
 
+                HeroAgentLocationModel? currentHeroAgentLocationModel = GetGameModel<HeroAgentLocationModel>(gameStarter);
+                gameStarter.AddModel(new MarryAnyoneHeroAgentLocationModel(currentHeroAgentLocationModel));
+
                 if (Settings.Instance!.EnableCommonerRomance)
                 {
                     gameStarter.AddBehavior(new CommonerRomanceCampaignBehavior());

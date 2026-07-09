@@ -12,9 +12,6 @@ using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
-using TaleWorlds.CampaignSystem.Settlements.Locations;
-using TaleWorlds.CampaignSystem.ComponentInterfaces;
-using TaleWorlds.CampaignSystem.Party;
 
 namespace MarryAnyone.CampaignBehaviors
 {
@@ -24,10 +21,6 @@ namespace MarryAnyone.CampaignBehaviors
 
         private readonly Dictionary<Agent, Hero> _createdHeroes = new();
 
-        private Location? _locationOfConversation = null;
-
-        private string? _specialTargetTag = null;
-
         public CommonerRomanceCampaignBehavior() { }
 
         public override void SyncData(IDataStore dataStore) { }
@@ -35,26 +28,11 @@ namespace MarryAnyone.CampaignBehaviors
         public override void RegisterEvents()
         {
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, new Action<CampaignGameStarter>(OnSessionLaunched));
-            CampaignEvents.OnSettlementLeftEvent.AddNonSerializedListener(this, new Action<MobileParty, Settlement>(OnSettlementLeft));
         }
 
         private void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
             AddDialogs(campaignGameStarter);
-        }
-
-        private void OnSettlementLeft(MobileParty party, Settlement settlement)
-        {
-            foreach (KeyValuePair<Agent, Hero> hero in _createdHeroes)
-            {
-                LocationCharacter locationCharacterOfHero = settlement.LocationComplex.GetLocationCharacterOfHero(hero.Value);
-                locationCharacterOfHero.SpecialTargetTag = _specialTargetTag;
-                _locationOfConversation?.AddCharacter(locationCharacterOfHero);
-                Log.Debug(hero.Value.GetName().ToString());
-            }
-            _createdHeroes.Clear();
-            _locationOfConversation = null;
-            _specialTargetTag = null;
         }
 
         private static bool MarriageCourtshipPossibility(Hero person1, Hero person2)
@@ -212,8 +190,8 @@ namespace MarryAnyone.CampaignBehaviors
                 GiveGoldAction.ApplyBetweenCharacters(null, hero, MBRandom.RandomInt(0, 1000), false);
                 // CampaignEventDispatcher.Instance.OnClanCreated(clan, false);
                 hero.SetHasMet();
-                _locationOfConversation = CampaignMission.Current.Location;
-                _specialTargetTag = settlement.LocationComplex.GetFirstLocationCharacterOfCharacter((CharacterObject)conversationAgent.Character).SpecialTargetTag;
+                string conversationAgentSpecialTargetTag = settlement.LocationComplex.GetFirstLocationCharacterOfCharacter((CharacterObject)conversationAgent.Character).SpecialTargetTag;
+                settlement.LocationComplex.GetLocationCharacterOfHero(hero).SpecialTargetTag = conversationAgentSpecialTargetTag;
                 // LocationCharacter locationCharacterOfHero = settlement.LocationComplex.GetLocationCharacterOfHero(hero);
                 // LocationCharacter locationCharacterOfConversationAgent = settlement.LocationComplex.GetFirstLocationCharacterOfCharacter((CharacterObject)conversationAgent.Character);
                 // Location currentLocation = CampaignMission.Current.Location;
