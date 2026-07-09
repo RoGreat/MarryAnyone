@@ -168,13 +168,14 @@ namespace MarryAnyone.CampaignBehaviors
                 newHero.Weight = conversationAgent.BodyPropertiesValue.DynamicProperties.Weight;
                 newHero.Build = conversationAgent.BodyPropertiesValue.DynamicProperties.Build;
                 newHero.HeroDeveloper.InitializeHeroDeveloper();
+                newHero.SetNewOccupation(Occupation.Special);
                 newHero.ChangeState(Hero.CharacterStates.Active);
                 EnterSettlementAction.ApplyForCharacterOnly(newHero, settlement);
                 GiveGoldAction.ApplyBetweenCharacters(null, newHero, MBRandom.RandomInt(0, 1000), false);
                 newHero.SetHasMet();
-                LocationCharacter locationCharacterOfHero = settlement.LocationComplex.GetLocationCharacterOfHero(newHero);
-                LocationCharacter locationCharacterOfConversationAgent = settlement.LocationComplex.GetFirstLocationCharacterOfCharacter((CharacterObject)conversationAgent.Character);
-                locationCharacterOfHero.SpecialTargetTag = locationCharacterOfConversationAgent.SpecialTargetTag;
+                // LocationCharacter locationCharacterOfHero = settlement.LocationComplex.GetLocationCharacterOfHero(newHero);
+                // LocationCharacter locationCharacterOfConversationAgent = settlement.LocationComplex.GetFirstLocationCharacterOfCharacter((CharacterObject)conversationAgent.Character);
+                // locationCharacterOfHero.SpecialTargetTag = locationCharacterOfConversationAgent.SpecialTargetTag;
                 _createdHeroes.Add(conversationAgent, newHero);
             }
 
