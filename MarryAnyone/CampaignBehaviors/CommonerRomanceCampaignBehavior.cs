@@ -9,7 +9,6 @@ using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Conversation.Tags;
 using TaleWorlds.CampaignSystem.Encounters;
 using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.CampaignSystem.Settlements.Locations;
 using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
@@ -153,14 +152,12 @@ namespace MarryAnyone.CampaignBehaviors
             Agent? conversationAgent = GetConversationAgent();
             if (conversationAgent is null || !IsCommoner() || _courtedAgents.Contains(conversationAgent))
             {
-                Log.Debug("conversation_player_can_open_courtship_on_condition -> False");
                 return false;
             }
 
             Hero? createdHero = GetCreatedHero();
             if (!conversationAgent.IsHero && createdHero is null && !_createdHeroes.ContainsKey(conversationAgent))
             {
-                Log.Debug("Create Hero");
                 Settlement settlement = Hero.MainHero.CurrentSettlement;
                 TextObject textObject = NameGenerator.Current.GenerateClanName(settlement.Culture, settlement);
                 Clan clan = Clan.CreateClan("test_clan_" + Clan.All.Count);
@@ -186,7 +183,6 @@ namespace MarryAnyone.CampaignBehaviors
 
             if (createdHero is null)
             {
-                Log.Debug("conversation_player_can_open_courtship_on_condition -> False");
                 return false;
             }
             if (MarriageCourtshipPossibility(Hero.MainHero, createdHero) && Romance.GetRomanticLevel(Hero.MainHero, createdHero) == Romance.RomanceLevelEnum.Untested)
@@ -199,7 +195,6 @@ namespace MarryAnyone.CampaignBehaviors
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE", "{=v1hC6Aem}My lady, I wish to profess myself your most ardent admirer.", false);
                 }
-                Log.Debug("conversation_player_can_open_courtship_on_condition -> True");
                 return true;
             }
             if (Romance.GetRomanticLevel(Hero.MainHero, createdHero) == Romance.RomanceLevelEnum.FailedInCompatibility || Romance.GetRomanticLevel(Hero.MainHero, createdHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
@@ -212,17 +207,13 @@ namespace MarryAnyone.CampaignBehaviors
                 {
                     MBTextManager.SetTextVariable("FLIRTATION_LINE", "{=4iTaEZKg}My lady, may you give me another chance to prove myself?", false);
                 }
-                Log.Debug("conversation_player_can_open_courtship_on_condition -> True");
                 return true;
             }
-            KillCharacterAction.ApplyByRemove(createdHero, false, true);
-            Log.Debug("conversation_player_can_open_courtship_on_condition -> False");
             return false;
         }
 
         private void conversation_player_opens_courtship_on_consequence()
         {
-            Log.Debug("conversation_player_opens_courtship_on_consequence");
             Hero? createdHero = GetCreatedHero();
             if (Romance.GetRomanticLevel(Hero.MainHero, createdHero) != Romance.RomanceLevelEnum.FailedInCompatibility && Romance.GetRomanticLevel(Hero.MainHero, createdHero) != Romance.RomanceLevelEnum.FailedInPracticalities)
             {
@@ -235,17 +226,14 @@ namespace MarryAnyone.CampaignBehaviors
             Hero? createdHero = GetCreatedHero();
             if (createdHero is null || !IsCommoner())
             {
-                Log.Debug("conversation_courtship_initial_reaction_on_condition -> False");
                 return false;
             }
             IEnumerable<RomanceReservationDescription> romanceReservations = GetRomanceReservations(createdHero, Hero.MainHero);
             if (Romance.GetRomanticLevel(Hero.MainHero, createdHero) == Romance.RomanceLevelEnum.FailedInPracticalities || Romance.GetRomanticLevel(Hero.MainHero, createdHero) == Romance.RomanceLevelEnum.FailedInCompatibility)
             {
-                Log.Debug("conversation_courtship_initial_reaction_on_condition -> False");
                 return false;
             }
             MBTextManager.SetTextVariable("INITIAL_COURTSHIP_REACTION", Enumerable.Any(romanceReservations, x => x == RomanceReservationDescription.AttractionIAmDrawnToYou) ? "{=WEkjz9tg}Ah! Yes... We are considering offers... Did you have someone in mind?" : "{=KdhnBhZ1}Yes, we are considering offers. These things are not rushed into.", false);
-            Log.Debug("conversation_courtship_initial_reaction_on_condition -> True");
             return true;
         }
 
@@ -254,22 +242,18 @@ namespace MarryAnyone.CampaignBehaviors
             Hero? createdHero = GetCreatedHero();
             if (createdHero is null || !IsCommoner())
             {
-                Log.Debug("conversation_courtship_decline_reaction_to_player_on_condition -> False");
                 return false;
             }
             if (Romance.GetRomanticLevel(Hero.MainHero, createdHero) == Romance.RomanceLevelEnum.FailedInPracticalities)
             {
                 MBTextManager.SetTextVariable("COURTSHIP_DECLINE_REACTION", "{=emLBsWj6}I am terribly sorry. It is practically not possible for us to be married.", false);
-                Log.Debug("conversation_courtship_decline_reaction_to_player_on_condition -> True");
                 return true;
             }
             if (Romance.GetRomanticLevel(Hero.MainHero, createdHero) == Romance.RomanceLevelEnum.FailedInCompatibility)
             {
                 MBTextManager.SetTextVariable("COURTSHIP_DECLINE_REACTION", "{=s7idfhBO}I am terribly sorry. We are not really compatible with each other.", false);
-                Log.Debug("conversation_courtship_decline_reaction_to_player_on_condition -> True");
                 return true;
             }
-            Log.Debug("conversation_courtship_decline_reaction_to_player_on_condition -> False");
             return false;
         }
 
@@ -278,11 +262,9 @@ namespace MarryAnyone.CampaignBehaviors
             Hero? createdHero = GetCreatedHero();
             if (createdHero is null || !IsCommoner())
             {
-                Log.Debug("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition -> False");
                 return false;
             }
             bool result = Hero.MainHero.Spouse is null && createdHero is not null && MarriageCourtshipPossibility(Hero.MainHero, createdHero);
-            Log.Debug("conversation_player_eligible_for_marriage_with_conversation_hero_on_condition -> " + result);
             return result;
         }
 
@@ -291,7 +273,6 @@ namespace MarryAnyone.CampaignBehaviors
             Hero? createdHero = GetCreatedHero();
             if (createdHero is null || !IsCommoner())
             {
-                Log.Debug("conversation_courtship_reaction_to_player_on_condition -> False");
                 return false;
             }
             IEnumerable<RomanceReservationDescription> romanceReservations = GetRomanceReservations(createdHero, Hero.MainHero);
@@ -332,7 +313,6 @@ namespace MarryAnyone.CampaignBehaviors
                     if (Enumerable.Any(romanceReservations, x => x == RomanceReservationDescription.PropertyIWantRealWealth || x == RomanceReservationDescription.PropertyWeNeedToBeComfortable))
                     {
                         MBTextManager.SetTextVariable("INITIAL_COURTSHIP_REACTION_TO_PLAYER", "{=P407baEa}I think you would need to rise considerably in the world before I could consider such a thing...", false);
-                        Log.Debug("conversation_courtship_reaction_to_player_on_condition -> True");
                         return true;
                     }
                 }
@@ -341,7 +321,6 @@ namespace MarryAnyone.CampaignBehaviors
                     if (Enumerable.Any(romanceReservations, x => x == RomanceReservationDescription.PropertyIWantRealWealth))
                     {
                         MBTextManager.SetTextVariable("INITIAL_COURTSHIP_REACTION_TO_PLAYER", "{=gS1noLvf}I do not know whether to find that charming or impertinent...", false);
-                        Log.Debug("conversation_courtship_reaction_to_player_on_condition -> True");
                         return true;
                     }
                 }
@@ -358,7 +337,6 @@ namespace MarryAnyone.CampaignBehaviors
                     MBTextManager.SetTextVariable("INITIAL_COURTSHIP_REACTION_TO_PLAYER", "{=VYmQmqIv}We are considering many offers. You may certainly add your name to the list.", false);
                 }
             }
-            Log.Debug("conversation_courtship_reaction_to_player_on_condition -> True");
             return true;
         }
 
@@ -371,10 +349,8 @@ namespace MarryAnyone.CampaignBehaviors
             }
             if (PlayerEncounter.Current is not null)
             {
-                Log.Debug("Leave Encounter");
                 PlayerEncounter.LeaveEncounter = true;
             }
-            Log.Debug("courtship_conversation_leave_on_consequence");
         }
 
         protected void AddDialogs(CampaignGameStarter starter)
