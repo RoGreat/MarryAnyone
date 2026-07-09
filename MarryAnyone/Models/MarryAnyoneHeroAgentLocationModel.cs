@@ -1,10 +1,7 @@
-using System.Collections.Generic;
-
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem.Settlements;
 using TaleWorlds.CampaignSystem.Settlements.Locations;
-using TaleWorlds.Core;
 
 namespace MarryAnyone.Models
 {
@@ -22,6 +19,7 @@ namespace MarryAnyone.Models
             heroLocationDetail = HeroLocationDetail.None;
             if (hero.Occupation == Occupation.Special)
             {
+                heroLocationDetail = HeroLocationDetail.Wanderer;
                 return settlement.LocationComplex.GetLocationWithId("tavern");
             }
             return _previousModel?.GetLocationForHero(hero, settlement, out heroLocationDetail) ?? null!;

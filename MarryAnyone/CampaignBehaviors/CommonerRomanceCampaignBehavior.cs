@@ -215,6 +215,7 @@ namespace MarryAnyone.CampaignBehaviors
                 Log.Debug("conversation_player_can_open_courtship_on_condition -> True");
                 return true;
             }
+            KillCharacterAction.ApplyByRemove(createdHero, false, true);
             Log.Debug("conversation_player_can_open_courtship_on_condition -> False");
             return false;
         }
