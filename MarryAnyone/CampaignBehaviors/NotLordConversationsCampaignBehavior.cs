@@ -20,7 +20,7 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
-            AddDialogs(campaignGameStarter);
+            AddDialogs(campaignGameStarter, CampaignBehaviorConversationsDialog);
         }
 
         private bool conversation_hero_main_options_discussions()
@@ -38,39 +38,41 @@ namespace MarryAnyone.CampaignBehaviors
             return true;
         }
 
-        protected void AddDialogs(CampaignGameStarter starter)
+        public delegate void CampaignBehaviorDialog(CampaignGameStarter starter, string input, string output = "close_window");
+
+        public void AddDialogs(CampaignGameStarter starter, CampaignBehaviorDialog dialog)
         {
             // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignBehaviors
             // CaravansCampaignBehavior: Hero.IsPlayerCompanion, Clan; MobileParty.IsCaravan
-            CampaignBehaviorConversationsDialog(starter, "caravan_companion_talk_start_reply", "lord_pretalk");
-            CampaignBehaviorConversationsDialog(starter, "caravan_talk", "caravan_pretalk");
+            dialog(starter, "caravan_companion_talk_start_reply", "lord_pretalk");
+            dialog(starter, "caravan_talk", "caravan_pretalk");
             // CompanionRolesCampaignBehavior: Clan
-            CampaignBehaviorConversationsDialog(starter, "hero_main_options", "companion_okay");
+            dialog(starter, "hero_main_options", "companion_okay");
             // CraftingCampaignBehavior: Occupation.Blacksmith
-            CampaignBehaviorConversationsDialog(starter, "blacksmith_player", "player_blacksmith_after_craft");
+            dialog(starter, "blacksmith_player", "player_blacksmith_after_craft");
             // WorkshopsCharactersCampaignBehavior: Occupation.ShopWorker
-            CampaignBehaviorConversationsDialog(starter, "shopworker_npc_player", "start_2");
+            dialog(starter, "shopworker_npc_player", "start_2");
 
             // Modules\SandBox\bin\...\SandBox.dll -> CampaignBehaviors
             // AlleyCampaignBehavior: Occupation.Gangster
-            CampaignBehaviorConversationsDialog(starter, "alley_talk_start", "alley_options");
+            dialog(starter, "alley_talk_start", "alley_options");
             // ArenaMasterCampaignBehavior: Occupation.ArenaMaster
-            CampaignBehaviorConversationsDialog(starter, "arena_master_talk", "arena_master_pre_talk");
+            dialog(starter, "arena_master_talk", "arena_master_pre_talk");
             // BarberCampaignBehavior: CultureObject.Barber
-            CampaignBehaviorConversationsDialog(starter, "barber_question1", "no_haircut_conversation_token");
+            dialog(starter, "barber_question1", "no_haircut_conversation_token");
             // BoardGameCampaignBehavior: Occupation.TavernGameHost
-            CampaignBehaviorConversationsDialog(starter, "taverngamehost_talk");
+            dialog(starter, "taverngamehost_talk");
             // CommonVillagersCampaignBehavior: Occupation.Villager, Occupation.Townsfolk
-            CampaignBehaviorConversationsDialog(starter, "town_or_village_player", "town_or_village_pretalk");
+            dialog(starter, "town_or_village_player", "town_or_village_pretalk");
             // GuardsCampaignBehavior: Occupation.PrisonGuard
-            CampaignBehaviorConversationsDialog(starter, "prison_guard_talk");
+            dialog(starter, "prison_guard_talk");
             // TavernEmployeesCampaignBehavior: Occupation.RansomBroker, Occupation.Musician, Occupation.Tavernkeeper, Occupation.TavernWench
-            CampaignBehaviorConversationsDialog(starter, "ransom_broker_talk", "ransom_broker_pretalk");
-            CampaignBehaviorConversationsDialog(starter, "talk_bard_player");
-            CampaignBehaviorConversationsDialog(starter, "tavernkeeper_talk", "tavernkeeper_pretalk");
-            CampaignBehaviorConversationsDialog(starter, "tavernmaid_talk");
+            dialog(starter, "ransom_broker_talk", "ransom_broker_pretalk");
+            dialog(starter, "talk_bard_player");
+            dialog(starter, "tavernkeeper_talk", "tavernkeeper_pretalk");
+            dialog(starter, "tavernmaid_talk");
             // TradersCampaignBehavior: Occupation.Weaponsmith, Occupation.Armorer, Occupation.HorseTrader, Occupation.Blacksmith
-            CampaignBehaviorConversationsDialog(starter, "weaponsmith_talk_player", "merchant_response_3");
+            dialog(starter, "weaponsmith_talk_player", "merchant_response_3");
         }
 
         private void CampaignBehaviorConversationsDialog(CampaignGameStarter starter, string input, string output = "close_window")

@@ -34,7 +34,8 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
-            AddDialogs(campaignGameStarter);
+            NotLordConversationsCampaignBehavior notLordConversationsCampaignBehavior = Campaign.Current.CampaignBehaviorManager.GetBehavior<NotLordConversationsCampaignBehavior>();
+            notLordConversationsCampaignBehavior.AddDialogs(campaignGameStarter, CampaignBehaviorRomanceDialog);
         }
 
         private static bool MarriageCourtshipPossibility(Hero person1, Hero person2)
@@ -138,7 +139,6 @@ namespace MarryAnyone.CampaignBehaviors
                 createdHero.SetHasMet();
                 _createdHeroes.Add(conversationAgent, createdHero);
             }
-
             if (createdHero is null)
             {
                 return false;
@@ -311,41 +311,6 @@ namespace MarryAnyone.CampaignBehaviors
             {
                 PlayerEncounter.LeaveEncounter = true;
             }
-        }
-
-        protected void AddDialogs(CampaignGameStarter starter)
-        {
-            // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignBehaviors
-            // CaravansCampaignBehavior: Hero.IsPlayerCompanion, Clan; MobileParty.IsCaravan
-            CampaignBehaviorRomanceDialog(starter, "caravan_companion_talk_start_reply", "lord_pretalk");
-            CampaignBehaviorRomanceDialog(starter, "caravan_talk", "caravan_pretalk");
-            // CompanionRolesCampaignBehavior: Clan
-            CampaignBehaviorRomanceDialog(starter, "hero_main_options", "companion_okay");
-            // CraftingCampaignBehavior: Occupation.Blacksmith
-            CampaignBehaviorRomanceDialog(starter, "blacksmith_player", "player_blacksmith_after_craft");
-            // WorkshopsCharactersCampaignBehavior: Occupation.ShopWorker
-            CampaignBehaviorRomanceDialog(starter, "shopworker_npc_player", "start_2");
-
-            // Modules\SandBox\bin\...\SandBox.dll -> CampaignBehaviors
-            // AlleyCampaignBehavior: Occupation.Gangster
-            CampaignBehaviorRomanceDialog(starter, "alley_talk_start", "alley_options");
-            // ArenaMasterCampaignBehavior: Occupation.ArenaMaster
-            CampaignBehaviorRomanceDialog(starter, "arena_master_talk", "arena_master_pre_talk");
-            // BarberCampaignBehavior: CultureObject.Barber
-            CampaignBehaviorRomanceDialog(starter, "barber_question1", "no_haircut_conversation_token");
-            // BoardGameCampaignBehavior: Occupation.TavernGameHost
-            CampaignBehaviorRomanceDialog(starter, "taverngamehost_talk");
-            // CommonVillagersCampaignBehavior: Occupation.Villager, Occupation.Townsfolk
-            CampaignBehaviorRomanceDialog(starter, "town_or_village_player", "town_or_village_pretalk");
-            // GuardsCampaignBehavior: Occupation.PrisonGuard
-            CampaignBehaviorRomanceDialog(starter, "prison_guard_talk");
-            // TavernEmployeesCampaignBehavior: Occupation.RansomBroker, Occupation.Musician, Occupation.Tavernkeeper, Occupation.TavernWench
-            CampaignBehaviorRomanceDialog(starter, "ransom_broker_talk", "ransom_broker_pretalk");
-            CampaignBehaviorRomanceDialog(starter, "talk_bard_player");
-            CampaignBehaviorRomanceDialog(starter, "tavernkeeper_talk", "tavernkeeper_pretalk");
-            CampaignBehaviorRomanceDialog(starter, "tavernmaid_talk");
-            // TradersCampaignBehavior: Occupation.Weaponsmith, Occupation.Armorer, Occupation.HorseTrader, Occupation.Blacksmith
-            CampaignBehaviorRomanceDialog(starter, "weaponsmith_talk_player", "merchant_response_3");
         }
 
         private void CampaignBehaviorRomanceDialog(CampaignGameStarter starter, string input, string output = "close_window")
