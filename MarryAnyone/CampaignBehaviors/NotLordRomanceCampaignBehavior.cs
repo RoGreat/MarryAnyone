@@ -350,10 +350,6 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void CampaignBehaviorRomanceDialog(CampaignGameStarter starter, string input, string output = "close_window")
         {
-            // bin\...\\TaleWorlds.CampaignSystem.dll -> CampaignBehaviors.LordConversationsCampaignBehavior
-            starter.AddPlayerLine(input + "main_option_discussions_3", input, input + "lord_politics_request", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_hero_main_options_discussions), null, 100, null, null);
-            starter.AddDialogLine(input + "lord_politics_request", input + "lord_politics_request", input + "lord_talk_speak_diplomacy_2", "{=!}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_lord_agrees_to_discussion_on_condition), null, 100, null);
-            starter.AddPlayerLine(input + "hero_special_request", input + "lord_talk_speak_diplomacy_2", output, "{=PznWhAdU}Actually, never mind.", null, null, 1, null, null);
             // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignBehaviors.RomanceCampaignBehavior
             starter.AddPlayerLine(input + "lord_special_request_flirt", input + "lord_talk_speak_diplomacy_2", input + "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(conversation_player_can_open_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
             starter.AddDialogLine(input + "lord_start_courtship_response", input + "lord_start_courtship_response", input + "lord_start_courtship_response_player_offer", "{=!}{INITIAL_COURTSHIP_REACTION}", new ConversationSentence.OnConditionDelegate(conversation_courtship_initial_reaction_on_condition), null, 100, null);
@@ -363,21 +359,6 @@ namespace MarryAnyone.CampaignBehaviors
             starter.AddPlayerLine(input + "lord_start_courtship_response_player_offer_nevermind", input + "lord_start_courtship_response_player_offer", output, "{=D33fIGQe}Never mind.", null, null, 120, null, null);
             starter.AddDialogLine(input + "lord_start_courtship_response_2", input + "lord_start_courtship_response_2", input + "lord_start_courtship_response_3", "{=!}{INITIAL_COURTSHIP_REACTION_TO_PLAYER}", new ConversationSentence.OnConditionDelegate(conversation_courtship_reaction_to_player_on_condition), null, 100, null);
             starter.AddDialogLine(input + "lord_start_courtship_response_3", input + "lord_start_courtship_response_3", "close_window", "{=YHZsHohq}We meet from time to time, as is the custom, to see if we are right for each other. I hope to see you again soon.", null, new ConversationSentence.OnConsequenceDelegate(courtship_conversation_leave_on_consequence), 100, null);
-        }
-
-        private bool conversation_hero_main_options_discussions()
-        {
-            if (Hero.OneToOneConversationHero is not null && Hero.OneToOneConversationHero.IsLord)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        private bool conversation_lord_agrees_to_discussion_on_condition()
-        {
-            MBTextManager.SetTextVariable("STR_INTRIGUE_AGREEMENT", Campaign.Current.ConversationManager.FindMatchingTextOrNull("str_lord_intrigue_accept", CharacterObject.OneToOneConversationCharacter), false);
-            return true;
         }
 
         private enum RomanceReservationDescription

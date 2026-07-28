@@ -3,8 +3,6 @@
 using MarryAnyone.CampaignBehaviors;
 using MarryAnyone.Models;
 
-using System.Linq;
-
 using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.Core;
@@ -30,11 +28,13 @@ namespace MarryAnyone
             {
                 CampaignGameStarter gameStarter = (CampaignGameStarter)gameStarterObject;
 
-                MarriageModel? currentMarriageModel = GetGameModel<MarriageModel>(gameStarter);
+                MarriageModel? currentMarriageModel = gameStarter.GetModel<MarriageModel>();
                 gameStarter.AddModel(new MarryAnyoneMarriageModel(currentMarriageModel));
 
                 if (Settings.Instance!.EnableNotLordRomance)
                 {
+                    gameStarter.RemoveBehaviors<NotLordConversationsCampaignBehavior>();
+                    gameStarter.AddBehavior(new NotLordConversationsCampaignBehavior());
                     gameStarter.AddBehavior(new NotLordRomanceCampaignBehavior());
                 }
 
@@ -43,18 +43,6 @@ namespace MarryAnyone
                     gameStarter.AddBehavior(new LeaderRomanceCampaignBehavior());
                 }
             }
-        }
-
-        private static T? GetGameModel<T>(IGameStarter gameStarterObject) where T : GameModel
-        {
-            var models = gameStarterObject.Models.ToArray();
-
-            for (int index = models.Length - 1; index >= 0; --index)
-            {
-                if (models[index] is T gameModel1)
-                    return gameModel1;
-            }
-            return default;
         }
     }
 }
