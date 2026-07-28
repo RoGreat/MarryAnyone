@@ -3,6 +3,7 @@ using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone.CampaignBehaviors
 {
+    // bin\...\\TaleWorlds.CampaignSystem.dll -> CampaignBehaviors.LordConversationsCampaignBehavior
     internal class LeaderRomanceCampaignBehavior : CampaignBehaviorBase
     {
         public LeaderRomanceCampaignBehavior()

@@ -10,22 +10,22 @@ using TaleWorlds.CampaignSystem.CharacterDevelopment;
 using TaleWorlds.CampaignSystem.Conversation;
 using TaleWorlds.CampaignSystem.Conversation.Tags;
 using TaleWorlds.CampaignSystem.Encounters;
-using TaleWorlds.CampaignSystem.Settlements;
-using TaleWorlds.Core;
 using TaleWorlds.Localization;
 using TaleWorlds.MountAndBlade;
+using MarryAnyone.Helpers;
 
 namespace MarryAnyone.CampaignBehaviors
 {
+    // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignBehaviors.RomanceCampaignBehavior
     internal class NotLordRomanceCampaignBehavior : CampaignBehaviorBase
     {
         private readonly List<Agent> _courtedAgents = new();
 
-        private readonly Dictionary<Agent, Hero> _createdHeroes = new();
-
         public NotLordRomanceCampaignBehavior() { }
 
         public override void SyncData(IDataStore dataStore) { }
+
+        public NotLordConversationsCampaignBehavior? NotLordConversationsCampaignBehavior;
 
         public override void RegisterEvents()
         {
@@ -34,8 +34,8 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void OnSessionLaunched(CampaignGameStarter campaignGameStarter)
         {
-            NotLordConversationsCampaignBehavior notLordConversationsCampaignBehavior = Campaign.Current.CampaignBehaviorManager.GetBehavior<NotLordConversationsCampaignBehavior>();
-            notLordConversationsCampaignBehavior.AddDialogs(campaignGameStarter, CampaignBehaviorRomanceDialog);
+            NotLordConversationsCampaignBehavior = Campaign.Current.CampaignBehaviorManager.GetBehavior<NotLordConversationsCampaignBehavior>();
+            NotLordConversationsCampaignBehavior.AddDialogs(campaignGameStarter, CampaignBehaviorRomanceDialog);
         }
 
         private static bool MarriageCourtshipPossibility(Hero person1, Hero person2)
@@ -45,7 +45,7 @@ namespace MarryAnyone.CampaignBehaviors
 
         private IEnumerable<RomanceReservationDescription> GetRomanceReservations(Hero wooed, Hero wooer)
         {
-            Hero? createdHero = GetCreatedHero();
+            Hero? createdHero = MarryAnyoneHelper.GetCreatedHero(NotLordConversationsCampaignBehavior!.createdHeroes);
             List<RomanceReservationDescription> list = new();
             bool flag = wooed.GetTraitLevel(DefaultTraits.Honor) + wooed.GetTraitLevel(DefaultTraits.Mercy) > 0;
             bool flag4 = wooed.GetTraitLevel(DefaultTraits.Valor) - wooed.GetTraitLevel(DefaultTraits.Calculating) > 0 && wooed.GetTraitLevel(DefaultTraits.Mercy) <= 0;
@@ -83,62 +83,16 @@ namespace MarryAnyone.CampaignBehaviors
             return list;
         }
 
-        private Hero? GetCreatedHero()
-        {
-            Agent? agent = GetConversationAgent();
-            if (agent is null)
-            {
-                return null;
-            }
-            _createdHeroes.TryGetValue(agent, out Hero? createdHero);
-            return createdHero;
-        }
-
-        private static bool IsNotLord()
-        {
-            Agent? agent = GetConversationAgent();
-            if (agent is null)
-            {
-                return false;
-            }
-            if (((CharacterObject)agent.Character).Occupation != Occupation.Lord)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private static Agent? GetConversationAgent()
-        {
-            return Campaign.Current.ConversationManager.OneToOneConversationAgent as Agent;
-        }
-
         private bool conversation_player_can_open_courtship_on_condition()
         {
             // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignCheats.CreateRandomClan
-            Agent? conversationAgent = GetConversationAgent();
-            if (conversationAgent is null || !IsNotLord() || _courtedAgents.Contains(conversationAgent))
+            Agent? conversationAgent = MarryAnyoneHelper.GetConversationAgent();
+            if (conversationAgent is null || !MarryAnyoneHelper.IsNotLord() || _courtedAgents.Contains(conversationAgent))
             {
                 return false;
             }
 
-            Hero? createdHero = GetCreatedHero();
-            if (!conversationAgent.IsHero && createdHero is null && !_createdHeroes.ContainsKey(conversationAgent))
-            {
-                Settlement settlement = Hero.MainHero.CurrentSettlement;
-                CharacterObject characterObject = (CharacterObject)conversationAgent.Character;
-                createdHero = HeroCreator.CreateSpecialHero(characterObject, settlement, null, null, (int)conversationAgent.Age);
-                createdHero.StaticBodyProperties = conversationAgent.BodyPropertiesValue.StaticProperties;
-                createdHero.Weight = conversationAgent.BodyPropertiesValue.DynamicProperties.Weight;
-                createdHero.Build = conversationAgent.BodyPropertiesValue.DynamicProperties.Build;
-                createdHero.HeroDeveloper.InitializeHeroDeveloper();
-                createdHero.SetNewOccupation(Occupation.Wanderer);
-                createdHero.ChangeState(Hero.CharacterStates.Active);
-                EnterSettlementAction.ApplyForCharacterOnly(createdHero, settlement);
-                GiveGoldAction.ApplyBetweenCharacters(null, createdHero, MBRandom.RandomInt(0, 1000), false);
-                createdHero.SetHasMet();
-                _createdHeroes.Add(conversationAgent, createdHero);
-            }
+            Hero? createdHero = MarryAnyoneHelper.GetCreatedHero(NotLordConversationsCampaignBehavior!.createdHeroes);
             if (createdHero is null)
             {
                 return false;
@@ -174,7 +128,7 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void conversation_player_opens_courtship_on_consequence()
         {
-            Hero? createdHero = GetCreatedHero();
+            Hero? createdHero = MarryAnyoneHelper.GetCreatedHero(NotLordConversationsCampaignBehavior!.createdHeroes);
             if (Romance.GetRomanticLevel(Hero.MainHero, createdHero) != Romance.RomanceLevelEnum.FailedInCompatibility && Romance.GetRomanticLevel(Hero.MainHero, createdHero) != Romance.RomanceLevelEnum.FailedInPracticalities)
             {
                 ChangeRomanticStateAction.Apply(Hero.MainHero, createdHero, Romance.RomanceLevelEnum.CourtshipStarted);
@@ -183,8 +137,8 @@ namespace MarryAnyone.CampaignBehaviors
 
         private bool conversation_courtship_initial_reaction_on_condition()
         {
-            Hero? createdHero = GetCreatedHero();
-            if (createdHero is null || !IsNotLord())
+            Hero? createdHero = MarryAnyoneHelper.GetCreatedHero(NotLordConversationsCampaignBehavior!.createdHeroes);
+            if (createdHero is null || !MarryAnyoneHelper.IsNotLord())
             {
                 return false;
             }
@@ -199,8 +153,8 @@ namespace MarryAnyone.CampaignBehaviors
 
         private bool conversation_courtship_decline_reaction_to_player_on_condition()
         {
-            Hero? createdHero = GetCreatedHero();
-            if (createdHero is null || !IsNotLord())
+            Hero? createdHero = MarryAnyoneHelper.GetCreatedHero(NotLordConversationsCampaignBehavior!.createdHeroes);
+            if (createdHero is null || !MarryAnyoneHelper.IsNotLord())
             {
                 return false;
             }
@@ -219,8 +173,8 @@ namespace MarryAnyone.CampaignBehaviors
 
         private bool conversation_player_eligible_for_marriage_with_conversation_hero_on_condition()
         {
-            Hero? createdHero = GetCreatedHero();
-            if (createdHero is null || !IsNotLord())
+            Hero? createdHero = MarryAnyoneHelper.GetCreatedHero(NotLordConversationsCampaignBehavior!.createdHeroes);
+            if (createdHero is null || !MarryAnyoneHelper.IsNotLord())
             {
                 return false;
             }
@@ -230,8 +184,8 @@ namespace MarryAnyone.CampaignBehaviors
 
         private bool conversation_courtship_reaction_to_player_on_condition()
         {
-            Hero? createdHero = GetCreatedHero();
-            if (createdHero is null || !IsNotLord())
+            Hero? createdHero = MarryAnyoneHelper.GetCreatedHero(NotLordConversationsCampaignBehavior!.createdHeroes);
+            if (createdHero is null || !MarryAnyoneHelper.IsNotLord())
             {
                 return false;
             }
@@ -302,7 +256,7 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void courtship_conversation_leave_on_consequence()
         {
-            Agent? conversationAgent = GetConversationAgent();
+            Agent? conversationAgent = MarryAnyoneHelper.GetConversationAgent();
             if (conversationAgent is not null)
             {
                 _courtedAgents.Add(conversationAgent);
@@ -315,7 +269,6 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void CampaignBehaviorRomanceDialog(CampaignGameStarter starter, string input, string output = "close_window")
         {
-            // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignBehaviors.RomanceCampaignBehavior
             starter.AddPlayerLine(input + "lord_special_request_flirt", input + "lord_talk_speak_diplomacy_2", input + "lord_start_courtship_response", "{=!}{FLIRTATION_LINE}", new ConversationSentence.OnConditionDelegate(conversation_player_can_open_courtship_on_condition), new ConversationSentence.OnConsequenceDelegate(conversation_player_opens_courtship_on_consequence), 100, null, null);
             starter.AddDialogLine(input + "lord_start_courtship_response", input + "lord_start_courtship_response", input + "lord_start_courtship_response_player_offer", "{=!}{INITIAL_COURTSHIP_REACTION}", new ConversationSentence.OnConditionDelegate(conversation_courtship_initial_reaction_on_condition), null, 100, null);
             starter.AddDialogLine(input + "lord_start_courtship_response_decline", input + "lord_start_courtship_response", output, "{=!}{COURTSHIP_DECLINE_REACTION}", new ConversationSentence.OnConditionDelegate(conversation_courtship_decline_reaction_to_player_on_condition), null, 100, null);

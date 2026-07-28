@@ -1,14 +1,21 @@
+using MarryAnyone.Helpers;
+
 using System;
+using System.Collections.Generic;
 
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.Conversation;
+using TaleWorlds.CampaignSystem.Settlements;
+using TaleWorlds.Core;
 using TaleWorlds.Localization;
+using TaleWorlds.MountAndBlade;
 
 namespace MarryAnyone.CampaignBehaviors
 {
+    // bin\...\\TaleWorlds.CampaignSystem.dll -> CampaignBehaviors.LordConversationsCampaignBehavior
     internal class NotLordConversationsCampaignBehavior : CampaignBehaviorBase
     {
-
         public NotLordConversationsCampaignBehavior() { }
 
         public override void SyncData(IDataStore dataStore) { }
@@ -25,16 +32,37 @@ namespace MarryAnyone.CampaignBehaviors
 
         private bool conversation_hero_main_options_discussions()
         {
-            if (Hero.OneToOneConversationHero is not null && Hero.OneToOneConversationHero.IsLord)
-            {
-                return false;
-            }
-            return true;
+            return MarryAnyoneHelper.IsNotLord();
         }
+
+        public readonly Dictionary<Agent, Hero> createdHeroes = new();
 
         private bool conversation_lord_agrees_to_discussion_on_condition()
         {
             MBTextManager.SetTextVariable("STR_INTRIGUE_AGREEMENT", Campaign.Current.ConversationManager.FindMatchingTextOrNull("str_lord_intrigue_accept", CharacterObject.OneToOneConversationCharacter), false);
+            Agent? conversationAgent = MarryAnyoneHelper.GetConversationAgent();
+            if (conversationAgent is null || !MarryAnyoneHelper.IsNotLord())
+            {
+                return true;
+            }
+            Hero? createdHero = MarryAnyoneHelper.GetCreatedHero(createdHeroes);
+            if (!conversationAgent.IsHero && createdHero is null && !createdHeroes.ContainsKey(conversationAgent))
+            {
+                // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignCheats.CreateRandomClan
+                Settlement settlement = Hero.MainHero.CurrentSettlement;
+                CharacterObject characterObject = (CharacterObject)conversationAgent.Character;
+                createdHero = HeroCreator.CreateSpecialHero(characterObject, settlement, null, null, (int)conversationAgent.Age);
+                createdHero.StaticBodyProperties = conversationAgent.BodyPropertiesValue.StaticProperties;
+                createdHero.Weight = conversationAgent.BodyPropertiesValue.DynamicProperties.Weight;
+                createdHero.Build = conversationAgent.BodyPropertiesValue.DynamicProperties.Build;
+                createdHero.HeroDeveloper.InitializeHeroDeveloper();
+                createdHero.SetNewOccupation(Occupation.Wanderer);
+                createdHero.ChangeState(Hero.CharacterStates.Active);
+                EnterSettlementAction.ApplyForCharacterOnly(createdHero, settlement);
+                GiveGoldAction.ApplyBetweenCharacters(null, createdHero, MBRandom.RandomInt(0, 1000), false);
+                createdHero.SetHasMet();
+                createdHeroes.Add(conversationAgent, createdHero);
+            }
             return true;
         }
 
@@ -77,7 +105,6 @@ namespace MarryAnyone.CampaignBehaviors
 
         private void CampaignBehaviorConversationsDialog(CampaignGameStarter starter, string input, string output = "close_window")
         {
-            // bin\...\\TaleWorlds.CampaignSystem.dll -> CampaignBehaviors.LordConversationsCampaignBehavior
             starter.AddPlayerLine(input + "main_option_discussions_3", input, input + "lord_politics_request", "{=lord_conversations_343}There is something I'd like to discuss.", new ConversationSentence.OnConditionDelegate(conversation_hero_main_options_discussions), null, 100, null, null);
             starter.AddDialogLine(input + "lord_politics_request", input + "lord_politics_request", input + "lord_talk_speak_diplomacy_2", "{=!}{STR_INTRIGUE_AGREEMENT}", new ConversationSentence.OnConditionDelegate(conversation_lord_agrees_to_discussion_on_condition), null, 100, null);
             starter.AddPlayerLine(input + "hero_special_request", input + "lord_talk_speak_diplomacy_2", output, "{=PznWhAdU}Actually, never mind.", null, null, 1, null, null);
