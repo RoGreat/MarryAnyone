@@ -4,7 +4,7 @@ using TaleWorlds.MountAndBlade;
 
 namespace MarryAnyone.Helpers
 {
-    public static class MarryAnyoneHelper
+    public static class NotLordHelper
     {
         public static Agent? GetConversationAgent()
         {

@@ -32,7 +32,7 @@ namespace MarryAnyone.CampaignBehaviors
 
         private bool conversation_hero_main_options_discussions()
         {
-            return MarryAnyoneHelper.IsNotLord();
+            return NotLordHelper.IsNotLord();
         }
 
         public readonly Dictionary<Agent, Hero> createdHeroes = new();
@@ -40,12 +40,12 @@ namespace MarryAnyone.CampaignBehaviors
         private bool conversation_lord_agrees_to_discussion_on_condition()
         {
             MBTextManager.SetTextVariable("STR_INTRIGUE_AGREEMENT", Campaign.Current.ConversationManager.FindMatchingTextOrNull("str_lord_intrigue_accept", CharacterObject.OneToOneConversationCharacter), false);
-            Agent? conversationAgent = MarryAnyoneHelper.GetConversationAgent();
-            if (conversationAgent is null || !MarryAnyoneHelper.IsNotLord())
+            Agent? conversationAgent = NotLordHelper.GetConversationAgent();
+            if (conversationAgent is null || !NotLordHelper.IsNotLord())
             {
                 return true;
             }
-            Hero? createdHero = MarryAnyoneHelper.GetCreatedHero(createdHeroes);
+            Hero? createdHero = NotLordHelper.GetCreatedHero(createdHeroes);
             if (!conversationAgent.IsHero && createdHero is null && !createdHeroes.ContainsKey(conversationAgent))
             {
                 // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignCheats.CreateRandomClan
