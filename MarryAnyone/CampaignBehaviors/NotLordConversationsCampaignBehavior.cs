@@ -35,7 +35,7 @@ namespace MarryAnyone.CampaignBehaviors
             return NotLordHelper.IsNotLord();
         }
 
-        public readonly Dictionary<Agent, Hero> createdHeroes = new();
+        public readonly Dictionary<Agent, Hero> CreatedHeroes = new();
 
         private bool conversation_lord_agrees_to_discussion_on_condition()
         {
@@ -45,8 +45,8 @@ namespace MarryAnyone.CampaignBehaviors
             {
                 return true;
             }
-            Hero? createdHero = NotLordHelper.GetCreatedHero(createdHeroes);
-            if (!conversationAgent.IsHero && createdHero is null && !createdHeroes.ContainsKey(conversationAgent))
+            Hero? createdHero = NotLordHelper.GetCreatedHero(CreatedHeroes);
+            if (!conversationAgent.IsHero && createdHero is null && !CreatedHeroes.ContainsKey(conversationAgent))
             {
                 // bin\...\TaleWorlds.CampaignSystem.dll -> CampaignCheats.CreateRandomClan
                 Settlement settlement = Hero.MainHero.CurrentSettlement;
@@ -61,7 +61,7 @@ namespace MarryAnyone.CampaignBehaviors
                 EnterSettlementAction.ApplyForCharacterOnly(createdHero, settlement);
                 GiveGoldAction.ApplyBetweenCharacters(null, createdHero, MBRandom.RandomInt(0, 1000), false);
                 createdHero.SetHasMet();
-                createdHeroes.Add(conversationAgent, createdHero);
+                CreatedHeroes.Add(conversationAgent, createdHero);
             }
             return true;
         }

@@ -1,4 +1,5 @@
 using System;
+
 using TaleWorlds.CampaignSystem;
 
 namespace MarryAnyone.CampaignBehaviors
