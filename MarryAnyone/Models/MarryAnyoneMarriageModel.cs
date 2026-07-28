@@ -80,7 +80,7 @@ namespace MarryAnyone.Models
             {
                 return false;
             }
-            if (!Settings.Instance!.EnableCommonerRomance)
+            if (!Settings.Instance!.EnableNotLordRomance)
             {
                 if (!maidenOrSuitor.IsLord || maidenOrSuitor.IsMinorFactionHero || maidenOrSuitor.IsNotable)
                 {

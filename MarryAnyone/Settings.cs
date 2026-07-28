@@ -12,10 +12,10 @@ namespace MarryAnyone
         public override string FolderName => "MarryAnyone";
         public override string FormatType => "json2";
 
-        [SettingPropertyBool(displayName: "{=bbbbbbb}commoner", Order = 0, RequireRestart = true, HintText = "{=cccccc}")]
-        public bool EnableCommonerRomance { get; set; } = true;
+        [SettingPropertyBool(displayName: "{=bbbbbbb}not lord", Order = 0, RequireRestart = false, HintText = "{=cccccc}")]
+        public bool EnableNotLordRomance { get; set; } = true;
 
-        [SettingPropertyBool(displayName: "{=ddddddd}lord", Order = 10, RequireRestart = true, HintText = "{=eeeeee}")]
+        [SettingPropertyBool(displayName: "{=ddddddd}leader", Order = 10, RequireRestart = false, HintText = "{=eeeeee}")]
         public bool EnableLeaderRomance { get; set; } = true;
     }
 }
