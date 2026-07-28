@@ -1,11 +1,10 @@
-using Helpers;
-
 using MarryAnyone.Helpers;
 
 using System.Collections.Generic;
 using System.Linq;
 using System;
 
+using Helpers;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Actions;
 using TaleWorlds.CampaignSystem.CharacterDevelopment;
@@ -23,13 +22,13 @@ namespace MarryAnyone.CampaignBehaviors
         // TODO: patch conversation_finalize_courtship_for_hero_on_condition
         // we are going full patch mode so we don't have to deal with gross clan colors
 
+        private NotLordConversationsCampaignBehavior? NotLordConversationsCampaignBehavior;
+
         private readonly List<Agent> _courtedAgents = new();
 
         public NotLordRomanceCampaignBehavior() { }
 
         public override void SyncData(IDataStore dataStore) { }
-
-        public NotLordConversationsCampaignBehavior? NotLordConversationsCampaignBehavior;
 
         public override void RegisterEvents()
         {
@@ -40,11 +39,6 @@ namespace MarryAnyone.CampaignBehaviors
         {
             NotLordConversationsCampaignBehavior = Campaign.Current.CampaignBehaviorManager.GetBehavior<NotLordConversationsCampaignBehavior>();
             NotLordConversationsCampaignBehavior.AddDialogs(campaignGameStarter, CampaignBehaviorRomanceDialog);
-        }
-
-        private static bool MarriageCourtshipPossibility(Hero person1, Hero person2)
-        {
-            return Campaign.Current.Models.MarriageModel.IsCoupleSuitableForMarriage(person1, person2) && !FactionManager.IsAtWarAgainstFaction(person1.MapFaction, person2.MapFaction);
         }
 
         private IEnumerable<RomanceReservationDescription> GetRomanceReservations(Hero wooed, Hero wooer)
@@ -96,7 +90,7 @@ namespace MarryAnyone.CampaignBehaviors
             }
 
             StringHelpers.SetCharacterProperties("HERO", createdHero.CharacterObject, null, false);
-            if (MarriageCourtshipPossibility(Hero.MainHero, createdHero) && Romance.GetRomanticLevel(Hero.MainHero, createdHero) == Romance.RomanceLevelEnum.Untested)
+            if (NotLordHelper.MarriageCourtshipPossibility(Hero.MainHero, createdHero) && Romance.GetRomanticLevel(Hero.MainHero, createdHero) == Romance.RomanceLevelEnum.Untested)
             {
                 if (Hero.MainHero.IsFemale)
                 {
@@ -178,7 +172,7 @@ namespace MarryAnyone.CampaignBehaviors
                 return false;
             }
 
-            bool result = Hero.MainHero.Spouse is null && createdHero is not null && MarriageCourtshipPossibility(Hero.MainHero, createdHero);
+            bool result = Hero.MainHero.Spouse is null && createdHero is not null && NotLordHelper.MarriageCourtshipPossibility(Hero.MainHero, createdHero);
             return result;
         }
 

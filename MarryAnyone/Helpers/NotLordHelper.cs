@@ -6,6 +6,11 @@ namespace MarryAnyone.Helpers
 {
     public static class NotLordHelper
     {
+        public static bool MarriageCourtshipPossibility(Hero person1, Hero person2)
+        {
+            return Campaign.Current.Models.MarriageModel.IsCoupleSuitableForMarriage(person1, person2) && !FactionManager.IsAtWarAgainstFaction(person1.MapFaction, person2.MapFaction);
+        }
+
         public static Agent? GetConversationAgent()
         {
             return Campaign.Current.ConversationManager.OneToOneConversationAgent as Agent;
